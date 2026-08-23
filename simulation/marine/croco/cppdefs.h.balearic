@@ -1,0 +1,56 @@
+/*
+** cppdefs.h.balearic - CROCO Compile-Time Configuration for Balearic 1 km Grid
+*/
+
+#define REGIONAL
+#undef BASIN
+
+/* Grid Configuration */
+#define SPHERICAL
+#define CURVILINEAR
+#define MASKING
+#define SOLVE3D
+
+/* Equation of State & Physics */
+#define NONLIN_EOS
+#define SALINITY
+
+/* Lateral Boundary Conditions - Open Boundaries on All 4 Sides */
+#define OBC_EAST
+#define OBC_WEST
+#define OBC_NORTH
+#define OBC_SOUTH
+
+/* Boundary Condition Types (Radiation & Nudging) */
+#define OBC_M2CHARACT
+#define OBC_M3ORLANSKI
+#define OBC_TORLANSKI
+
+/* Boundary Forcing Sources */
+#define CLIMATOLOGY
+#define ZCLM_NUDGING
+#define M2CLM_NUDGING
+#define M3CLM_NUDGING
+#define TCLM_NUDGING
+
+/* Vertical Mixing Closure */
+#define LMD_MIXING
+#ifdef LMD_MIXING
+# define LMD_RIMIX
+# define LMD_CONVEC
+# define LMD_NONLOCAL
+#endif
+
+/* Vertical Advection & Drag & Boundary Sponge */
+#define SPLINES_VDIFF
+#define SPLINES_VDIFF_TRACER
+#define UV_LOGDRAG
+#define SPONGE_GRID
+
+/* Surface Forcing & Heat Fluxes */
+#define BULK_FLUX
+#ifdef BULK_FLUX
+# define SOLAR_PENETRATION
+# define MERRA_AEROSOL
+# define ONLINE
+#endif

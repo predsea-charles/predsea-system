@@ -1,0 +1,479 @@
+
+SPECTRUM %  XFR        =     1.10
+SPECTRUM %  FREQ1      =     0.04
+SPECTRUM %  NK         =       32
+SPECTRUM %  NTH        =       36
+SPECTRUM %  THOFF      =     0.00
+
+RUN %  FLDRY      = F
+RUN %  FLCX       = T
+RUN %  FLCY       = T
+RUN %  FLCTH      = T
+RUN %  FLCK       = F
+RUN %  FLSOU      = T
+
+TIMESTEPS %  DTMAX      =   142.60
+TIMESTEPS %  DTXY       =    47.50
+TIMESTEPS %  DTKTH      =    14.30
+TIMESTEPS %  DTMIN      =    10.00
+
+GRID %  NAME       = ALBORAN_1KM
+GRID %  NML        = namelists.nml
+GRID %  TYPE       = RECT
+GRID %  COORD      = SPHE
+GRID %  CLOS       = NONE
+GRID %  ZLIM       =    -0.10
+GRID %  DMIN       =     2.50
+
+RECT %  NX         =      556
+RECT %  NY         =      279
+RECT %  SX         =         0.01
+RECT %  SY         =         0.01
+RECT %  SF         =         1.00
+RECT %  X0         =        -6.00
+RECT %  Y0         =        35.00
+RECT %  SF0        =         1.00
+
+CURV %  NX                 =        0
+CURV %  NY                 =        0
+CURV %  XCOORD % SF        =     1.00
+CURV %  XCOORD % OFF       =     0.00
+CURV %  XCOORD % FILENAME  = unset
+CURV %  XCOORD % IDF       =       21
+CURV %  XCOORD % IDLA      =        1
+CURV %  XCOORD % IDFM      =        1
+CURV %  XCOORD % FORMAT    = (....)
+CURV %  XCOORD % FROM      = NAME
+CURV %  YCOORD % SF        =     1.00
+CURV %  YCOORD % OFF       =     0.00
+CURV %  YCOORD % FILENAME  = unset
+CURV %  YCOORD % IDF       =       22
+CURV %  YCOORD % IDLA      =        1
+CURV %  YCOORD % IDFM      =        1
+CURV %  YCOORD % FORMAT    = (....)
+CURV %  YCOORD % FROM      = NAME
+
+UNST %  SF        =     0.00
+UNST %  FILENAME  = unset
+UNST %  IDF       =       20
+UNST %  IDLA      =        1
+UNST %  IDFM      =        1
+UNST %  FORMAT    = (....)
+UNST %  UGOBCFILE = unset
+
+SMC %  MCELS % FILENAME  = unset
+SMC %  MCELS % IDF       =       31
+SMC %  MCELS % IDLA      =        1
+SMC %  MCELS % IDFM      =        1
+SMC %  MCELS % FORMAT    = (....)
+SMC %  ISIDE % FILENAME  = unset
+SMC %  ISIDE % IDF       =       32
+SMC %  ISIDE % IDLA      =        1
+SMC %  ISIDE % IDFM      =        1
+SMC %  ISIDE % FORMAT    = (....)
+SMC %  JSIDE % FILENAME  = unset
+SMC %  JSIDE % IDF       =       33
+SMC %  JSIDE % IDLA      =        1
+SMC %  JSIDE % IDFM      =        1
+SMC %  JSIDE % FORMAT    = (....)
+SMC %  SUBTR % FILENAME  = unset
+SMC %  SUBTR % IDF       =       34
+SMC %  SUBTR % IDLA      =        1
+SMC %  SUBTR % IDFM      =        1
+SMC %  SUBTR % FORMAT    = (....)
+SMC %  BUNDY % FILENAME  = unset
+SMC %  BUNDY % IDF       =       35
+SMC %  BUNDY % IDLA      =        1
+SMC %  BUNDY % IDFM      =        1
+SMC %  BUNDY % FORMAT    = (....)
+SMC %  MBARC % FILENAME  = unset
+SMC %  MBARC % IDF       =       36
+SMC %  MBARC % IDLA      =        1
+SMC %  MBARC % IDFM      =        1
+SMC %  MBARC % FORMAT    = (....)
+SMC %  AISID % FILENAME  = unset
+SMC %  AISID % IDF       =       37
+SMC %  AISID % IDLA      =        1
+SMC %  AISID % IDFM      =        1
+SMC %  AISID % FORMAT    = (....)
+SMC %  AJSID % FILENAME  = unset
+SMC %  AJSID % IDF       =       38
+SMC %  AJSID % IDLA      =        1
+SMC %  AJSID % IDFM      =        1
+SMC %  AJSID % FORMAT    = (....)
+
+DEPTH %  SF        =     1.00
+DEPTH %  FILENAME  = depth.inp
+DEPTH %  IDF       =       50
+DEPTH %  IDLA      =        1
+DEPTH %  IDFM      =        1
+DEPTH %  FORMAT    = (....)
+DEPTH %  FROM      = NAME
+
+MASK %  FILENAME  = unset
+MASK %  IDF       =       60
+MASK %  IDLA      =        1
+MASK %  IDFM      =        1
+MASK %  FORMAT    = (....)
+MASK %  FROM      = NAME
+
+OBST %  SF        =     1.00
+OBST %  FILENAME  = unset
+OBST %  IDF       =       70
+OBST %  IDLA      =        1
+OBST %  IDFM      =        1
+OBST %  FORMAT    = (....)
+OBST %  FROM      = NAME
+
+SLOPE %  SF        =     1.00
+SLOPE %  FILENAME  = unset
+SLOPE %  IDF       =       80
+SLOPE %  IDLA      =        1
+SLOPE %  IDFM      =        1
+SLOPE %  FORMAT    = (....)
+SLOPE %  FROM      = NAME
+
+SED %  SF        =     1.00
+SED %  FILENAME  = unset
+SED %  IDF       =       90
+SED %  IDLA      =        1
+SED %  IDFM      =        1
+SED %  FORMAT    = (....)
+SED %  FROM      = NAME
+
+INBND_COUNT %  N_POINT       =       66
+
+INBND_POINT(       1) %  X_INDEX   =        1
+INBND_POINT(       1) %  Y_INDEX   =      131
+INBND_POINT(       1) %  CONNECT   = F
+
+
+INBND_POINT(       2) %  X_INDEX   =        1
+INBND_POINT(       2) %  Y_INDEX   =      130
+INBND_POINT(       2) %  CONNECT   = T
+
+
+INBND_POINT(       3) %  X_INDEX   =        1
+INBND_POINT(       3) %  Y_INDEX   =      129
+INBND_POINT(       3) %  CONNECT   = T
+
+
+INBND_POINT(       4) %  X_INDEX   =        1
+INBND_POINT(       4) %  Y_INDEX   =      128
+INBND_POINT(       4) %  CONNECT   = T
+
+
+INBND_POINT(       5) %  X_INDEX   =        1
+INBND_POINT(       5) %  Y_INDEX   =      127
+INBND_POINT(       5) %  CONNECT   = T
+
+
+INBND_POINT(       6) %  X_INDEX   =        1
+INBND_POINT(       6) %  Y_INDEX   =      126
+INBND_POINT(       6) %  CONNECT   = T
+
+
+INBND_POINT(       7) %  X_INDEX   =        1
+INBND_POINT(       7) %  Y_INDEX   =      125
+INBND_POINT(       7) %  CONNECT   = T
+
+
+INBND_POINT(       8) %  X_INDEX   =        1
+INBND_POINT(       8) %  Y_INDEX   =      124
+INBND_POINT(       8) %  CONNECT   = T
+
+
+INBND_POINT(       9) %  X_INDEX   =        1
+INBND_POINT(       9) %  Y_INDEX   =      123
+INBND_POINT(       9) %  CONNECT   = T
+
+
+INBND_POINT(      10) %  X_INDEX   =        1
+INBND_POINT(      10) %  Y_INDEX   =      122
+INBND_POINT(      10) %  CONNECT   = T
+
+
+INBND_POINT(      11) %  X_INDEX   =        1
+INBND_POINT(      11) %  Y_INDEX   =      121
+INBND_POINT(      11) %  CONNECT   = T
+
+
+INBND_POINT(      12) %  X_INDEX   =        1
+INBND_POINT(      12) %  Y_INDEX   =      120
+INBND_POINT(      12) %  CONNECT   = T
+
+
+INBND_POINT(      13) %  X_INDEX   =        1
+INBND_POINT(      13) %  Y_INDEX   =      119
+INBND_POINT(      13) %  CONNECT   = T
+
+
+INBND_POINT(      14) %  X_INDEX   =        1
+INBND_POINT(      14) %  Y_INDEX   =      118
+INBND_POINT(      14) %  CONNECT   = T
+
+
+INBND_POINT(      15) %  X_INDEX   =        1
+INBND_POINT(      15) %  Y_INDEX   =      117
+INBND_POINT(      15) %  CONNECT   = T
+
+
+INBND_POINT(      16) %  X_INDEX   =        1
+INBND_POINT(      16) %  Y_INDEX   =      116
+INBND_POINT(      16) %  CONNECT   = T
+
+
+INBND_POINT(      17) %  X_INDEX   =        1
+INBND_POINT(      17) %  Y_INDEX   =      115
+INBND_POINT(      17) %  CONNECT   = T
+
+
+INBND_POINT(      18) %  X_INDEX   =        1
+INBND_POINT(      18) %  Y_INDEX   =      114
+INBND_POINT(      18) %  CONNECT   = T
+
+
+INBND_POINT(      19) %  X_INDEX   =        1
+INBND_POINT(      19) %  Y_INDEX   =      113
+INBND_POINT(      19) %  CONNECT   = T
+
+
+INBND_POINT(      20) %  X_INDEX   =        1
+INBND_POINT(      20) %  Y_INDEX   =      112
+INBND_POINT(      20) %  CONNECT   = T
+
+
+INBND_POINT(      21) %  X_INDEX   =        1
+INBND_POINT(      21) %  Y_INDEX   =      111
+INBND_POINT(      21) %  CONNECT   = T
+
+
+INBND_POINT(      22) %  X_INDEX   =        1
+INBND_POINT(      22) %  Y_INDEX   =      110
+INBND_POINT(      22) %  CONNECT   = T
+
+
+INBND_POINT(      23) %  X_INDEX   =        1
+INBND_POINT(      23) %  Y_INDEX   =      109
+INBND_POINT(      23) %  CONNECT   = T
+
+
+INBND_POINT(      24) %  X_INDEX   =        1
+INBND_POINT(      24) %  Y_INDEX   =      108
+INBND_POINT(      24) %  CONNECT   = T
+
+
+INBND_POINT(      25) %  X_INDEX   =        1
+INBND_POINT(      25) %  Y_INDEX   =      107
+INBND_POINT(      25) %  CONNECT   = T
+
+
+INBND_POINT(      26) %  X_INDEX   =        1
+INBND_POINT(      26) %  Y_INDEX   =      106
+INBND_POINT(      26) %  CONNECT   = T
+
+
+INBND_POINT(      27) %  X_INDEX   =        1
+INBND_POINT(      27) %  Y_INDEX   =      105
+INBND_POINT(      27) %  CONNECT   = T
+
+
+INBND_POINT(      28) %  X_INDEX   =        1
+INBND_POINT(      28) %  Y_INDEX   =      104
+INBND_POINT(      28) %  CONNECT   = T
+
+
+INBND_POINT(      29) %  X_INDEX   =        1
+INBND_POINT(      29) %  Y_INDEX   =      103
+INBND_POINT(      29) %  CONNECT   = T
+
+
+INBND_POINT(      30) %  X_INDEX   =        1
+INBND_POINT(      30) %  Y_INDEX   =      102
+INBND_POINT(      30) %  CONNECT   = T
+
+
+INBND_POINT(      31) %  X_INDEX   =        1
+INBND_POINT(      31) %  Y_INDEX   =      101
+INBND_POINT(      31) %  CONNECT   = T
+
+
+INBND_POINT(      32) %  X_INDEX   =        1
+INBND_POINT(      32) %  Y_INDEX   =      100
+INBND_POINT(      32) %  CONNECT   = T
+
+
+INBND_POINT(      33) %  X_INDEX   =        1
+INBND_POINT(      33) %  Y_INDEX   =       99
+INBND_POINT(      33) %  CONNECT   = T
+
+
+INBND_POINT(      34) %  X_INDEX   =        1
+INBND_POINT(      34) %  Y_INDEX   =       98
+INBND_POINT(      34) %  CONNECT   = T
+
+
+INBND_POINT(      35) %  X_INDEX   =        1
+INBND_POINT(      35) %  Y_INDEX   =       97
+INBND_POINT(      35) %  CONNECT   = T
+
+
+INBND_POINT(      36) %  X_INDEX   =        1
+INBND_POINT(      36) %  Y_INDEX   =       96
+INBND_POINT(      36) %  CONNECT   = T
+
+
+INBND_POINT(      37) %  X_INDEX   =        1
+INBND_POINT(      37) %  Y_INDEX   =       95
+INBND_POINT(      37) %  CONNECT   = T
+
+
+INBND_POINT(      38) %  X_INDEX   =        1
+INBND_POINT(      38) %  Y_INDEX   =       94
+INBND_POINT(      38) %  CONNECT   = T
+
+
+INBND_POINT(      39) %  X_INDEX   =        1
+INBND_POINT(      39) %  Y_INDEX   =       93
+INBND_POINT(      39) %  CONNECT   = T
+
+
+INBND_POINT(      40) %  X_INDEX   =        1
+INBND_POINT(      40) %  Y_INDEX   =       92
+INBND_POINT(      40) %  CONNECT   = T
+
+
+INBND_POINT(      41) %  X_INDEX   =        1
+INBND_POINT(      41) %  Y_INDEX   =       91
+INBND_POINT(      41) %  CONNECT   = T
+
+
+INBND_POINT(      42) %  X_INDEX   =        1
+INBND_POINT(      42) %  Y_INDEX   =       90
+INBND_POINT(      42) %  CONNECT   = T
+
+
+INBND_POINT(      43) %  X_INDEX   =        1
+INBND_POINT(      43) %  Y_INDEX   =       89
+INBND_POINT(      43) %  CONNECT   = T
+
+
+INBND_POINT(      44) %  X_INDEX   =        1
+INBND_POINT(      44) %  Y_INDEX   =       88
+INBND_POINT(      44) %  CONNECT   = T
+
+
+INBND_POINT(      45) %  X_INDEX   =        1
+INBND_POINT(      45) %  Y_INDEX   =       87
+INBND_POINT(      45) %  CONNECT   = T
+
+
+INBND_POINT(      46) %  X_INDEX   =        1
+INBND_POINT(      46) %  Y_INDEX   =       86
+INBND_POINT(      46) %  CONNECT   = T
+
+
+INBND_POINT(      47) %  X_INDEX   =        1
+INBND_POINT(      47) %  Y_INDEX   =       85
+INBND_POINT(      47) %  CONNECT   = T
+
+
+INBND_POINT(      48) %  X_INDEX   =        1
+INBND_POINT(      48) %  Y_INDEX   =       84
+INBND_POINT(      48) %  CONNECT   = T
+
+
+INBND_POINT(      49) %  X_INDEX   =        1
+INBND_POINT(      49) %  Y_INDEX   =       83
+INBND_POINT(      49) %  CONNECT   = T
+
+
+INBND_POINT(      50) %  X_INDEX   =        1
+INBND_POINT(      50) %  Y_INDEX   =       82
+INBND_POINT(      50) %  CONNECT   = T
+
+
+INBND_POINT(      51) %  X_INDEX   =        1
+INBND_POINT(      51) %  Y_INDEX   =       81
+INBND_POINT(      51) %  CONNECT   = T
+
+
+INBND_POINT(      52) %  X_INDEX   =        1
+INBND_POINT(      52) %  Y_INDEX   =       80
+INBND_POINT(      52) %  CONNECT   = T
+
+
+INBND_POINT(      53) %  X_INDEX   =        1
+INBND_POINT(      53) %  Y_INDEX   =       79
+INBND_POINT(      53) %  CONNECT   = T
+
+
+INBND_POINT(      54) %  X_INDEX   =        1
+INBND_POINT(      54) %  Y_INDEX   =       78
+INBND_POINT(      54) %  CONNECT   = T
+
+
+INBND_POINT(      55) %  X_INDEX   =        1
+INBND_POINT(      55) %  Y_INDEX   =       77
+INBND_POINT(      55) %  CONNECT   = T
+
+
+INBND_POINT(      56) %  X_INDEX   =        1
+INBND_POINT(      56) %  Y_INDEX   =       76
+INBND_POINT(      56) %  CONNECT   = T
+
+
+INBND_POINT(      57) %  X_INDEX   =        1
+INBND_POINT(      57) %  Y_INDEX   =       75
+INBND_POINT(      57) %  CONNECT   = T
+
+
+INBND_POINT(      58) %  X_INDEX   =        1
+INBND_POINT(      58) %  Y_INDEX   =       74
+INBND_POINT(      58) %  CONNECT   = T
+
+
+INBND_POINT(      59) %  X_INDEX   =        1
+INBND_POINT(      59) %  Y_INDEX   =       73
+INBND_POINT(      59) %  CONNECT   = T
+
+
+INBND_POINT(      60) %  X_INDEX   =        1
+INBND_POINT(      60) %  Y_INDEX   =       72
+INBND_POINT(      60) %  CONNECT   = T
+
+
+INBND_POINT(      61) %  X_INDEX   =        1
+INBND_POINT(      61) %  Y_INDEX   =       71
+INBND_POINT(      61) %  CONNECT   = T
+
+
+INBND_POINT(      62) %  X_INDEX   =        1
+INBND_POINT(      62) %  Y_INDEX   =       70
+INBND_POINT(      62) %  CONNECT   = T
+
+
+INBND_POINT(      63) %  X_INDEX   =        1
+INBND_POINT(      63) %  Y_INDEX   =       69
+INBND_POINT(      63) %  CONNECT   = T
+
+
+INBND_POINT(      64) %  X_INDEX   =        1
+INBND_POINT(      64) %  Y_INDEX   =       68
+INBND_POINT(      64) %  CONNECT   = T
+
+
+INBND_POINT(      65) %  X_INDEX   =        1
+INBND_POINT(      65) %  Y_INDEX   =       67
+INBND_POINT(      65) %  CONNECT   = T
+
+
+INBND_POINT(      66) %  X_INDEX   =        1
+INBND_POINT(      66) %  Y_INDEX   =       66
+INBND_POINT(      66) %  CONNECT   = T
+
+
+EXCL_COUNT %  N_POINT       =        0
+EXCL_COUNT %  N_BODY        =        0
+
+OUTBND_COUNT %  N_LINE        =        0

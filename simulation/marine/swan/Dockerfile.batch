@@ -1,0 +1,71 @@
+FROM debian:bookworm-slim AS swan_builder
+
+ARG SWAN_VERSION=4151
+ARG SWAN_SHA256=325c229f3dde0b812db4ec9ae6fa1cd4086d2109562c389576590ce8f94b26bb
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl gfortran libnetcdf-dev libnetcdff-dev make \
+        openmpi-bin libopenmpi-dev perl \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+RUN curl --fail --location --retry 4 \
+      "https://swanmodel.sourceforge.io/download/zip/swan${SWAN_VERSION}.tar.gz" \
+      --output swan.tar.gz \
+    && echo "${SWAN_SHA256}  swan.tar.gz" | sha256sum --check \
+    && tar -xzf swan.tar.gz
+WORKDIR /src/swan4151
+RUN make config \
+    && sed -i 's|^NETCDFROOT =.*|NETCDFROOT = /usr|' macros.inc \
+    && sed -i 's|^  LIBS_SER = $(LIBS_SER) |  LIBS_SER += |' macros.inc \
+    && sed -i 's|^  LIBS_OMP = $(LIBS_OMP) |  LIBS_OMP += |' macros.inc \
+    && sed -i 's|^  LIBS_MPI = $(LIBS_MPI) |  LIBS_MPI += |' macros.inc \
+    && sed -i 's|^  swch = $(swch) -netcdf|  swch += -netcdf|' macros.inc \
+    && make mpi \
+    && sed -i 's|echo "localhost" > machinefile|echo "localhost slots=$npmpi" > machinefile|' swanrun \
+    && test -x swan.exe
+
+# Keep the runtime ABI aligned with the Bookworm builder. The floating
+# python:3.11-slim tag currently resolves to Trixie, where the Bookworm NetCDF
+# runtime package names below no longer exist.
+FROM python:3.11-slim-bookworm
+
+# Google Cloud Batch injects CLOUDSDK_PYTHON=/usr/bin/python3. The official
+# Python slim image installs it under /usr/local/bin, so expose the path
+# expected by Batch and by gsutil.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl libeccodes-tools libgfortran5 libnetcdf19 \
+        libnetcdff7 openmpi-bin \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/local/bin/python3 /usr/bin/python3
+
+RUN curl -sSL \
+      https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
+      -o /tmp/google-cloud-sdk.tar.gz \
+    && tar -xzf /tmp/google-cloud-sdk.tar.gz -C /opt \
+    && /opt/google-cloud-sdk/install.sh --quiet \
+    && rm /tmp/google-cloud-sdk.tar.gz
+ENV PATH="/opt/google-cloud-sdk/bin:${PATH}" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app
+
+COPY --from=swan_builder /src/swan4151/swan.exe /usr/local/bin/swan.exe
+COPY --from=swan_builder /src/swan4151/swanrun /usr/local/bin/swanrun
+RUN chmod 0755 /usr/local/bin/swan.exe /usr/local/bin/swanrun
+WORKDIR /app
+COPY simulation/marine/swan/requirements.batch.txt /app/requirements.batch.txt
+RUN pip install --no-cache-dir -r /app/requirements.batch.txt
+
+COPY scripts /app/scripts
+COPY simulation/marine/regions /app/simulation/marine/regions
+COPY assets/static_grids/balearic_bathymetry_swan.nc \
+     /app/simulation/inputs/balearic_bathymetry_swan.nc
+
+RUN test -x /usr/local/bin/swan.exe \
+    && test -x /usr/local/bin/swanrun \
+    && test -x /usr/bin/python3 \
+    && python3 -c "import cfgrib, copernicusmarine, ecmwf.opendata, netCDF4, numpy, xarray"
+
+ENTRYPOINT ["python3", "/app/scripts/run_marine_simulation.py"]

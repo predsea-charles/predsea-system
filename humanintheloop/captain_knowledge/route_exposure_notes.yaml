@@ -1,0 +1,175 @@
+{
+  "palma_ibiza": {
+    "route": "Palma -> Ibiza",
+    "exposure": "Exposed SW Mallorca to Ibiza crossing; the Ibiza Channel can dominate comfort.",
+    "watch_patterns": [
+      "NW swell in the Ibiza Channel",
+      "beam or quartering sea during the open-water section",
+      "late-day peak coinciding with passenger-sensitive passages"
+    ],
+    "default_operational_bias": "Prefer earlier/lower sea-state windows when small vessels or guests are involved."
+  },
+  "palma_cabrera": {
+    "route": "Palma -> Cabrera",
+    "exposure": "Shorter exposed run south of Mallorca; comfort depends on direction and shelter near Cabrera.",
+    "watch_patterns": [
+      "southerly exposure near Cabrera",
+      "local chop despite moderate significant wave height"
+    ],
+    "default_operational_bias": "Confirm shelter and local conditions before treating the crossing as easy."
+  },
+  "ibiza_formentera": {
+    "route": "Ibiza -> Formentera",
+    "exposure": "Short channel route where local chop and current can matter.",
+    "watch_patterns": [
+      "current opposing wind",
+      "short-period chop in the Freus channel"
+    ],
+    "default_operational_bias": "Treat low wave height as only part of the comfort read."
+  },
+  "ibiza_mahon": {
+    "route": "Ibiza -> Mahon",
+    "exposure": "Direct cross-island crossing from Ibiza into eastern Menorca with a long open-water fetch.",
+    "watch_patterns": [
+      "east Menorca swell on the arrival side",
+      "late-day exposure across the Balearic crossing"
+    ],
+    "default_operational_bias": "Prefer a fresh forecast before committing to the eastern Menorca approach."
+  },
+  "alcudia_ciutadella": {
+    "route": "Alcudia -> Ciutadella",
+    "exposure": "Menorca Channel crossing; exposed conditions can restrict smaller vessels sooner than protected routes.",
+    "watch_patterns": [
+      "northerly sea state",
+      "late-afternoon exposed peak",
+      "schedule pressure masking comfort risk"
+    ],
+    "default_operational_bias": "Use conservative timing and be explicit when smaller vessels should wait."
+  },
+  "formentera_palma": {
+    "route": "Palma -> Formentera",
+    "exposure": "Long open-water passage into the Ibiza/Formentera corridor.",
+    "watch_patterns": [
+      "channel sea state across the full leg",
+      "small-vessel comfort margin eroding late in the day"
+    ],
+    "default_operational_bias": "Read this as an exposed crossing rather than a sheltered hop."
+  },
+  "andratx_ibiza": {
+    "route": "Ibiza -> Andratx",
+    "exposure": "Open-water crossing from Ibiza to southwest Mallorca.",
+    "watch_patterns": [
+      "westerly swell into the Mallorca approach",
+      "coastal acceleration near Andratx"
+    ],
+    "default_operational_bias": "Treat the Mallorca approach as the operational key segment."
+  },
+  "cabrera_ibiza": {
+    "route": "Ibiza -> Cabrera",
+    "exposure": "South Mallorca crossing with open-water exposure and short arrival shelter only near Cabrera.",
+    "watch_patterns": [
+      "southerly exposure along the crossing",
+      "approach timing near the Cabrera shoreline"
+    ],
+    "default_operational_bias": "Check the arrival side carefully before committing smaller vessels."
+  },
+  "ibiza_soller": {
+    "route": "Ibiza -> Soller",
+    "exposure": "Long exposed crossing into north Mallorca with few natural breaks.",
+    "watch_patterns": [
+      "fresh swell set along the whole leg",
+      "late-day fatigue on a long open-water run"
+    ],
+    "default_operational_bias": "Use a fresh forecast window and keep passenger comfort in mind."
+  },
+  "ibiza_san_antonio": {
+    "route": "Ibiza -> Sant Antoni de Portmany",
+    "exposure": "Short west Ibiza coastal leg with localized chop near the bay mouth.",
+    "watch_patterns": [
+      "west Ibiza wind funneling",
+      "short-period chop near San Antonio"
+    ],
+    "default_operational_bias": "Treat it as a local coastal leg, not just a tiny hop."
+  },
+  "andratx_san_antonio": {
+    "route": "Sant Antoni de Portmany -> Port d'Andratx",
+    "exposure": "Cross-island transit from west Ibiza to southwest Mallorca.",
+    "watch_patterns": [
+      "open-water mid-leg swell",
+      "Mallorca southwest approach"
+    ],
+    "default_operational_bias": "The arrival approach deserves as much attention as the crossing."
+  },
+  "addaia_mahon": {
+    "route": "Mahon -> Port d'Addaia",
+    "exposure": "Short Menorca east-coast coastal connection with local shoreline conditions.",
+    "watch_patterns": [
+      "east Menorca coastal chop",
+      "arrival exposure near Addaia"
+    ],
+    "default_operational_bias": "Small-vessel timing matters even on the shorter east-coast leg."
+  },
+  "fornells_mahon": {
+    "route": "Mahon -> Cala Fornells",
+    "exposure": "Open-water passage from Menorca to south-west Mallorca.",
+    "watch_patterns": [
+      "Menorca Channel swell and wind",
+      "south-west Mallorca arrival conditions"
+    ],
+    "default_operational_bias": "Treat it as a substantial inter-island passage, not a Menorca coastal leg."
+  },
+  "addaia_fornells": {
+    "route": "Port d'Addaia -> Cala Fornells",
+    "exposure": "Open-water passage from Menorca to south-west Mallorca.",
+    "watch_patterns": [
+      "Menorca Channel swell and wind",
+      "south-west Mallorca arrival conditions"
+    ],
+    "default_operational_bias": "Use crossing-level margins and review the full channel forecast."
+  },
+  "ciutadella_fornells": {
+    "route": "Ciutadella -> Cala Fornells",
+    "exposure": "Open-water passage from Menorca to south-west Mallorca.",
+    "watch_patterns": [
+      "Menorca Channel swell and wind",
+      "south-west Mallorca arrival conditions"
+    ],
+    "default_operational_bias": "Treat it as an inter-island crossing rather than a coastal day sail."
+  },
+  "alcudia_fornells": {
+    "route": "Alcudia -> Cala Fornells",
+    "exposure": "Mallorca coastal passage from Alcudia to the south-west coast.",
+    "watch_patterns": [
+      "exposure around Mallorca's capes",
+      "south-west Mallorca arrival conditions"
+    ],
+    "default_operational_bias": "Review conditions along the full Mallorca coastline, not only at departure."
+  },
+  "barcelona_tarragona": {
+    "route": "Barcelona -> Tarragona",
+    "exposure": "Mainland Catalan coast transit with busy traffic and changing shoreline exposure.",
+    "watch_patterns": [
+      "coastal gradient changes",
+      "traffic density near the approaches"
+    ],
+    "default_operational_bias": "Useful as a mainland leg, but not one to rush."
+  },
+  "tarragona_valencia": {
+    "route": "Tarragona -> Valencia",
+    "exposure": "Long mainland coastal transit with broad planning windows.",
+    "watch_patterns": [
+      "long coastal fetch",
+      "weather evolution across the whole leg"
+    ],
+    "default_operational_bias": "Plan with the longer horizon in mind and refresh before departure."
+  },
+  "barcelona_palamos": {
+    "route": "Barcelona -> Palamos",
+    "exposure": "Catalan coast transit north of Barcelona with frequent local gradients.",
+    "watch_patterns": [
+      "coastal wind shifts",
+      "approach exposure near Palamos"
+    ],
+    "default_operational_bias": "A good coastal connector, but still deserving of a proper forecast check."
+  }
+}

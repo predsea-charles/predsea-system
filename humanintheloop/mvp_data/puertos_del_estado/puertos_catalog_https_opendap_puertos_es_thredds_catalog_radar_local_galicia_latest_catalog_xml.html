@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2">
+  <service name="all" serviceType="compound" base="">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="http" serviceType="HTTPServer" base="/thredds/fileServer/" />
+    <service name="wms" serviceType="WMS" base="/thredds/wms/" />
+    <service name="ncssGrid" serviceType="NetcdfSubset" base="/thredds/ncss/grid/" />
+    <service name="latest" serviceType="Resolver" base="" />
+  </service>
+  <dataset name="latest/">
+    <property name="DatasetScan" value="true" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+    </metadata>
+    <dataset name="1_month.nc" ID="radar_local_galicia/latest/1_month.nc" urlPath="radar_local_galicia/latest/1_month.nc">
+      <dataSize units="Mbytes">116.9</dataSize>
+      <date type="modified">2024-01-10T09:16:53.634Z</date>
+    </dataset>
+    <dataset name="five_days.nc" ID="radar_local_galicia/latest/five_days.nc" urlPath="radar_local_galicia/latest/five_days.nc">
+      <dataSize units="Mbytes">20.56</dataSize>
+      <date type="modified">2026-08-09T14:23:14.688Z</date>
+    </dataset>
+    <dataset name="sasemar_8-13.nc" ID="radar_local_galicia/latest/sasemar_8-13.nc" urlPath="radar_local_galicia/latest/sasemar_8-13.nc">
+      <dataSize units="Mbytes">21.93</dataSize>
+      <date type="modified">2024-01-10T07:43:34.151Z</date>
+    </dataset>
+  </dataset>
+</catalog>

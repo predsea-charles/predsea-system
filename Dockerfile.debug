@@ -1,0 +1,2 @@
+FROM europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch:v2-forcing-patch
+COPY patched_prepare_croco_forcing.py /app/scripts/prepare_croco_forcing.py

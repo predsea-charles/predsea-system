@@ -1,0 +1,8 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Palma -> Ibiza today. Best time to leave?
+PredSea: Go earlier. The route looks manageable today, with no major wave build-up flagged.
+PredSea: Palma -> Ibiza peaks near 0.7 m around 06:00.
+PredSea: Operational read: manageable for vessels 15-24m.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

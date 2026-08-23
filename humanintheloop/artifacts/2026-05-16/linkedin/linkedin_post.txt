@@ -1,0 +1,29 @@
+Saturday Balearic Operational Read - PredSea
+
+08:39 in Mallorca.
+This is not a red-alert day, but it is not a perfect morning either.
+
+SOCIB buoy truth at 06:00 UTC:
+
+Palma Bay: 0.63 m
+Ibiza Channel: 1.34 m
+
+Operational read:
+Exposed routes are still carrying energy this morning.
+
+Palma -> Ibiza: around 1.8-1.9 m through the morning, easing later.
+Alcudia -> Ciutadella: around 1.7-1.8 m until early afternoon, easing after.
+Palma -> Cabrera: workable but not glassy, easing through the day.
+Ibiza -> Formentera: best-looking route, around 0.8-1.0 m this morning and lower later.
+
+So the guidance is simple:
+
+If you are crossing exposed water, use conservative timing and consider waiting.
+If you are doing a shorter protected hop, the day improves. Go enjoy it, but keep checking the sea.
+
+PredSea is not trying to shout warnings every day.
+The value is knowing when the sea is actually giving you room, and when timing still matters.
+
+Forecast source: Copernicus Mediterranean ocean model.
+Buoy truth: SOCIB public observations.
+Confidence: medium.

@@ -1,0 +1,8 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Ibiza -> Formentera today. Best time to leave?
+PredSea: Go earlier. The route looks manageable today, with no major wave build-up flagged.
+PredSea: Ibiza -> Formentera peaks near 0.4 m around 15:00.
+PredSea: Operational read: manageable for vessels 15-24m.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

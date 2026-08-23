@@ -1,0 +1,6 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+PredSea: Got it. You're near Palma Marina. For Alcudia -> Ciutadella, the best window looks before midday.
+PredSea: Watch-out: waves build toward 1.1 m around 01:00.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PredSea Demo | Visual Co-Captain</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIINfQF7Oz2F3cClWZxkVbVxnn8WELfzBFM="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">PredSea Visual Co-Captain</p>
+          <h1>Real sea-state evidence, readable at captain speed.</h1>
+        </div>
+        <div class="hero-summary" aria-live="polite">
+          <span id="run-date">Loading forecast</span>
+          <strong id="hero-route">Balearic sea-state layer</strong>
+        </div>
+      </section>
+
+      <section class="demo-grid" aria-label="PredSea demo">
+        <div class="map-panel">
+          <div class="toolbar">
+            <span class="layer-key wave"></span>
+            <strong>Wave height</strong>
+            <span class="layer-key current"></span>
+            <strong>Current vectors</strong>
+          </div>
+          <div id="map" class="map"></div>
+          <div class="metric-strip" aria-live="polite">
+            <div>
+              <span>Mean wave</span>
+              <strong id="metric-now">--</strong>
+            </div>
+            <div>
+              <span>Max wave</span>
+              <strong id="metric-peak">--</strong>
+            </div>
+            <div>
+              <span>Max current</span>
+              <strong id="metric-current">--</strong>
+            </div>
+            <div>
+              <span>Confidence</span>
+              <strong id="metric-confidence">--</strong>
+            </div>
+          </div>
+        </div>
+
+        <aside class="captain-panel" aria-label="Conversational captain briefing">
+          <div class="captain-header">
+            <div>
+              <p class="eyebrow">Captain-in-the-loop</p>
+              <h2>Ask what the sea is doing</h2>
+            </div>
+            <span id="status-pill" class="status-pill">Loading</span>
+          </div>
+
+          <div id="chat-thread" class="chat-thread" aria-live="polite"></div>
+
+          <div class="evidence">
+            <div>
+              <span>Prediction field</span>
+              <strong id="wave-range">--</strong>
+            </div>
+            <svg id="wave-chart" viewBox="0 0 420 88" role="img" aria-label="Hourly wave forecast"></svg>
+          </div>
+        </aside>
+      </section>
+
+      <section class="source-band">
+        <div>
+          <span>Data layer</span>
+          <strong>Copernicus Mediterranean wave height + surface current forecast</strong>
+        </div>
+        <div>
+          <span>Interface</span>
+          <strong>Map evidence first, conversation second</strong>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

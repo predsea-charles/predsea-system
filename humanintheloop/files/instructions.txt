@@ -1,0 +1,10 @@
+Four files, one clear responsibility each:
+route_graph.py — loads your Copernicus NetCDF, applies the sea mask, builds the sparse adjacency matrix. Edge weights change based on priority: time uses effective speed accounting for currents, comfort adds a wave penalty, safety hard-excludes edges above vessel limits.
+route_solver.py — runs scipy's Dijkstra on that graph, reconstructs the path, computes distance/time/condition summaries, decimates to 60 waypoints for the API response.
+precompute_routes.py — the overnight script. Solves all 110 route pairs (11 places × 10 directed pairs) × 3 priorities × 3 vessel classes = 990 solves, writes route_results.json to GCS. Run it from GitHub Actions after the ETL completes.
+route_store.py — loads the precomputed JSON at API startup, exposes get(origin, dest, priority, vessel_class). Also has get_distance_nm() and get_typical_time_h() — those are the endpoints Matt needs instead of his Haversine implementation.
+The two things you need to adjust for your real data:
+In route_graph.py, the NetCDF variable names (VHM0, uo, vo) — match these to whatever Copernicus actually gives you. Also check whether currents have a depth dimension; the code takes [0] (surface).
+The COMFORT_ALPHA = 0.4 coefficient in route_graph.py controls how strongly wave height penalises a route relative to time. Graham should tune this based on what feels right — you can expose it as a parameter later.
+What to tell Matt:
+You'll have /places/distance?origin=palma&destination=ibiza and /routes/optimal/palma/ibiza?priority=comfort&vessel_class=medium ready once the first overnight run completes. He can drop his Haversine tool entirely.

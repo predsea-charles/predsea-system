@@ -1,0 +1,7 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Palma to Ibiza this afternoon. Still worth leaving?
+PredSea: Yes. Forecast eases from about 1.2 m early afternoon to 0.9-1.0 m this evening.
+PredSea: Buoy truth was higher in the Ibiza Channel: 1.54 m from NW at 08:30 local.
+PredSea: Read: workable for 15-24m vessels. Smoother later if schedule allows.
+PredSea: Confidence: medium.

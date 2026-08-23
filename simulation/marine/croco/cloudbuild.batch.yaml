@@ -1,0 +1,34 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=simulation/marine/croco/Dockerfile.batch
+      - --build-arg=PREDSEA_CROCO_LM=${_CROCO_LM}
+      - --build-arg=PREDSEA_CROCO_MM=${_CROCO_MM}
+      - --build-arg=PREDSEA_CROCO_N=${_CROCO_N}
+      - --tag=${_IMAGE}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - run
+      - --rm
+      - --entrypoint=/bin/sh
+      - ${_IMAGE}
+      - -c
+      - >-
+        test -x /usr/local/bin/croco_balearic &&
+        CLOUDSDK_PYTHON=/usr/bin/python3 gsutil version -l &&
+        python3 /app/scripts/prepare_croco_bulk_forcing.py --help &&
+        python3 /app/simulation/marine/croco/prepare_croco_in.py --help &&
+        python3 /app/scripts/run_marine_simulation.py --help
+images:
+  - ${_IMAGE}
+substitutions:
+  _IMAGE: europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch:2.1.3
+  _CROCO_LM: "499"
+  _CROCO_MM: "399"
+  _CROCO_N: "30"
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 3600s

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2">
+  <service name="all" serviceType="compound" base="">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="http" serviceType="HTTPServer" base="/thredds/fileServer/" />
+    <service name="wms" serviceType="WMS" base="/thredds/wms/" />
+    <service name="ncssGrid" serviceType="NetcdfSubset" base="/thredds/ncss/grid/" />
+    <service name="latest" serviceType="Resolver" base="" />
+  </service>
+  <dataset name="Valencia">
+    <property name="zoom" value="13" />
+    <property name="DatasetScan" value="true" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+      <dataType>Grid</dataType>
+    </metadata>
+    <catalogRef xlink:href="2023/catalog.xml" xlink:title="2023" ID="wave_coast_s05b/2023" name="2023">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2024/catalog.xml" xlink:title="2024" ID="wave_coast_s05b/2024" name="2024">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2025/catalog.xml" xlink:title="2025" ID="wave_coast_s05b/2025" name="2025">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2026/catalog.xml" xlink:title="2026" ID="wave_coast_s05b/2026" name="2026">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="HOURLY/catalog.xml" xlink:title="HOURLY" ID="wave_coast_s05b/HOURLY" name="HOURLY">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+  </dataset>
+</catalog>

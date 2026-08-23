@@ -1,0 +1,21 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "simulation/Dockerfile"
+      - "-t"
+      - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/wrf:latest"
+      - "simulation"
+
+images:
+  - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/wrf:latest"
+
+# Cloud Build has no local Docker layer cache from prior builds, so this
+# rebuilds the wrf-builder stage (WRF/WPS compiled from source) from scratch
+# even for a one-line setup_domain.py change -- same situation as
+# cloudbuild.ww3-batch.yaml's first build. Generous timeout for that reason.
+timeout: 7200s
+options:
+  machineType: "E2_HIGHCPU_32"
+  logging: CLOUD_LOGGING_ONLY

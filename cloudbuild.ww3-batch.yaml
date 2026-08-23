@@ -1,0 +1,22 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "Dockerfile.ww3-batch"
+      - "-t"
+      - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/ww3-batch:latest"
+      - "."
+
+images:
+  - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/ww3-batch:latest"
+
+# Higher than cloudbuild.croco-batch.yaml's 5400s: this is WW3's first-ever
+# build in this project (no Docker layer cache yet), and it compiles a large
+# Fortran codebase from source via CMake -- if this proves too tight once a
+# real build is observed, raise it rather than let a slow-but-succeeding
+# compile get killed by the ceiling.
+timeout: 7200s
+options:
+  machineType: "E2_HIGHCPU_32"
+  logging: CLOUD_LOGGING_ONLY

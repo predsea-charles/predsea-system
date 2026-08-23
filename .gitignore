@@ -1,0 +1,32 @@
+# Environments & Build
+venv/
+to_ignore/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Credentials & Secrets
+aws_credentials.txt
+credentials.sh
+
+# Infrastructure & Terraform State
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Large Model Data & Outputs
+outputs/
+data/
+*.nc
+*.nc4
+*.grib
+*.grib2
+*.bin
+*.jsonl
+humanintheloop/extracted_observations.json
+
+# Service Account Keys & Secrets
+*.json
+!package.json
+!tsconfig.json
+predsea-etl-writer-key.json

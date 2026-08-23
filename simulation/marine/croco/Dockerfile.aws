@@ -1,0 +1,5 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN pip install --no-cache-dir boto3 awscli
+ENV PREDSEA_STORAGE_BACKEND=s3
+ENTRYPOINT ["python3", "/app/scripts/run_marine_simulation.py"]

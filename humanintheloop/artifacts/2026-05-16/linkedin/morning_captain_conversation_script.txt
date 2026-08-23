@@ -1,0 +1,7 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Good morning. Is today a go?
+PredSea: Yes, but route and vessel size matter today.
+PredSea: Best-looking now: Ibiza -> Formentera. Most vessels can go.
+PredSea: Palma -> Ibiza: better from ~16:00 for 15-24 m. Under 15 m: wait until ~19:00.
+PredSea: Menorca Channel: 15-24 m better after ~20:00. Under 15 m: avoid unless checked again.

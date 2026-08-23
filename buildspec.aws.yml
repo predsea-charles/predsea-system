@@ -1,0 +1,25 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - IMAGE_TAG=$(printf '%s' "$IMAGE_TAG" | cut -c1-12)
+  build:
+    commands:
+      - docker build --pull -f Dockerfile.aws -t "$API_REPOSITORY:$IMAGE_TAG" -t "$API_REPOSITORY:latest" .
+      - docker tag "$API_REPOSITORY:$IMAGE_TAG" "$ORCHESTRATOR_REPOSITORY:$IMAGE_TAG"
+      - docker tag "$API_REPOSITORY:$IMAGE_TAG" "$ORCHESTRATOR_REPOSITORY:latest"
+      - docker build --pull -f simulation/Dockerfile -t "$WRF_REPOSITORY:$IMAGE_TAG" -t "$WRF_REPOSITORY:latest" simulation
+      - docker build --pull -f simulation/marine/croco/Dockerfile.batch -t predsea-croco-base:$IMAGE_TAG .
+      - docker build -f simulation/marine/croco/Dockerfile.aws --build-arg BASE_IMAGE=predsea-croco-base:$IMAGE_TAG -t "$CROCO_REPOSITORY:$IMAGE_TAG" -t "$CROCO_REPOSITORY:latest" .
+      - docker build --pull -f Dockerfile.ww3-batch -t predsea-ww3-base:$IMAGE_TAG .
+      - docker build -f Dockerfile.ww3-aws --build-arg BASE_IMAGE=predsea-ww3-base:$IMAGE_TAG -t "$WW3_REPOSITORY:$IMAGE_TAG" -t "$WW3_REPOSITORY:latest" .
+  post_build:
+    commands:
+      - docker push --all-tags "$API_REPOSITORY"
+      - docker push --all-tags "$ORCHESTRATOR_REPOSITORY"
+      - docker push --all-tags "$WRF_REPOSITORY"
+      - docker push --all-tags "$CROCO_REPOSITORY"
+      - docker push --all-tags "$WW3_REPOSITORY"

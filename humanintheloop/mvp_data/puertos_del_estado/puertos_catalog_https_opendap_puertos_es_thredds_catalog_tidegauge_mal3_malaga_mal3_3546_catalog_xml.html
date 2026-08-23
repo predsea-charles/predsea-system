@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2">
+  <service name="all" serviceType="compound" base="">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="http" serviceType="HTTPServer" base="/thredds/fileServer/" />
+    <service name="wms" serviceType="WMS" base="/thredds/wms/" />
+    <service name="ncssGrid" serviceType="NetcdfSubset" base="/thredds/ncss/grid/" />
+    <service name="latest" serviceType="Resolver" base="" />
+  </service>
+  <dataset name="Malaga_Mal3_3546/">
+    <property name="coords" value="36.71184;-4.41709" />
+    <property name="portusLink" value="https://portus.puertos.es/?station=3546" />
+    <property name="DatasetScan" value="true" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+    </metadata>
+    <catalogRef xlink:href="2016/catalog.xml" xlink:title="2016" ID="tidegauge_mal3/Malaga_Mal3_3546/2016" name="2016">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2017/catalog.xml" xlink:title="2017" ID="tidegauge_mal3/Malaga_Mal3_3546/2017" name="2017">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2018/catalog.xml" xlink:title="2018" ID="tidegauge_mal3/Malaga_Mal3_3546/2018" name="2018">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+  </dataset>
+</catalog>

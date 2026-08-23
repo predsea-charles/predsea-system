@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="PdE" version="1.2">
+  <service name="all" serviceType="compound" base="">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="http" serviceType="HTTPServer" base="/thredds/fileServer/" />
+    <service name="wms" serviceType="WMS" base="/thredds/wms/" />
+    <service name="ncssGrid" serviceType="NetcdfSubset" base="/thredds/ncss/grid/" />
+    <service name="latest" serviceType="Resolver" base="" />
+  </service>
+  <dataset name="Medidas">
+    <property name="nodeType" value="dataType" />
+    <property name="nodeValue" value="measure" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+    </metadata>
+    <dataset name="Mareógrafos">
+      <property name="nodeType" value="device" />
+      <property name="nodeValue" value="tide_gaude" />
+      <property name="point" value="true" />
+      <variables vocabulary="CF-1.0">
+        <variable name="SLEV" vocabulary_name="sea_surface_height_above_sea_level" units="m">sea_surface_height_above_sea_level</variable>
+        <variable name="SLEV_QC" vocabulary_name="quality_flag" units="">quality_flag</variable>
+        <variable name="TIME_QC" vocabulary_name="time_quality_flag" units="">time_quality_flag</variable>
+      </variables>
+      <dataset name="Nivel del Mar">
+        <property name="nodeType" value="variable" />
+        <property name="nodeValue" value="sea_level" />
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_alge/catalog.xml" xlink:title="Algeciras" name="Algeciras">
+          <property name="coords" value="36.177;-5.39838" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3541" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_alcu/catalog.xml" xlink:title="Alcudia" name="Alcudia">
+          <property name="coords" value="39.83456;3.13898" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3853" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_alme/catalog.xml" xlink:title="Almería" name="Almería">
+          <property name="coords" value="36.83002;-2.47835" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3545" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_arre/catalog.xml" xlink:title="Arrecife" name="Arrecife">
+          <property name="coords" value="28.97188;-13.53006" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3470" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_avi2/catalog.xml" xlink:title="Avilés2" name="Avilés2">
+          <property name="coords" value="43.59139;-5.92993" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3107" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_bar2/catalog.xml" xlink:title="Barcelona" name="Barcelona">
+          <property name="coords" value="41.34177;2.1657" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3758" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_bil3/catalog.xml" xlink:title="Bilbao" name="Bilbao">
+          <property name="coords" value="43.35153;-3.04513" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3114" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_bon2/catalog.xml" xlink:title="Bonanza" name="Bonanza">
+          <property name="coords" value="36.80221;-6.33813" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3333" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_carb/catalog.xml" xlink:title="Carboneras" name="Carboneras">
+          <property name="coords" value="36.9743;-1.89959" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3547" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_hie2/catalog.xml" xlink:title="El Hierro" name="El Hierro">
+          <property name="coords" value="27.78408;-17.90163" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3459" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_fer1/catalog.xml" xlink:title="Ferrol 1" name="Ferrol 1">
+          <property name="coords" value="43.46285;-8.32582" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3215" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_fer2/catalog.xml" xlink:title="Ferrol 2" name="Ferrol 2">
+          <property name="coords" value="43.47618;-8.24851" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3217" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_fer3/catalog.xml" xlink:title="Ferrol 3" name="Ferrol 3">
+          <property name="coords" value="43.45905;-8.3334" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3211" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_fer4/catalog.xml" xlink:title="Ferrol 4" name="Ferrol 4">
+          <property name="coords" value="43.466236;-8.319110" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3212" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_form/catalog.xml" xlink:title="Formentera" name="Formentera">
+          <property name="coords" value="38.73466;1.41903" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3855" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_fue2/catalog.xml" xlink:title="Fuerteventura" name="Fuerteventura">
+          <property name="coords" value="28.49251;-13.85822" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3469" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_gand/catalog.xml" xlink:title="Gandía" name="Gandía">
+          <property name="coords" value="38.99521;-0.15139" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3656" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_gij2/catalog.xml" xlink:title="Gijón" name="Gijón">
+          <property name="coords" value="43.55803;-5.69835" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3108" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_hue5/catalog.xml" xlink:title="Huelva" name="Huelva">
+          <property name="coords" value="37.13202;-6.83369" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3329" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_ibi2/catalog.xml" xlink:title="Ibiza" name="Ibiza">
+          <property name="coords" value="38.91123;1.44984" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3856" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_cor2/catalog.xml" xlink:title="La Coruña" name="La Coruña">
+          <property name="coords" value="43.35727;-8.38938" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3219" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_gome/catalog.xml" xlink:title="La Gomera" name="La Gomera">
+          <property name="coords" value="28.08777;-17.10831" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=346" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_lapa/catalog.xml" xlink:title="La Palma" name="La Palma">
+          <property name="coords" value="28.6778;-17.76795" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3465" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_lang/catalog.xml" xlink:title="Langosteira" name="Langosteira">
+          <property name="coords" value="43.34653;-8.53012" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3214" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_lan2/catalog.xml" xlink:title="Langosteira 2" name="Langosteira 2">
+          <property name="coords" value="43.34653;-8.53012" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3213" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_las2/catalog.xml" xlink:title="Las Palmas" name="Las Palmas">
+          <property name="coords" value="28.14056;-15.41181" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3450" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_maho/catalog.xml" xlink:title="Mahón" name="Mahón">
+          <property name="coords" value="39.89304;4.27056" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3860" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_mal3/catalog.xml" xlink:title="Malaga" name="Malaga">
+          <property name="coords" value="36.71184;-4.41709" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3546" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_mall/catalog.xml" xlink:title="Mallorca" name="Mallorca">
+          <property name="coords" value="39.56015;2.63748" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3851" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_meli/catalog.xml" xlink:title="Melilla" name="Melilla">
+          <property name="coords" value="35.29061;-2.92853" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3510" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_mari/catalog.xml" xlink:title="Marín" name="Marín">
+          <property name="coords" value="42.40612;-8.69108" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3223" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_mot2/catalog.xml" xlink:title="Motril" name="Motril">
+          <property name="coords" value="36.72024;-3.5236" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3543" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_pasa/catalog.xml" xlink:title="Pasaia" name="Pasaia">
+          <property name="coords" value="43.32321;-1.92329" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3115" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_scib/catalog.xml" xlink:title="San Cibrao" name="San Cibrao">
+          <property name="coords" value="43.70904;-7.46093" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3210" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_san2/catalog.xml" xlink:title="Santander" name="Santander">
+          <property name="coords" value="43.4613;-3.79076" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3109" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_sagu/catalog.xml" xlink:title="Sagunto" name="Sagunto">
+          <property name="coords" value="39.63392;-0.20624" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3655" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_tari/catalog.xml" xlink:title="Tarifa" name="Tarifa">
+          <property name="coords" value="36.00646;-5.60351" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3540" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_tarr/catalog.xml" xlink:title="Tarragona" name="Tarragona">
+          <property name="coords" value="41.07897;1.21325" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3756" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_ten2/catalog.xml" xlink:title="Tenerife" name="Tenerife">
+          <property name="coords" value="28.47722;-16.24111" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3471" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_val3/catalog.xml" xlink:title="Valencia" name="Valencia">
+          <property name="coords" value="39.44203;-0.31128" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3651" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_vig2/catalog.xml" xlink:title="Vigo" name="Vigo">
+          <property name="coords" value="42.24314;-8.726" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3221" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/tidegauge_vil2/catalog.xml" xlink:title="Villagarcía" name="Villagarcía">
+          <property name="coords" value="42.60071;-8.77003" />
+          <property name="portusLink" value="https://portus.puertos.es/?station=3220" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+    <dataset name="Radares">
+      <property name="nodeType" value="device" />
+      <property name="nodeValue" value="radar" />
+      <property name="point" value="false" />
+      <dataset name="Corrientes">
+        <property name="nodeType" value="variable" />
+        <property name="nodeValue" value="currents" />
+        <variables vocabulary="CF-1.0">
+          <variable name="cov" vocabulary_name="Covariance" units="m²/s²">Covariance</variable>
+          <variable name="sea_water_velocity" vocabulary_name="Sea Water Velocity" units="m/s">Sea Water Velocity</variable>
+          <variable name="stdu" vocabulary_name="Standard Deviation U" units="m/s">Standard Deviation U</variable>
+          <variable name="stdv" vocabulary_name="Standard Deviation V" units="m/s">Standard Deviation V</variable>
+          <variable name="u" vocabulary_name="Eastward Sea Water Velocity" units="m/s">Eastward Sea Water Velocity</variable>
+          <variable name="v" vocabulary_name="Northward Sea Water Velocity" units="m/s">Northward Sea Water Velocity</variable>
+        </variables>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_deltaebro/catalog.xml" xlink:title="Delta del Ebro" name="Delta del Ebro">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_gibraltar/catalog.xml" xlink:title="Estrecho de Gibraltar" name="Estrecho de Gibraltar">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_galicia/catalog.xml" xlink:title="NW_Iberian" name="NW_Iberian">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_huelva/catalog.xml" xlink:title="Golfo de Cádiz" name="Golfo de Cádiz">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_vigo/catalog.xml" xlink:title="Vigo" name="Vigo">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/radar_local_plocan/catalog.xml" xlink:title="Canarias-PLOCAN" name="Canarias-PLOCAN">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+    <dataset name="Satélite">
+      <property name="availableMean" value="wm" />
+      <property name="nodeType" value="device" />
+      <property name="nodeValue" value="satellite" />
+      <property name="point" value="false" />
+      <variables vocabulary="CF-1.0">
+        <variable name="temperature" vocabulary_name="sea_surface_skin_temperature" units="º">sea_surface_skin_temperature</variable>
+      </variables>
+      <dataset name="Temperatura">
+        <property name="nodeType" value="variable" />
+        <property name="nodeValue" value="temperature" />
+        <catalogRef xlink:href="/thredds/catalog/sat_large_ibi/catalog.xml" xlink:title="Region IBI (Iberia-Biscay-Ireland)" name="Region IBI (Iberia-Biscay-Ireland)">
+          <property name="hourStep" value="24" />
+          <property name="netcdf4" value="true" />
+          <property name="zoom" value="5" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+  </dataset>
+  <dataset name="Modelos">
+    <property name="nodeType" value="dataType" />
+    <property name="nodeValue" value="model" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+      <dataType>Grid</dataType>
+    </metadata>
+    <dataset name="Atmósfera">
+      <property name="visible" value="false" />
+      <dataset name="Escala regional">
+        <dataset name="HARMONIE 2.5km">
+          <catalogRef xlink:href="/thredds/catalog/atmosphere_regional_harmonie25/IBE/catalog.xml" xlink:title="IBE" restrictAccess="regHarmonieIbe" name="IBE">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/atmosphere_regional_harmonie25/CANT/catalog.xml" xlink:title="CANT" restrictAccess="regHarmonieCant" name="CANT">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/atmosphere_regional_harmonie25/CANA/catalog.xml" xlink:title="CANA" restrictAccess="regHarmonieCana" name="CANA">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/atmosphere_regional_harmonie25/BALE/catalog.xml" xlink:title="BALE" restrictAccess="regHarmonieBale" name="BALE">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/atmosphere_regional_harmonie25/ALBO/catalog.xml" xlink:title="ALBO" restrictAccess="regHarmonieAlbo" name="ALBO">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+        </dataset>
+      </dataset>
+      <dataset name="Escala local">
+        <catalogRef xlink:href="/thredds/catalog/atmosphere_local_safeport/catalog.xml" xlink:title="SAFEPORT" restrictAccess="localSafeport" name="SAFEPORT">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <dataset name="HARMONIE 1Km">
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_gijon/catalog.xml" xlink:title="Gijón" restrictAccess="regHarmonie1kGijon" name="Gijón">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_barcelona/catalog.xml" xlink:title="Barcelona" restrictAccess="regHarmonie1kBcn" name="Barcelona">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_almeria/catalog.xml" xlink:title="Almería" restrictAccess="regHarmonie1kAlm" name="Almería">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_carboneras/catalog.xml" xlink:title="Carboneras" restrictAccess="regHarmonie1kAlm" name="Carboneras">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_aviles/catalog.xml" xlink:title="Avilés" restrictAccess="regHarmonie1kAviles" name="Avilés">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_tenerife/catalog.xml" xlink:title="S.C. Tenerife" restrictAccess="regHarmonie1kTenerife" name="S.C. Tenerife">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_cristianos/catalog.xml" xlink:title="Cristianos - La Gomera" restrictAccess="regHarmonie1kTenerife" name="Cristianos - La Gomera">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_scpalma/catalog.xml" xlink:title="S.C. de la Palma" restrictAccess="regHarmonie1kTenerife" name="S.C. de la Palma">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_palmamallorca/catalog.xml" xlink:title="Palma de Mallorca" restrictAccess="regHarmonie1kBaleares" name="Palma de Mallorca">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_tarragona/catalog.xml" xlink:title="Tarragona" restrictAccess="regHarmonie1kTarragona" name="Tarragona">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_pdelrosario/catalog.xml" xlink:title="Puerto del Rosario" restrictAccess="regHarmonie1kLasPalmas" name="Puerto del Rosario">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_laspalmas/catalog.xml" xlink:title="Las Palmas" restrictAccess="regHarmonie1kLasPalmas" name="Las Palmas">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_arrecife/catalog.xml" xlink:title="Arrecife" restrictAccess="regHarmonie1kLasPalmas" name="Arrecife">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_malaga/catalog.xml" xlink:title="Málaga" restrictAccess="regHarmonie1kMalaga" name="Málaga">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_algeciras/catalog.xml" xlink:title="Algeciras" restrictAccess="regHarmonie1kAlgeciras" name="Algeciras">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+          <catalogRef xlink:href="/thredds/catalog/harmonie1k_tarifa/catalog.xml" xlink:title="Tarifa" restrictAccess="regHarmonie1kAlgeciras" name="Tarifa">
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+        </dataset>
+      </dataset>
+    </dataset>
+    <dataset name="3D - Temperatura, Circulación, Nivel y Salinidad">
+      <property name="nodeType" value="variable" />
+      <property name="nodeValue" value="temp_circ_niv_sal" />
+      <property name="availableMean" value="dm" />
+      <variables vocabulary="CF-1.0">
+        <variable name="salinity" vocabulary_name="Sea Water Salinity" units="psu">Sea Water Salinity</variable>
+        <variable name="sea_barotropic_velocity" vocabulary_name="Sea Barotropic Velocity" units="m/s">Sea Barotropic Velocity</variable>
+        <variable name="sea_water_velocity" vocabulary_name="Sea Water Velocity" units="m/s">Sea Water Velocity</variable>
+        <variable name="ssh" vocabulary_name="Sea Surface Height Above Sea Level" units="m">Sea Surface Height Above Sea Level</variable>
+        <variable name="temperature" vocabulary_name="Sea Water Potential Temperature" units="ºC">Sea Water Potential Temperature</variable>
+        <variable name="u" vocabulary_name="Eastward Sea Water Velocity" units="m/s">Eastward Sea Water Velocity</variable>
+        <variable name="v" vocabulary_name="Northward Sea Water Velocity" units="m/s">Northward Sea Water Velocity</variable>
+      </variables>
+      <dataset name="Escala Regional">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_regional" />
+        <catalogRef xlink:href="/thredds/catalog/circulation_regional_gib/catalog.xml" xlink:title="Gibraltar" name="Gibraltar">
+          <property name="zoom" value="8" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+      <dataset name="Escala Costera">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_coast" />
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_ali/catalog.xml" xlink:title="Alicante" name="Alicante">
+          <property name="zoom" value="9" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_alm/catalog.xml" xlink:title="Almeria" name="Almeria">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_gij/catalog.xml" xlink:title="Asturias" name="Asturias">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_bal/catalog.xml" xlink:title="Bahia de Algeciras" name="Bahia de Algeciras">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_bcn/catalog.xml" xlink:title="Barcelona" name="Barcelona">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_bil/catalog.xml" xlink:title="Bilbao" name="Bilbao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_car/catalog.xml" xlink:title="Cartagena" name="Cartagena">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_cas/catalog.xml" xlink:title="Castellón" name="Castellón">
+          <property name="zoom" value="8" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_ceu/catalog.xml" xlink:title="Ceuta" name="Ceuta">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_hie/catalog.xml" xlink:title="El Hierro" name="El Hierro">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_est/catalog.xml" xlink:title="Estrecho" name="Estrecho">
+          <property name="zoom" value="8" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_fer/catalog.xml" xlink:title="Ferrol" name="Ferrol">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_gcn/catalog.xml" xlink:title="Gran Canaria" name="Gran Canaria">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_hue/catalog.xml" xlink:title="Huelva" name="Huelva">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_ibs/catalog.xml" xlink:title="Ibiza - La Savina" name="Ibiza - La Savina">
+          <property name="zoom" value="9" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_pal/catalog.xml" xlink:title="La Palma" name="La Palma">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_lnz/catalog.xml" xlink:title="Lanzarote y Fuerteventura" name="Lanzarote y Fuerteventura">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_mao/catalog.xml" xlink:title="Mahón" name="Mahón">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_mlg/catalog.xml" xlink:title="Málaga" name="Málaga">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_pam/catalog.xml" xlink:title="Palma de Mallorca" name="Palma de Mallorca">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_pas/catalog.xml" xlink:title="Pasajes" name="Pasajes">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_rbx/catalog.xml" xlink:title="Rías Bajas" name="Rías Bajas">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_sci/catalog.xml" xlink:title="San Cibrao" name="San Cibrao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_tar/catalog.xml" xlink:title="Tarragona" name="Tarragona">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_ten/catalog.xml" xlink:title="Tenerife" name="Tenerife">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_coastal_tns/catalog.xml" xlink:title="Tenerife Sur y La Gomera" name="Tenerife Sur y La Gomera">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+      <dataset name="Escala Portuaria">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_port" />
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ali/catalog.xml" xlink:title="Alicante" name="Alicante">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_alm/catalog.xml" xlink:title="Almería" name="Almería">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_alg/catalog.xml" xlink:title="Algeciras" name="Algeciras">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ari/catalog.xml" xlink:title="Arinaga" name="Arinaga">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_arr/catalog.xml" xlink:title="Arrecife" name="Arrecife">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_avi/catalog.xml" xlink:title="Avilés" name="Avilés">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_bcn/catalog.xml" xlink:title="Barcelona" name="Barcelona">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_bil/catalog.xml" xlink:title="Bilbao" name="Bilbao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_cam/catalog.xml" xlink:title="Campamento" name="Campamento">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_car/catalog.xml" xlink:title="Cartagena" name="Cartagena">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_crb/catalog.xml" xlink:title="Carboneras" name="Carboneras">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_cas/catalog.xml" xlink:title="Castellón" name="Castellón">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ceu/catalog.xml" xlink:title="Ceuta" name="Ceuta">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_hie/catalog.xml" xlink:title="El Hierro" name="El Hierro">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ros/catalog.xml" xlink:title="El Rosario" name="El Rosario">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_fer/catalog.xml" xlink:title="Ferrol" name="Ferrol">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_gij/catalog.xml" xlink:title="Gijón" name="Gijón">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_gcn/catalog.xml" xlink:title="Gran Canaria" name="Gran Canaria">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_gra/catalog.xml" xlink:title="Granadilla" name="Granadilla">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_hue/catalog.xml" xlink:title="Huelva" name="Huelva">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ibs/catalog.xml" xlink:title="Ibiza - La Savina" name="Ibiza - La Savina">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_gmr/catalog.xml" xlink:title="La Gomera" name="La Gomera">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_pal/catalog.xml" xlink:title="La Palma" name="La Palma">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_mao/catalog.xml" xlink:title="Mahón" name="Mahón">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_mlg/catalog.xml" xlink:title="Málaga" name="Málaga">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_mrn/catalog.xml" xlink:title="Marín" name="Marín">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_pam/catalog.xml" xlink:title="Palma de Mallorca" name="Palma de Mallorca">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_pas/catalog.xml" xlink:title="Pasajes" name="Pasajes">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_sci/catalog.xml" xlink:title="San Cibrao" name="San Cibrao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_tar/catalog.xml" xlink:title="Tarragona" name="Tarragona">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_ten/catalog.xml" xlink:title="Tenerife" name="Tenerife">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_vig/catalog.xml" xlink:title="Vigo" name="Vigo">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/circulation_local_vil/catalog.xml" xlink:title="Villagarcía" name="Villagarcía">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+    <dataset name="2D - Nivel del mar">
+      <property name="nodeType" value="variable" />
+      <property name="nodeValue" value="sea_level_model" />
+      <variables vocabulary="CF-1.0">
+        <variable name="ovxt" vocabulary_name="Ocean Volume X Transport" units="m3 s-1">Ocean Volume X Transport</variable>
+        <variable name="ovyt" vocabulary_name="Ocean Volume Y Transport" units="m3 s-1">Ocean Volume Y Transport</variable>
+        <variable name="res" vocabulary_name="Sea Surface Air Correction" units="m">Sea Surface Air Correction</variable>
+      </variables>
+      <dataset name="Escala Regional">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_regional" />
+        <property name="zoom" value="6" />
+        <property name="netcdf4" value="true" />
+        <dataset name="nivmar">
+          <catalogRef xlink:href="/thredds/catalog/nivmar_large_nivmar/catalog.xml" xlink:title="NIVMAR" name="NIVMAR">
+            <property name="zoom" value="5" />
+            <property name="DatasetScan" value="true" />
+          </catalogRef>
+        </dataset>
+      </dataset>
+    </dataset>
+    <dataset name="Oleaje">
+      <property name="nodeType" value="variable" />
+      <property name="nodeValue" value="wave" />
+      <variables vocabulary="CF-1.0">
+        <variable name="VHM0" vocabulary_name="sea_surface_spectral_significant_wave_height" units="m">sea_surface_spectral_significant_wave_height</variable>
+        <variable name="VHM0_SW1" vocabulary_name="sea_surface_primary_swell_significant_wave_height" units="m">sea_surface_primary_swell_significant_wave_height</variable>
+        <variable name="VHM0_SW2" vocabulary_name="sea_surface_primary_swell_from_mean_direction" units="m">sea_surface_secondary_swell_significant_wave_height</variable>
+        <variable name="VHM0_WS" vocabulary_name="sea_surface_secondary_swell_from_mean_direction" units="m">sea_surface_wind_sea_significant_wave_height</variable>
+        <variable name="VMDR" vocabulary_name="sea_surface_wave_from_mean_direction" units="degrees">sea_surface_wave_from_mean_direction</variable>
+        <variable name="VMDR_SW1" vocabulary_name="sea_surface_primary_swell_from_mean_direction" units="degree">sea_surface_primary_swell_from_mean_direction</variable>
+        <variable name="VMDR_SW2" vocabulary_name="sea_surface_secondary_swell_from_mean_direction" units="degree">sea_surface_secondary_swell_from_mean_direction</variable>
+        <variable name="VMDR_WS" vocabulary_name="sea_surface_wave_from_mean_direction" units="degree">sea_surface_wind_sea_from_mean_direction</variable>
+        <variable name="VSMC" vocabulary_name="sea_surface_wave_mean_period_spectral_second_frequency_moment" units="s">sea_surface_wave_mean_period_spectral_second_frequency_moment</variable>
+        <variable name="VSMC_SW1" vocabulary_name="sea_surface_primary_swell_mean_period_spectral_second_frequency_moment" units="s">sea_surface_primary_swell_mean_period_spectral_second_frequency_moment</variable>
+        <variable name="VSMC_SW2" vocabulary_name="sea_surface_secondary_swell_mean_period_spectral_second_frequency_moment" units="s">sea_surface_secondary_swell_mean_period_spectral_second_frequency_moment</variable>
+        <variable name="VSMC_WS" vocabulary_name="sea_surface_wind_sea_mean_period_spectral_second_frequency_moment" units="s">sea_surface_wind_sea_mean_period_spectral_second_frequency_moment</variable>
+        <variable name="VTPK" vocabulary_name="sea_surface_wave_period_at_spectral_density_maximum" units="s">sea_surface_wave_period_at_spectral_density_maximum</variable>
+      </variables>
+      <dataset name="Gran Escala">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_global" />
+        <property name="nodeValue" value="scale_global" />
+        <catalogRef xlink:href="/thredds/catalog/wave_large_atlmed/catalog.xml" xlink:title="Atlántico y Mediterráneo" name="Atlántico y Mediterráneo">
+          <property name="zoom" value="4" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+      <dataset name="Escala Regional">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_regional" />
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_gib/catalog.xml" xlink:title="Estrecho de Gibraltar" name="Estrecho de Gibraltar">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_sfp_gib/catalog.xml" xlink:title="Estrecho de Gibraltar (SAFEPORT)" restrictAccess="localSafeport" name="Estrecho de Gibraltar (SAFEPORT)">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_bal/catalog.xml" xlink:title="Islas Baleares" name="Islas Baleares">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_can/catalog.xml" xlink:title="Islas Canarias" name="Islas Canarias">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_aib/catalog.xml" xlink:title="Península y Baleares" name="Península y Baleares">
+          <property name="zoom" value="5" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_regional_ibi/catalog.xml" xlink:title="Region IBI (Iberia-Biscay-Ireland)" name="Region IBI (Iberia-Biscay-Ireland)">
+          <property name="zoom" value="5" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+      <dataset name="Escala Costera">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_coast" />
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s11/catalog.xml" xlink:title="Algeciras" name="Algeciras">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s09b/catalog.xml" xlink:title="Alicante" name="Alicante">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s06a/catalog.xml" xlink:title="Almería (coarse)" name="Almería (coarse)">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s06b/catalog.xml" xlink:title="Almería" name="Almería">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s15c/catalog.xml" xlink:title="Arrecife" name="Arrecife">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s00/catalog.xml" xlink:title="Asturias" name="Asturias">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s07/catalog.xml" xlink:title="Avilés" name="Avilés">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s02/catalog.xml" xlink:title="Barcelona" name="Barcelona">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s14/catalog.xml" xlink:title="Bilbao" name="Bilbao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s10a/catalog.xml" xlink:title="Cádiz (coarse)" name="Cádiz (coarse)">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s10b/catalog.xml" xlink:title="Cádiz" name="Cádiz">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s06c/catalog.xml" xlink:title="Carboneras" name="Carboneras">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s03a/catalog.xml" xlink:title="Cartagena (coarse)" name="Cartagena (coarse)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s03b/catalog.xml" xlink:title="Cartagena" name="Cartagena">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s26/catalog.xml" xlink:title="Castellón" name="Castellón">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08b/catalog.xml" xlink:title="Cristianos - Gomera" name="Cristianos - Gomera">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s04a/catalog.xml" xlink:title="Ferrol (coarse)" name="Ferrol (coarse)">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s04b/catalog.xml" xlink:title="Ferrol" name="Ferrol">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s05d/catalog.xml" xlink:title="Gandia" name="Gandia">
+          <property name="zoom" value="13" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s01/catalog.xml" xlink:title="Gijón" name="Gijón">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08f/catalog.xml" xlink:title="Gomera" name="Gomera">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s27a/catalog.xml" xlink:title="Granada (coarse)" name="Granada (coarse)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08e/catalog.xml" xlink:title="Granadilla" name="Granadilla">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s24/catalog.xml" xlink:title="Huelva" name="Huelva">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s19b/catalog.xml" xlink:title="La Coruña" name="La Coruña">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08d/catalog.xml" xlink:title="La Estaca" name="La Estaca">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s15b/catalog.xml" xlink:title="Las Palmas" name="Las Palmas">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s17/catalog.xml" xlink:title="Málaga" name="Málaga">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s21/catalog.xml" xlink:title="Marín" name="Marín">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s25/catalog.xml" xlink:title="Melilla" name="Melilla">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s27b/catalog.xml" xlink:title="Motril" name="Motril">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s12a/catalog.xml" xlink:title="Palma de Mallorca" name="Palma de Mallorca">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s16/catalog.xml" xlink:title="Pasajes" name="Pasajes">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s15a/catalog.xml" xlink:title="Puerto del Rosario" name="Puerto del Rosario">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_rbai/catalog.xml" xlink:title="Rías Bajas" name="Rías Bajas">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s05c/catalog.xml" xlink:title="Sagunto" name="Sagunto">
+          <property name="zoom" value="13" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s23a/catalog.xml" xlink:title="San Cibrao (coarse)" name="San Cibrao (coarse)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s23b/catalog.xml" xlink:title="San Cibrao" name="San Cibrao">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s20a/catalog.xml" xlink:title="Santander (coarse)" name="Santander (coarse)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s20b/catalog.xml" xlink:title="Santander" name="Santander">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08c/catalog.xml" xlink:title="S.C. de La Palma" name="S.C. de La Palma">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s08a/catalog.xml" xlink:title="S.C. de Tenerife" name="S.C. de Tenerife">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s18/catalog.xml" xlink:title="Tarifa" name="Tarifa">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s13a/catalog.xml" xlink:title="Tarragona (coarse)" name="Tarragona (coarse)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s13b/catalog.xml" xlink:title="Tarragona" name="Tarragona">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s05b/catalog.xml" xlink:title="Valencia" name="Valencia">
+          <property name="zoom" value="13" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s05/catalog.xml" xlink:title="Valencia (old)" name="Valencia (old)">
+          <property name="zoom" value="11" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s05a/catalog.xml" xlink:title="Valencia (coarse)" name="Valencia (coarse)">
+          <property name="zoom" value="10" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_coast_s22/catalog.xml" xlink:title="Vigo" name="Vigo">
+          <property name="zoom" value="12" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+      <dataset name="Escala Portuaria">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_port" />
+        <catalogRef xlink:href="/thredds/catalog/wave_local_sfp_a11/catalog.xml" xlink:title="Algeciras (SAFEPORT)" name="Algeciras (SAFEPORT)">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a06b/catalog.xml" xlink:title="Almeria" name="Almeria">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a15d/catalog.xml" xlink:title="Arinaga" name="Arinaga">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a15c/catalog.xml" xlink:title="Arrecife" name="Arrecife">
+          <property name="zoom" value="16" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a07/catalog.xml" xlink:title="Avilés" name="Avilés">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a02/catalog.xml" xlink:title="Barcelona" name="Barcelona">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a14/catalog.xml" xlink:title="Bilbao" name="Bilbao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a06c/catalog.xml" xlink:title="Carboneras" name="Carboneras">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a03b/catalog.xml" xlink:title="Cartagena" name="Cartagena">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a08d/catalog.xml" xlink:title="El Hierro" name="El Hierro">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a04b/catalog.xml" xlink:title="Ferrol" name="Ferrol">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a05d/catalog.xml" xlink:title="Gandia" name="Gandia">
+          <property name="zoom" value="16" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a01/catalog.xml" xlink:title="Gijon" name="Gijon">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a08e/catalog.xml" xlink:title="Granadilla" name="Granadilla">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a19b/catalog.xml" xlink:title="La Coruña" name="La Coruña">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a08f/catalog.xml" xlink:title="La Gomera" name="La Gomera">
+          <property name="zoom" value="16" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a15b/catalog.xml" xlink:title="Las Palmas" name="Las Palmas">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a17/catalog.xml" xlink:title="Malaga" name="Malaga">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a12a/catalog.xml" xlink:title="Palma de Mallorca" name="Palma de Mallorca">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a16/catalog.xml" xlink:title="Pasajes" name="Pasajes">
+          <property name="zoom" value="15" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a15a/catalog.xml" xlink:title="Puerto del Rosario" name="Puerto del Rosario">
+          <property name="zoom" value="16" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a08c/catalog.xml" xlink:title="La Palma" name="La Palma">
+          <property name="zoom" value="16" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a05c/catalog.xml" xlink:title="Sagunto" name="Sagunto">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a23b/catalog.xml" xlink:title="San Cibrao" name="San Cibrao">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a13b/catalog.xml" xlink:title="Tarragona" name="Tarragona">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a08a/catalog.xml" xlink:title="Tenerife" name="Tenerife">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a05b/catalog.xml" xlink:title="Valencia" name="Valencia">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/wave_local_a05/catalog.xml" xlink:title="Valencia (old)" name="Valencia (old)">
+          <property name="zoom" value="14" />
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+    <dataset name="Onda Larga">
+      <property name="nodeType" value="variable" />
+      <property name="nodeValue" value="wave_long" />
+      <variables vocabulary="CF-1.0">
+        <variable name="HM0_IG" vocabulary_name="infragravitatory_spectral_significant_wave_height" units="m">infragravitatory_spectral_significant_wave_height</variable>
+        <variable name="TM02_IG" vocabulary_name="infragravitatory_wave_mean_period_spectral_second_frequency_moment" units="s">infragravitatory_wave_mean_period_spectral_second_frequency_moment</variable>
+        <variable name="TP_IG" vocabulary_name="infragravitatory_wave_period_at_spectral_density_maximum" units="s">infragravitatory_wave_period_at_spectral_density_maximum</variable>
+        <variable name="VC_IG" vocabulary_name="infragravitatory_sea_water_velocity" units="m/s">infragravitatory_sea_water_velocity</variable>
+      </variables>
+      <dataset name="Escala Portuaria">
+        <property name="nodeType" value="scale" />
+        <property name="nodeValue" value="scale_port" />
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l04b/catalog.xml" xlink:title="Ferrol" name="Ferrol">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l01/catalog.xml" xlink:title="Gijón" name="Gijón">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l08f/catalog.xml" xlink:title="Gomera" name="Gomera">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l08e/catalog.xml" xlink:title="Granadilla" name="Granadilla">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l24/catalog.xml" xlink:title="Huelva" name="Huelva">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l08c/catalog.xml" xlink:title="La Palma" name="La Palma">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+        <catalogRef xlink:href="/thredds/catalog/ondalarga_local_l08a/catalog.xml" xlink:title="Tenerife" name="Tenerife">
+          <property name="DatasetScan" value="true" />
+        </catalogRef>
+      </dataset>
+    </dataset>
+  </dataset>
+</catalog>

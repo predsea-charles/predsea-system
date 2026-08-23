@@ -1,0 +1,24 @@
+Category,Line Item,Year 1 (Pilot/Seed),Year 2 (Series A Scale),Year 3 (Global Dominance)
+OPERATIONAL METRICS,Active Contracted Vessels,100,1050,5200
+OPERATIONAL METRICS,Average Monthly SaaS Price / Vessel (EUR),49,49,49
+OPERATIONAL METRICS,Annual Recurring Revenue (ARR) (EUR),58800,617400,3057600
+,,,,
+REVENUE,Core B2B SaaS Subscriptions (EUR),58800,617400,3057600
+REVENUE,Total Revenue (EUR),58800,617400,3057600
+,,,,
+EXPENSES,Personnel - Charles (Founder & Tech Lead) (EUR),65000,65000,65000
+EXPENSES,Personnel - Graham (Maritime Advisor) (EUR),65000,65000,65000
+EXPENSES,Personnel - Matt (Product & AI Marketing) (EUR),65000,65000,65000
+EXPENSES,Personnel - Kobe (Core Developer) (EUR),65000,65000,65000
+EXPENSES,Personnel - Engineering & Sales Expansion (EUR),0,1240000,2040000
+EXPENSES,Infrastructure & Compute (GCP Partner Tier) (EUR),35000,250000,450000
+EXPENSES,Marketing & Sales (Boat Shows & Lead-Gen) (EUR),35000,250000,300000
+EXPENSES,Working Capital & Operational Contingency (EUR),20000,100000,150000
+EXPENSES,Total Operating Expenses (EUR),350000,2100000,3200000
+,,,,
+FUNDING,Equity Seed Round Inflow (EUR),350000,0,0
+FUNDING,Equity Series A Round Inflow (EUR),0,3500000,0
+FUNDING,Total Funding Inflows (EUR),350000,3500000,0
+,,,,
+CASH FLOW,Net Cash Flow (Revenue + Funding - Expenses) (EUR),58800,2017400,-142400
+CASH FLOW,Cumulative Cash Balance (EUR),58800,2076200,1933800

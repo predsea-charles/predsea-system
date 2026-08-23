@@ -1,0 +1,27 @@
+Friday Balearic Operational Read - PredSea
+
+SOCIB buoy truth this morning, 06:00 UTC:
+
+Palma Bay: 0.43 m
+Ibiza Channel: 1.00 m
+
+PredSea route interpretation for 15-24 m vessels:
+
+Palma -> Cabrera: manageable, 0.4-1.3 m
+Ibiza -> Formentera: manageable, 0.5-1.1 m
+Palma -> Ibiza: use the earlier window, exposed points up to 1.9 m
+Alcudia -> Ciutadella: conservative timing, exposed points up to 1.9 m around midday
+
+Operational read:
+Today is not a general bad-sea day.
+The useful distinction is exposure and timing.
+
+Protected / shorter crossings look workable.
+The Menorca Channel and the Palma-Ibiza crossing deserve more conservative timing, especially for smaller or comfort-sensitive vessels.
+
+This is the kind of decision layer we are building with PredSea:
+not more raw marine data, but clearer operational interpretation from forecast fields + buoy truth.
+
+Forecast source: Copernicus Mediterranean ocean model.
+Buoy truth: SOCIB public observations.
+Confidence: medium.

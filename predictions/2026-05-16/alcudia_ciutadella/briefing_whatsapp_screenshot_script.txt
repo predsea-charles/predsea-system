@@ -1,0 +1,8 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Alcudia -> Ciutadella today. Best time to leave?
+PredSea: Go earlier. The route is calm this morning, but exposed wave energy builds later.
+PredSea: Alcudia -> Ciutadella peaks near 1.8 m around 14:00.
+PredSea: Operational read: caution for vessels 15-24m; use the best weather window.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

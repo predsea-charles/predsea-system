@@ -1,0 +1,6 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+PredSea: Got it. You're near Palma Marina. For Palma -> Ibiza, the best window looks before midday.
+PredSea: Watch-out: waves build toward 1.5 m around 23:00.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

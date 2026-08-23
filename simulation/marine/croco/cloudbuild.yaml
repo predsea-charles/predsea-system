@@ -1,0 +1,20 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=Dockerfile
+      - --tag=${_IMAGE}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - run
+      - --rm
+      - --entrypoint=/usr/local/bin/smoke_basin.sh
+      - ${_IMAGE}
+images:
+  - ${_IMAGE}
+substitutions:
+  _IMAGE: europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco:2.1.3
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3600s

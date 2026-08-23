@@ -1,0 +1,18 @@
+/*
+** param.h.balearic - CROCO Compile-Time Dimensions for Balearic 1 km Grid
+*/
+
+      integer LM, MM, N
+      parameter (LM=499, MM=399, N=30)
+
+      integer NP_XI, NP_ETA, NSUB_X, NSUB_E
+      parameter (NP_XI=4, NP_ETA=4)
+      parameter (NSUB_X=1, NSUB_E=1)
+
+#ifdef MPI
+      integer LDe, MDe
+      parameter (LDe=(LM+NP_XI-1)/NP_XI, MDe=(MM+NP_ETA-1)/NP_ETA)
+#else
+      integer LDe, MDe
+      parameter (LDe=LM, MDe=MM)
+#endif

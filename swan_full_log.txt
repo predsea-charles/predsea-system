@@ -1,0 +1,189 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-03T14:12:29.636576273Z 
+2026-08-03T14:12:29.636611848Z ============================================================
+2026-08-03T14:12:29.636614876Z 🌊 [RUNNER] Initializing simulation shard: region=med_basin_1km, model=swan, hours=6
+2026-08-03T14:12:29.636617532Z ============================================================
+2026-08-03T14:12:29.636619483Z 📅 Run Date: 2026-08-03
+2026-08-03T14:12:29.636621190Z 🆔 Run ID: 2026-08-03T1239Z
+2026-08-03T14:12:29.636622975Z 🪣 GCS Bucket: predsea-daily-outputs-test
+2026-08-03T14:12:29.636624997Z 🧵 MPI Ranks: 64
+2026-08-03T14:12:29.636699690Z 
+2026-08-03T14:12:29.636703623Z ============================================================
+2026-08-03T14:12:29.636705426Z 🌊 [RUNNER] 1. Syncing boundary forcing files from GCS
+2026-08-03T14:12:29.636707193Z ============================================================
+2026-08-03T14:12:29.636709150Z 📥 Syncing ECMWF forcing from gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/...
+2026-08-03T14:12:29.636711121Z Running: gsutil -m rsync -r gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/ /workspace/inputs
+2026-08-03T14:12:31.705033406Z Building synchronization state...
+2026-08-03T14:12:32.207380551Z Starting synchronization...
+2026-08-03T14:12:32.266750369Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/Vtable.ECMWF_grib2...
+2026-08-03T14:12:32.275982109Z / [0/7 files][    0.0 B/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.276000685Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/forcing_metadata.json...
+2026-08-03T14:12:32.310137566Z / [0/7 files][    0.0 B/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.310158992Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/ecmwf_pl_2026-08-03_00Z.grib2...
+2026-08-03T14:12:32.310856966Z / [0/7 files][    0.0 B/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.310863936Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/run_pipeline.sh...
+2026-08-03T14:12:32.318241899Z / [0/7 files][    0.0 B/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.318250693Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/ecmwf_sfc_2026-08-03_00Z.grib2...
+2026-08-03T14:12:32.328443250Z / [0/7 files][    0.0 B/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.330031406Z / [1/7 files][  5.7 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.331414476Z / [2/7 files][  5.8 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.331426400Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/setup_domain.py...
+2026-08-03T14:12:32.366445952Z / [2/7 files][  5.8 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.366471820Z Copying gs://predsea-daily-outputs-test/forcing/ecmwf/2026-08-03/namelist.wps...
+2026-08-03T14:12:32.376955481Z / [3/7 files][ 11.0 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.385700119Z / [3/7 files][ 11.0 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.422161954Z / [4/7 files][ 26.2 KiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:32.807251923Z / [5/7 files][  1.8 MiB/343.2 MiB]   0% Done                                    
+2026-08-03T14:12:33.269902533Z -
+2026-08-03T14:12:33.408453344Z - [6/7 files][115.5 MiB/343.2 MiB]  33% Done                                    
+2026-08-03T14:12:34.008525501Z \
+2026-08-03T14:12:34.270819925Z |
+2026-08-03T14:12:34.609853792Z | [6/7 files][277.6 MiB/343.2 MiB]  80% Done                                    
+2026-08-03T14:12:34.683268422Z /
+2026-08-03T14:12:34.683286376Z / [7/7 files][343.2 MiB/343.2 MiB] 100% Done                                    
+2026-08-03T14:12:34.683288897Z Operation completed over 7 objects/343.2 MiB.                                    
+2026-08-03T14:12:34.907414471Z 📥 Syncing CMEMS forcing from gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/...
+2026-08-03T14:12:34.907437816Z Running: gsutil -m rsync -r gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/ /workspace/inputs
+2026-08-03T14:12:36.923656476Z Building synchronization state...
+2026-08-03T14:12:37.414273086Z Starting synchronization...
+2026-08-03T14:12:37.474478770Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_currents_3d_alboran_1km.nc...
+2026-08-03T14:12:37.476407601Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.476424963Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_currents_3d_tyrrhenian_1km.nc...
+2026-08-03T14:12:37.485533156Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.485547641Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_ocean_forcing.nc...
+2026-08-03T14:12:37.497266101Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.497281843Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_temperature_3d_tyrrhenian_1km.nc...
+2026-08-03T14:12:37.503836758Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.503853470Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_temperature_3d_gulf_of_lion_1km.nc...
+2026-08-03T14:12:37.514607564Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.514618640Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_currents_3d_balearic_1km.nc...
+2026-08-03T14:12:37.523034139Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.523053233Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_salinity_3d_tyrrhenian_1km.nc...
+2026-08-03T14:12:37.528764687Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.528786339Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_salinity_3d_alboran_1km.nc...
+2026-08-03T14:12:37.537981610Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.537995193Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_sea_level_alboran_1km.nc...
+2026-08-03T14:12:37.544767957Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_sea_level_tyrrhenian_1km.nc...
+2026-08-03T14:12:37.557314193Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_salinity_3d_balearic_1km.nc...
+2026-08-03T14:12:37.575292922Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.579403619Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.580097915Z / [0/18 files][    0.0 B/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.580105231Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_salinity_3d_gulf_of_lion_1km.nc...
+2026-08-03T14:12:37.591236242Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_swan_boundary_med_basin_1km.nc...
+2026-08-03T14:12:37.592024291Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_currents_3d_gulf_of_lion_1km.nc...
+2026-08-03T14:12:37.618241623Z / [0/18 files][  3.4 MiB/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.624205356Z / [0/18 files][  7.7 MiB/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.646255158Z / [0/18 files][  8.5 MiB/  1.2 GiB]   0% Done                                   
+2026-08-03T14:12:37.651579476Z / [1/18 files][ 13.6 MiB/  1.2 GiB]   1% Done                                   
+2026-08-03T14:12:37.692945400Z / [2/18 files][ 14.4 MiB/  1.2 GiB]   1% Done                                   
+2026-08-03T14:12:37.692963049Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_sea_level_balearic_1km.nc...
+2026-08-03T14:12:37.887771826Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_sea_level_gulf_of_lion_1km.nc...
+2026-08-03T14:12:37.903877353Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_temperature_3d_alboran_1km.nc...
+2026-08-03T14:12:37.985518930Z / [2/18 files][ 81.9 MiB/  1.2 GiB]   6% Done                                   
+2026-08-03T14:12:37.985536144Z Copying gs://predsea-daily-outputs-test/forcing/cmems/2026-08-03/cmems_croco_temperature_3d_balearic_1km.nc...
+2026-08-03T14:12:38.202679079Z / [3/18 files][109.0 MiB/  1.2 GiB]   9% Done                                   
+2026-08-03T14:12:38.500317541Z / [4/18 files][145.0 MiB/  1.2 GiB]  12% Done                                   
+2026-08-03T14:12:38.514296771Z / [4/18 files][294.6 MiB/  1.2 GiB]  24% Done                                   
+2026-08-03T14:12:38.546968424Z / [4/18 files][315.2 MiB/  1.2 GiB]  26% Done                                   
+2026-08-03T14:12:38.562225741Z / [5/18 files][369.4 MiB/  1.2 GiB]  31% Done                                   
+2026-08-03T14:12:38.572314216Z / [5/18 files][398.8 MiB/  1.2 GiB]  33% Done                                   
+2026-08-03T14:12:38.648289877Z -
+2026-08-03T14:12:38.759577570Z - [6/18 files][577.0 MiB/  1.2 GiB]  48% Done                                   
+2026-08-03T14:12:39.156178220Z \
+2026-08-03T14:12:39.211976082Z \ [6/18 files][989.3 MiB/  1.2 GiB]  83% Done                                   
+2026-08-03T14:12:39.403334069Z |
+2026-08-03T14:12:39.813424729Z | [7/18 files][  1.0 GiB/  1.2 GiB]  88% Done                                   
+2026-08-03T14:12:40.269159565Z /
+2026-08-03T14:12:40.717372203Z / [8/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                   
+2026-08-03T14:12:40.717396418Z / [9/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                   
+2026-08-03T14:12:42.139923402Z -
+2026-08-03T14:12:42.139947682Z - [10/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:43.089120221Z \
+2026-08-03T14:12:43.089144529Z \ [11/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:43.089238484Z |
+2026-08-03T14:12:44.573031229Z | [12/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:44.573054901Z | [13/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:44.990247547Z /
+2026-08-03T14:12:45.411857514Z / [14/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:45.411881533Z / [15/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:45.623488565Z -
+2026-08-03T14:12:45.829694834Z - [16/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:46.034525030Z - [17/18 files][  1.2 GiB/  1.2 GiB]  99% Done                                  
+2026-08-03T14:12:46.034549325Z - [18/18 files][  1.2 GiB/  1.2 GiB] 100% Done                                  
+2026-08-03T14:12:46.034551752Z \
+2026-08-03T14:12:46.034553816Z Operation completed over 18 objects/1.2 GiB.                                     
+2026-08-03T14:12:47.577183666Z ✅ Cached ECMWF SWAN wind passed payload/time validation: {'path': '/workspace/inputs/ecmwf_sfc_2026-08-03_00Z.grib2', 'expected_times': 3, '10u': {'times': 3, 'minimum': -28.873626708984375, 'maximum': 27.641998291015625}, '10v': {'times': 3, 'minimum': -28.215744018554688, 'maximum': 31.430938720703125}}
+2026-08-03T14:12:47.577209743Z 🔍 Resolved forcing: wind=ecmwf_sfc_2026-08-03_00Z.grib2, waves=cmems_swan_boundary_med_basin_1km.nc
+2026-08-03T14:12:47.577222076Z 
+2026-08-03T14:12:47.577224030Z ============================================================
+2026-08-03T14:12:47.577225894Z 🌊 [RUNNER] 2. Running SWAN Wave Simulation
+2026-08-03T14:12:47.577227794Z ============================================================
+2026-08-03T14:12:47.577405753Z Running: python3 /app/scripts/prepare_swan_run.py --region /app/simulation/marine/regions/med_basin_1km.json --bathymetry /app/simulation/inputs/med_basin_1km_bathymetry_swan.nc --wind-grib /workspace/inputs/ecmwf_sfc_2026-08-03_00Z.grib2 --wave-boundary /workspace/inputs/cmems_swan_boundary_med_basin_1km.nc --output-dir /workspace/outputs/swan_med_basin_1km --start-time 2026-08-03T00:00:00 --forecast-hours 6
+2026-08-03T14:12:50.462147085Z {
+2026-08-03T14:12:50.462168742Z   "computational_timestep_minutes": 5,
+2026-08-03T14:12:50.462171210Z   "end_time": "2026-08-03T06:00:00",
+2026-08-03T14:12:50.462173416Z   "forecast_hours": 6,
+2026-08-03T14:12:50.462175304Z   "grid": {
+2026-08-03T14:12:50.462177139Z     "dx_degrees": 0.009009009227156639,
+2026-08-03T14:12:50.462179065Z     "dy_degrees": 0.009009008295834064,
+2026-08-03T14:12:50.462180869Z     "nx": 2221,
+2026-08-03T14:12:50.462182719Z     "ny": 1055
+2026-08-03T14:12:50.462184413Z   },
+2026-08-03T14:12:50.462186087Z   "inputs": {
+2026-08-03T14:12:50.462187901Z     "bottom.bot": {
+2026-08-03T14:12:50.462189839Z       "sha256": "890752e4c0cead4ec0708d4b8f904dc5f9b9a0b4540b9c0a4d5cc9fffa684d52",
+2026-08-03T14:12:50.462191921Z       "size_bytes": 15192360
+2026-08-03T14:12:50.462193799Z     },
+2026-08-03T14:12:50.462195487Z     "cmems_swan_boundary_med_basin_1km.nc": {
+2026-08-03T14:12:50.462197381Z       "sha256": "78adfba06c79b7f57f30c0b766ef70bc2cd09f1d3db18c7b332e8a2f40105d3b",
+2026-08-03T14:12:50.462199222Z       "size_bytes": 5365962
+2026-08-03T14:12:50.462200945Z     },
+2026-08-03T14:12:50.462202590Z     "ecmwf_sfc_2026-08-03_00Z.grib2": {
+2026-08-03T14:12:50.462204397Z       "sha256": "8d7450808d73759c1eb571662880cd4da20d749a2deacee412d8d9dc0e7b0942",
+2026-08-03T14:12:50.462206239Z       "size_bytes": 79435356
+2026-08-03T14:12:50.462207943Z     },
+2026-08-03T14:12:50.462209601Z     "med_basin_1km.json": {
+2026-08-03T14:12:50.462211436Z       "sha256": "86c4607bc4aed56eb1432f8929fa46669fda3209269ee70f1e80af24b47acb2f",
+2026-08-03T14:12:50.462213236Z       "size_bytes": 3325
+2026-08-03T14:12:50.462214947Z     },
+2026-08-03T14:12:50.462216601Z     "med_basin_1km_bathymetry_swan.nc": {
+2026-08-03T14:12:50.462218362Z       "sha256": "24d46f482be85efb01ad2ee7e3c693a988a94975cd4f40fb503e5c36975ec88b",
+2026-08-03T14:12:50.462220241Z       "size_bytes": 9402804
+2026-08-03T14:12:50.462236626Z     },
+2026-08-03T14:12:50.462238474Z     "predsea_med_basin_1km.swn": {
+2026-08-03T14:12:50.462240173Z       "sha256": "1c58bbff4fe2f38718e592ff5f46be7c9939a58bf1c59c9f7eeae3c0c5ceffcf",
+2026-08-03T14:12:50.462241957Z       "size_bytes": 1038
+2026-08-03T14:12:50.462243649Z     },
+2026-08-03T14:12:50.462245262Z     "wind.dat": {
+2026-08-03T14:12:50.462246990Z       "sha256": "6cf927d1a602f39f15663bebaa64445af8b6c50155c3b1867c26bf8316d78601",
+2026-08-03T14:12:50.462248774Z       "size_bytes": 371264
+2026-08-03T14:12:50.462250498Z     }
+2026-08-03T14:12:50.462252123Z   },
+2026-08-03T14:12:50.462253816Z   "native_output": {
+2026-08-03T14:12:50.462255506Z     "format": "parallel_vtk",
+2026-08-03T14:12:50.462257337Z     "publication_format": "netcdf",
+2026-08-03T14:12:50.462259507Z     "reason": "avoid SWAN MPI NetCDF shard collection failure"
+2026-08-03T14:12:50.462261411Z   },
+2026-08-03T14:12:50.462263002Z   "open_boundary": {
+2026-08-03T14:12:50.462264664Z     "formulation": "hourly parametric JONSWAP from VHM0/VTPK/VMDR",
+2026-08-03T14:12:50.462266537Z     "source": "Copernicus Marine",
+2026-08-03T14:12:50.462268256Z     "timestamps": 7
+2026-08-03T14:12:50.462269911Z   },
+2026-08-03T14:12:50.462271517Z   "region_id": "med_basin_1km",
+2026-08-03T14:12:50.462273302Z   "schema_version": "predsea.swan_run_input.v1",
+2026-08-03T14:12:50.462275136Z   "start_time": "2026-08-03T00:00:00",
+2026-08-03T14:12:50.462276912Z   "wind": {
+2026-08-03T14:12:50.462278549Z     "interval_hours": 1,
+2026-08-03T14:12:50.462280268Z     "source": "ECMWF",
+2026-08-03T14:12:50.462282129Z     "timestamps": 7
+2026-08-03T14:12:50.462283841Z   }
+2026-08-03T14:12:50.462285461Z }
+2026-08-03T14:12:50.570387929Z 🚀 Executing parallel SWAN wave model on 64 MPI ranks...
+2026-08-03T14:12:50.570716032Z Running: /usr/local/bin/swanrun -input predsea_med_basin_1km -mpi 64
+2026-08-03T14:12:50.572375811Z swan.exe is /usr/local/bin/swan.exe
+2026-08-03T14:12:51.620734960Z 
+2026-08-03T14:12:51.620763236Z  SWAN is preparing computation
+2026-08-03T14:12:51.620766427Z 
+2026-08-03T14:12:53.837538855Z +SWAN is processing output request    1

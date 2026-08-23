@@ -1,0 +1,7 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: How does the sea look for this evening?
+PredSea: Sea state builds later. The regional wave field peaks around 21:00 UTC.
+PredSea: Exposed areas reach ~2.4 m, mainly offshore / north-east of Mallorca.
+PredSea: Keep exposed crossings conservative this evening.
+PredSea: Shorter protected hops may remain workable. Confidence: medium.

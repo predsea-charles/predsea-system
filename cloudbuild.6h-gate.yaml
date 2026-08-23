@@ -1,0 +1,94 @@
+substitutions:
+  _FORECAST_HOURS: "6"
+  _BATCH_REGIONS: "alboran_1km,gulf_of_lion_1km,balearic_1km,tyrrhenian_1km,algerian_1km"
+  _BATCH_IMAGE_URI: "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:5b7c30bbe0bd29793506f4607755dd494a9d201215f6184872fe78055acc9f37"
+  _GCS_BUCKET: "predsea-daily-outputs-test"
+  # daily_orchestrator.py's --batch-mpi-ranks default (16) is passed to every
+  # region in a submission and OVERRIDES submit_gcp_batch_simulation.py's own
+  # per-region calculate_resources() sizing (which would pick 8 ranks for any
+  # region under 500k grid points -- that includes all 3 broken regions AND,
+  # by current bbox sizes, balearic/tyrrhenian too). Exposed here so a test
+  # build can override it without touching the orchestrator's default for
+  # normal daily runs. See docs note in the step below for why this is worth
+  # testing for alboran/gulf_of_lion/algerian specifically.
+  _BATCH_MPI_RANKS: "16"
+  # Opt-in basin-wide SWAN experiment (see med_basin_1km.json,
+  # crop_basin_swan_output.py, and vm_startup.sh's basin-swan-region
+  # handling). Empty by default -- daily_orchestrator.py treats an empty
+  # --basin-swan-region as "not set" and per-region SWAN Batch jobs still
+  # run exactly as before. Set _BASIN_SWAN_REGION=med_basin_1km (and drop
+  # gulf_of_lion_1km/alboran_1km/algerian_1km's "swan" model from a
+  # --batch-regions submission, since CROCO still runs per-region but SWAN
+  # no longer needs to) to test running SWAN once over the union bbox
+  # instead of as 5 separate small-domain jobs, 3 of which currently fail.
+  _BASIN_SWAN_REGION: ""
+  _BASIN_SWAN_IMAGE_URI: ""
+  _BASIN_SWAN_MPI_RANKS: ""
+
+# humanintheloop/.env is git-ignored, so it never reaches this build's source
+# upload — credentials must come from Secret Manager instead. Each secret below
+# must exist (gcloud secrets create ...). Builds submitted with `gcloud builds
+# submit` (no --service-account flag) run as the Compute Engine default service
+# account ({PROJECT_NUMBER}-compute@developer.gserviceaccount.com), NOT the
+# legacy Cloud Build SA — confirm with `gcloud builds describe <id>
+# --format="value(serviceAccount)"`. That Compute Engine default SA needs
+# roles/secretmanager.secretAccessor on all four secrets before this will work.
+availableSecrets:
+  secretManager:
+    - versionName: projects/predsea-api/secrets/copernicus-username/versions/latest
+      env: COPERNICUS_USERNAME
+    - versionName: projects/predsea-api/secrets/copernicus-password/versions/latest
+      env: COPERNICUS_PASSWORD
+    - versionName: projects/predsea-api/secrets/aemet-api-key/versions/latest
+      env: AEMET_API_KEY
+    - versionName: projects/predsea-api/secrets/socib-api-key/versions/latest
+      env: SOCIB_API_KEY
+
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: "bash"
+    secretEnv:
+      - COPERNICUS_USERNAME
+      - COPERNICUS_PASSWORD
+      - AEMET_API_KEY
+      - SOCIB_API_KEY
+    args:
+      - "-c"
+      - |
+        set -euo pipefail
+        echo "Installing Python dependencies..."
+        pip3 install --quiet --break-system-packages -r requirements.txt
+        export COPERNICUSMARINE_SERVICE_USERNAME="$$COPERNICUS_USERNAME"
+        export COPERNICUSMARINE_SERVICE_PASSWORD="$$COPERNICUS_PASSWORD"
+        echo "Launching daily_orchestrator.py from Cloud Build (ephemeral, no local machine needed)..."
+        python3 scripts/daily_orchestrator.py \
+          --use-gcp-batch \
+          --forecast-hours "${_FORECAST_HOURS}" \
+          --batch-regions "${_BATCH_REGIONS}" \
+          --batch-image-uri "${_BATCH_IMAGE_URI}" \
+          --batch-mpi-ranks "${_BATCH_MPI_RANKS}" \
+          --basin-swan-region "${_BASIN_SWAN_REGION}" \
+          --basin-swan-image-uri "${_BASIN_SWAN_IMAGE_URI}" \
+          --basin-swan-mpi-ranks "${_BASIN_SWAN_MPI_RANKS}" \
+          --gcs-bucket "${_GCS_BUCKET}"
+
+# WRF timeout (max(4.0, forecast_hours/24*1.25)) + basin-SWAN-VM timeout
+# (basin_swan_timeout_hours(): max(12.0, forecast_hours/24*6.0)) + Batch-phase
+# timeout (batch_pipeline_timeout_hours(): max(8.0, forecast_hours/24*4.0), see
+# daily_orchestrator.py) now run as 3 STRICTLY SEQUENTIAL stages (WRF VM ->
+# delete -> basin-SWAN VM -> delete -> throttled CROCO Batch jobs), not
+# overlapping, to avoid all 3 competing for the same 64-vCPU CPUS_ALL_REGIONS
+# project quota. So this ceiling must cover the SUM of all 3: for a 6h
+# forecast, 4h (WRF) + 12h (basin-SWAN floor) + 8h (Batch floor) = 24h worst
+# case -- which is ALSO Cloud Build's own hard maximum for `timeout` (24h0m0s),
+# so this is set to that exact ceiling with essentially no margin at the
+# nominal-worst-case level. In practice WRF and CROCO both tend to finish
+# well under their own individual budgets, so there's usually real slack.
+# Revisit the 12h basin-SWAN floor once a real 64-rank runtime has been
+# measured (it's currently a rough guess based on an 8+ hour observation at
+# half the ranks) -- shrinking it is the only way to get headroom back for
+# longer forecasts without hitting this 24h ceiling.
+timeout: 86400s
+options:
+  machineType: "E2_MEDIUM"
+  logging: CLOUD_LOGGING_ONLY

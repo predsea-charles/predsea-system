@@ -1,0 +1,9 @@
+PredSea Balearic Briefing | Ibiza -> Formentera
+
+Now: Buoy Canal de Ibiza reports 0.57 m significant wave height and 19.09 C water.
+Next 24h: forecast wave peak near 1.4 m around 02:00.
+Captain's read: best crossing window is before midday.
+Watch-out: waves build toward 1.4 m around 02:00; current may reach 1.1 kn around 02:00.
+Confidence: medium.
+
+Illustrative route intelligence example, based on public marine data.

@@ -1,0 +1,12 @@
+{
+  "name": "predsea-frontend-sdk",
+  "version": "2.0.0",
+  "description": "TypeScript SDK, API Wrappers, Adapters, and Mocking layers for the PredSea Platform.",
+  "scripts": {
+    "api:generate": "mkdir -p src/api/generated && npx openapi-typescript docs/api/openapi.json -o src/api/generated/openapi.ts",
+    "api:check": "mkdir -p src/api/generated && npx openapi-typescript docs/api/openapi.json -o src/api/generated/openapi.temp.ts && diff src/api/generated/openapi.ts src/api/generated/openapi.temp.ts && rm src/api/generated/openapi.temp.ts && echo '✨ API contract check passed successfully!'"
+  },
+  "dependencies": {
+    "openapi-typescript": "^7.13.0"
+  }
+}

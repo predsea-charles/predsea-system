@@ -1,0 +1,29 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=simulation/marine/swan/Dockerfile.batch
+      - --tag=${_IMAGE}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - run
+      - --rm
+      - --entrypoint=/bin/sh
+      - ${_IMAGE}
+      - -c
+      - >-
+        test -x /usr/local/bin/swan.exe &&
+        test -x /usr/local/bin/swanrun &&
+        test -x /usr/bin/python3 &&
+        CLOUDSDK_PYTHON=/usr/bin/python3 gsutil version -l &&
+        python3 -c 'import cfgrib, copernicusmarine, ecmwf.opendata, netCDF4, numpy, xarray' &&
+        python3 /app/scripts/fetch_swan_wind.py --help &&
+        python3 /app/scripts/run_marine_simulation.py --help
+images:
+  - ${_IMAGE}
+substitutions:
+  _IMAGE: europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/swan-batch:41.51
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3600s

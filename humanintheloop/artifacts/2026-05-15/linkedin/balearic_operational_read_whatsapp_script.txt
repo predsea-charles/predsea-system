@@ -1,0 +1,7 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+Captain: Balearics today - what matters?
+PredSea: Not a closed day. The difference is exposure and timing.
+PredSea: Buoy truth at 06:00 UTC: Palma Bay 0.43 m; Ibiza Channel 1.0 m.
+PredSea: Manageable: Ibiza -> Formentera 0.5-1.1 m; Palma -> Cabrera 0.4-1.3 m.
+PredSea: Conservative timing: Menorca Channel and Palma -> Ibiza. Exposed points reach ~1.9 m. Confidence: medium.

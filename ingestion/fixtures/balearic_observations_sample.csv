@@ -1,0 +1,4 @@
+station_id,time,lat,lon,wind_knots,wind_direction_deg,pressure_hpa
+sample-a,2026-04-29T18:00:00Z,39.30,3.00,8.0,90,1012.4
+sample-b,2026-04-29T18:00:00Z,39.50,3.20,7.0,85,1011.8
+sample-c,2026-04-29T18:00:00Z,39.70,3.45,4.0,70,1011.2

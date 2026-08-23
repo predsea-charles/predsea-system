@@ -1,0 +1,30 @@
+substitutions:
+  _GCS_BUCKET: "predsea-daily-outputs-test"
+
+steps:
+  - name: "python:3.11-slim"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -euo pipefail
+        echo "Installing Python dependencies..."
+        pip install --quiet numpy scipy xarray requests Pillow google-cloud-storage netCDF4
+
+        for region in alboran_1km gulf_of_lion_1km balearic_1km tyrrhenian_1km algerian_1km; do
+          echo ""
+          echo "=== Generating bathymetry for ${region} ==="
+          python3 scripts/prepare_bathymetry.py \
+            --region "${region}" \
+            --output-dir /workspace/assets/static_grids \
+            --gcs-bucket "${_GCS_BUCKET}"
+        done
+
+        echo ""
+        echo "=== Generated files ==="
+        ls -la /workspace/assets/static_grids/
+
+timeout: 7200s
+options:
+  machineType: "E2_HIGHCPU_8"
+  logging: CLOUD_LOGGING_ONLY

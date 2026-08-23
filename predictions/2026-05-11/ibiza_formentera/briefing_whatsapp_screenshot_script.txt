@@ -1,0 +1,6 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+PredSea: Got it. You're near Palma Marina. For Ibiza -> Formentera, the best window looks most daylight windows look manageable.
+PredSea: Watch-out: no major wave build-up in the 24h forecast.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.

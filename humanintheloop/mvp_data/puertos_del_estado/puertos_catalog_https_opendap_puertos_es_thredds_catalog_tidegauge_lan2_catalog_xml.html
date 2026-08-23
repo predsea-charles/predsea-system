@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2">
+  <service name="all" serviceType="compound" base="">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="http" serviceType="HTTPServer" base="/thredds/fileServer/" />
+    <service name="wms" serviceType="WMS" base="/thredds/wms/" />
+    <service name="ncssGrid" serviceType="NetcdfSubset" base="/thredds/ncss/grid/" />
+    <service name="latest" serviceType="Resolver" base="" />
+  </service>
+  <dataset name="Langosteira 2">
+    <property name="coords" value="43.34653;-8.53012" />
+    <property name="portusLink" value="https://portus.puertos.es/?station=3213" />
+    <property name="DatasetScan" value="true" />
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+    </metadata>
+    <catalogRef xlink:href="2022/catalog.xml" xlink:title="2022" ID="tidegauge_lan2/2022" name="2022">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2023/catalog.xml" xlink:title="2023" ID="tidegauge_lan2/2023" name="2023">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2024/catalog.xml" xlink:title="2024" ID="tidegauge_lan2/2024" name="2024">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2025/catalog.xml" xlink:title="2025" ID="tidegauge_lan2/2025" name="2025">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+    <catalogRef xlink:href="2026/catalog.xml" xlink:title="2026" ID="tidegauge_lan2/2026" name="2026">
+      <property name="DatasetScan" value="true" />
+    </catalogRef>
+  </dataset>
+</catalog>

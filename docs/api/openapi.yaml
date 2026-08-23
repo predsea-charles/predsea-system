@@ -1,0 +1,2738 @@
+openapi: 3.1.0
+info:
+  title: PredSea MVP API
+  description: File-backed API for PredSea route evidence, briefings, and captain
+    questions.
+  version: 0.1.0
+paths:
+  /warnings/active:
+    post:
+      tags:
+      - warnings
+      summary: Register pre-calculated active anomaly or official warnings
+      description: Allows ingestion pipelines or scripts to push pre-calculated active
+        warning items directly to the API.
+      operationId: post_warnings_active_endpoint_warnings_active_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WarningItem'
+              title: Warnings
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Post Warnings Active Endpoint Warnings Active Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - warnings
+      summary: Operational warnings from official alerts and anomaly detection
+      description: Combine AEMET official CAP alerts with PredSea anomaly warnings
+        computed from the latest evidence rows and climatology baseline.
+      operationId: warnings_active_endpoint_warnings_active_get
+      parameters:
+      - name: route
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional route id, e.g. palma_ibiza
+          title: Route
+        description: Optional route id, e.g. palma_ibiza
+      - name: place
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional place id, e.g. palma
+          title: Place
+        description: Optional place id, e.g. palma
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional ISO date YYYY-MM-DD
+          title: Date
+        description: Optional ISO date YYYY-MM-DD
+      - name: z_threshold
+        in: query
+        required: false
+        schema:
+          type: number
+          minimum: 0.0
+          default: 1.5
+          title: Z Threshold
+      - name: lookback_hours
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 240
+          title: Lookback Hours
+      - name: min_window_hours
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 240
+          title: Min Window Hours
+      - name: min_sample_count
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 10
+          title: Min Sample Count
+      - name: include_aemet
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Include Aemet
+      - name: include_anomaly
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Include Anomaly
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WarningsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /navigation/magnetic-variation:
+    get:
+      summary: Get Magnetic Variation
+      operationId: get_magnetic_variation_navigation_magnetic_variation_get
+      parameters:
+      - name: latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90
+          minimum: -90
+          description: Latitude coordinate
+          title: Latitude
+        description: Latitude coordinate
+      - name: longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180
+          minimum: -180
+          description: Longitude coordinate
+          title: Longitude
+        description: Longitude coordinate
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^\d{4}-\d{2}-\d{2}$
+          - type: 'null'
+          description: Optional date format YYYY-MM-DD
+          title: Date
+        description: Optional date format YYYY-MM-DD
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes:
+    get:
+      summary: Routes
+      operationId: routes_routes_get
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places:
+    get:
+      summary: List canonical places
+      description: Return the canonical place registry used by PredSea for weather
+        lookups, route planning, and coordinate resolution.
+      operationId: places_places_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacesResponse'
+  /places/resolve:
+    get:
+      summary: Resolve Place Endpoint
+      operationId: resolve_place_endpoint_places_resolve_get
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceResolutionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/evidence:
+    get:
+      summary: Route Evidence
+      operationId: route_evidence_routes__route_id__evidence_get
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/briefing:
+    get:
+      summary: Route Briefing
+      operationId: route_briefing_routes__route_id__briefing_get
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: vessel_class
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(small|medium|large)$
+          default: medium
+          title: Vessel Class
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(whatsapp|linkedin)$
+          default: whatsapp
+          title: Format
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BriefingResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/gmdss:
+    get:
+      summary: Route Gmdss Warnings
+      operationId: route_gmdss_warnings_routes__route_id__gmdss_get
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      - name: max_distance
+        in: query
+        required: false
+        schema:
+          type: number
+          maximum: 500.0
+          minimum: 0.0
+          description: Max proximity distance threshold in Nautical Miles
+          default: 60.0
+          title: Max Distance
+        description: Max proximity distance threshold in Nautical Miles
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional run date YYYY-MM-DD
+          title: Date
+        description: Optional run date YYYY-MM-DD
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional run ID
+          title: Run
+        description: Optional run ID
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /warnings/gmdss:
+    get:
+      summary: Position Gmdss Warnings
+      operationId: position_gmdss_warnings_warnings_gmdss_get
+      parameters:
+      - name: lat
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90.0
+          minimum: -90.0
+          description: Vessel GPS latitude
+          title: Lat
+        description: Vessel GPS latitude
+      - name: lon
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180.0
+          minimum: -180.0
+          description: Vessel GPS longitude
+          title: Lon
+        description: Vessel GPS longitude
+      - name: radius
+        in: query
+        required: false
+        schema:
+          type: number
+          maximum: 500.0
+          minimum: 0.0
+          description: Max proximity distance threshold in Nautical Miles
+          default: 60.0
+          title: Radius
+        description: Max proximity distance threshold in Nautical Miles
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional run date YYYY-MM-DD
+          title: Date
+        description: Optional run date YYYY-MM-DD
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional run ID
+          title: Run
+        description: Optional run ID
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /locations/weather:
+    get:
+      summary: Weather for a raw GPS position
+      description: Return the nearest supported place-weather package for a raw latitude
+        and longitude pair. The request must include both coordinates.
+      operationId: location_weather_endpoint_locations_weather_get
+      parameters:
+      - name: latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90
+          minimum: -90
+          title: Latitude
+      - name: longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180
+          minimum: -180
+          title: Longitude
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceWeatherResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places/{place_id}/weather:
+    get:
+      summary: Place Weather Endpoint
+      operationId: place_weather_endpoint_places__place_id__weather_get
+      parameters:
+      - name: place_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Place Id
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time
+      - name: lat
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 90
+            minimum: -90
+          - type: 'null'
+          title: Lat
+      - name: lon
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 180
+            minimum: -180
+          - type: 'null'
+          title: Lon
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceWeatherResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/optimal/{origin}/{destination}:
+    get:
+      summary: Optimal Route
+      operationId: optimal_route_routes_optimal__origin___destination__get
+      parameters:
+      - name: origin
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Origin
+      - name: destination
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Destination
+      - name: priority
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(time|comfort|safety)$
+          default: comfort
+          title: Priority
+      - name: vessel_class
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(small|medium|large)$
+          default: medium
+          title: Vessel Class
+      - name: length_over_all_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel LOA in meters
+          title: Length Over All M
+        description: Vessel LOA in meters
+      - name: beam_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel beam in meters
+          title: Beam M
+        description: Vessel beam in meters
+      - name: draft_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 0.1
+          - type: 'null'
+          description: Vessel draft in meters
+          title: Draft M
+        description: Vessel draft in meters
+      - name: vessel_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^(monohull|catamaran|sailing)$
+          - type: 'null'
+          description: Vessel type
+          title: Vessel Type
+        description: Vessel type
+      - name: cruising_speed_knots
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel cruising speed
+          title: Cruising Speed Knots
+        description: Vessel cruising speed
+      - name: max_wave_height_tolerance_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 0.5
+          - type: 'null'
+          description: Max wave height tolerance
+          title: Max Wave Height Tolerance M
+        description: Max wave height tolerance
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places/distance:
+    get:
+      summary: Places Distance
+      operationId: places_distance_places_distance_get
+      parameters:
+      - name: origin
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Origin
+      - name: destination
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Destination
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places/distance/mixed:
+    get:
+      summary: Places Distance Mixed
+      operationId: places_distance_mixed_places_distance_mixed_get
+      parameters:
+      - name: origin
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+      - name: destination
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Destination
+      - name: origin_latitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 90
+            minimum: -90
+          - type: 'null'
+          title: Origin Latitude
+      - name: origin_longitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 180
+            minimum: -180
+          - type: 'null'
+          title: Origin Longitude
+      - name: destination_latitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 90
+            minimum: -90
+          - type: 'null'
+          title: Destination Latitude
+      - name: destination_longitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 180
+            minimum: -180
+          - type: 'null'
+          title: Destination Longitude
+      - name: typical_speed_kn
+        in: query
+        required: false
+        schema:
+          type: number
+          exclusiveMinimum: 0
+          default: 15.0
+          title: Typical Speed Kn
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedDistanceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places/distance/coordinates:
+    get:
+      summary: Places Distance Coordinates
+      operationId: places_distance_coordinates_places_distance_coordinates_get
+      parameters:
+      - name: origin_latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90
+          minimum: -90
+          title: Origin Latitude
+      - name: origin_longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180
+          minimum: -180
+          title: Origin Longitude
+      - name: destination_latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90
+          minimum: -90
+          title: Destination Latitude
+      - name: destination_longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180
+          minimum: -180
+          title: Destination Longitude
+      - name: typical_speed_kn
+        in: query
+        required: false
+        schema:
+          type: number
+          exclusiveMinimum: 0
+          default: 15.0
+          title: Typical Speed Kn
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoordinateDistanceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /places/route/{origin}/{destination}:
+    get:
+      summary: Get navigable route waypoints between two places
+      description: Return the navigable sea-route geometry between two places as an
+        ordered list of waypoints. You can call the endpoint with place IDs only,
+        or provide raw latitude/longitude overrides for either side on day one. When
+        coordinates are supplied, PredSea uses the exact locations instead of the
+        place registry resolution.
+      operationId: places_route_places_route__origin___destination__get
+      parameters:
+      - name: origin
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Origin
+      - name: destination
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Destination
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: departure_time
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^([01]\d|2[0-3]):[0-5]\d$
+          description: Local departure time used to compute ETA at each route checkpoint.
+          default: 08:30
+          title: Departure Time
+        description: Local departure time used to compute ETA at each route checkpoint.
+      - name: origin_latitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 90
+            minimum: -90
+          - type: 'null'
+          description: Optional raw latitude for the origin. If provided, it overrides
+            the origin place ID.
+          title: Origin Latitude
+        description: Optional raw latitude for the origin. If provided, it overrides
+          the origin place ID.
+      - name: origin_longitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 180
+            minimum: -180
+          - type: 'null'
+          description: Optional raw longitude for the origin. If provided, it overrides
+            the origin place ID.
+          title: Origin Longitude
+        description: Optional raw longitude for the origin. If provided, it overrides
+          the origin place ID.
+      - name: destination_latitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 90
+            minimum: -90
+          - type: 'null'
+          description: Optional raw latitude for the destination. If provided, it
+            overrides the destination place ID.
+          title: Destination Latitude
+        description: Optional raw latitude for the destination. If provided, it overrides
+          the destination place ID.
+      - name: destination_longitude
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            maximum: 180
+            minimum: -180
+          - type: 'null'
+          description: Optional raw longitude for the destination. If provided, it
+            overrides the destination place ID.
+          title: Destination Longitude
+        description: Optional raw longitude for the destination. If provided, it overrides
+          the destination place ID.
+      - name: typical_speed_kn
+        in: query
+        required: false
+        schema:
+          type: number
+          exclusiveMinimum: 0
+          description: Typical vessel speed used to estimate travel time when the
+            route geometry is returned.
+          default: 15.0
+          title: Typical Speed Kn
+        description: Typical vessel speed used to estimate travel time when the route
+          geometry is returned.
+      - name: vessel_class
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(small|medium|large)$
+          default: medium
+          title: Vessel Class
+      - name: length_over_all_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel LOA in meters
+          title: Length Over All M
+        description: Vessel LOA in meters
+      - name: beam_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel beam in meters
+          title: Beam M
+        description: Vessel beam in meters
+      - name: draft_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 0.1
+          - type: 'null'
+          description: Vessel draft in meters
+          title: Draft M
+        description: Vessel draft in meters
+      - name: vessel_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^(monohull|catamaran|sailing)$
+          - type: 'null'
+          description: Vessel type
+          title: Vessel Type
+        description: Vessel type
+      - name: cruising_speed_knots
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 1.0
+          - type: 'null'
+          description: Vessel cruising speed
+          title: Cruising Speed Knots
+        description: Vessel cruising speed
+      - name: max_wave_height_tolerance_m
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+            minimum: 0.5
+          - type: 'null'
+          description: Max wave height tolerance
+          title: Max Wave Height Tolerance M
+        description: Max wave height tolerance
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteWaypointsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/optimal/status:
+    get:
+      summary: Routes Optimal Status
+      operationId: routes_optimal_status_routes_optimal_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /places/{origin_place_id}/connection/{destination_place_id}:
+    get:
+      summary: Place Connection Metrics
+      operationId: place_connection_metrics_places__origin_place_id__connection__destination_place_id__get
+      parameters:
+      - name: origin_place_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Origin Place Id
+      - name: destination_place_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Destination Place Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceConnectionMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/artifacts/{artifact_name}:
+    get:
+      summary: Route Artifact
+      operationId: route_artifact_routes__route_id__artifacts__artifact_name__get
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      - name: artifact_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Artifact Name
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/media:
+    get:
+      summary: Route Media
+      operationId: route_media_routes__route_id__media_get
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: expires_minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1440
+          minimum: 1
+          default: 30
+          title: Expires Minutes
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /maps:
+    get:
+      summary: Maps
+      operationId: maps_maps_get
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: variable
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(wave_height|swell_1_height|swell_1_direction|swell_2_height|swell_2_direction|wind_wave_height|wind_wave_direction|current_speed)$
+          default: wave_height
+          title: Variable
+      - name: time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /maps/overlays/{variable}/{filename}:
+    get:
+      summary: Map Overlay
+      operationId: map_overlay_maps_overlays__variable___filename__get
+      parameters:
+      - name: variable
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Variable
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Filename
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /maps/inspect:
+    get:
+      summary: Map Inspect
+      operationId: map_inspect_maps_inspect_get
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: run
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+      - name: variable
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(wave_height|swell_1_height|swell_1_direction|swell_2_height|swell_2_direction|wind_wave_height|wind_wave_direction|current_speed)$
+          default: wave_height
+          title: Variable
+      - name: time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time
+      - name: lat
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 90
+          minimum: -90
+          title: Lat
+      - name: lon
+        in: query
+        required: true
+        schema:
+          type: number
+          maximum: 180
+          minimum: -180
+          title: Lon
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /observations/stations:
+    get:
+      summary: Observation Stations
+      description: 'Real observation stations (buoys, tide gauges, HF radar, EMODnet
+        platforms)
+
+        with their most recent real observed value, read live from BigQuery.
+
+
+        Never fabricates: a station with no recent real observation for the requested
+
+        variable is returned with an empty `observations` dict for that variable,
+        not a
+
+        guessed value. If BigQuery isn''t reachable, this returns 503 rather than
+        a
+
+        placeholder station list.'
+      operationId: observation_stations_observations_stations_get
+      parameters:
+      - name: variable
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variable
+      - name: lookback_days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 30
+          minimum: 1
+          default: 3
+          title: Lookback Days
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /forecasts/evaluate:
+    get:
+      summary: Evaluate Forecasts
+      description: 'Run real-time forecast evaluation against buoy/station observations.
+
+
+        Allows filtering by observation location/station name, evaluation date, and
+        time range.
+
+        Does not fabricate or use synthetic data.'
+      operationId: evaluate_forecasts_forecasts_evaluate_get
+      parameters:
+      - name: location
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Location
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+      - name: lookback_days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 30
+          minimum: 1
+          default: 1
+          title: Lookback Days
+      - name: max_station_distance_nm
+        in: query
+        required: false
+        schema:
+          type: number
+          maximum: 100.0
+          minimum: 1.0
+          default: 25.0
+          title: Max Station Distance Nm
+      - name: time_tolerance_minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 180
+          minimum: 5
+          default: 30
+          title: Time Tolerance Minutes
+      - name: min_sample_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 5
+          title: Min Sample Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /question:
+    post:
+      summary: Location question from a shared GPS position
+      description: Phase 1 location intelligence. The request must include latitude
+        and longitude. PredSea samples the nearest forecast map grids around that
+        position and returns a conservative operational read.
+      operationId: location_question_question_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationQuestionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /routes/{route_id}/question:
+    post:
+      summary: Route question from stored passage evidence
+      description: Answer a captain question from the latest stored route evidence
+        package. Use this for named passages such as Palma to Ibiza.
+      operationId: route_question_routes__route_id__question_post
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Route Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    BriefingResponse:
+      properties:
+        route_id:
+          type: string
+          title: Route Id
+        route:
+          type: string
+          title: Route
+        date:
+          type: string
+          title: Date
+        run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+        format:
+          type: string
+          enum:
+          - whatsapp
+          - linkedin
+          title: Format
+        briefing:
+          type: string
+          title: Briefing
+      type: object
+      required:
+      - route_id
+      - route
+      - date
+      - format
+      - briefing
+      title: BriefingResponse
+    CoordinateDistanceResponse:
+      properties:
+        origin_latitude:
+          type: number
+          title: Origin Latitude
+        origin_longitude:
+          type: number
+          title: Origin Longitude
+        destination_latitude:
+          type: number
+          title: Destination Latitude
+        destination_longitude:
+          type: number
+          title: Destination Longitude
+        distance_nm:
+          type: number
+          title: Distance Nm
+        typical_speed_kn:
+          type: number
+          title: Typical Speed Kn
+        typical_travel_time_minutes:
+          type: integer
+          title: Typical Travel Time Minutes
+        computed_at_utc:
+          type: string
+          title: Computed At Utc
+        source_tag:
+          type: string
+          title: Source Tag
+      type: object
+      required:
+      - origin_latitude
+      - origin_longitude
+      - destination_latitude
+      - destination_longitude
+      - distance_nm
+      - typical_speed_kn
+      - typical_travel_time_minutes
+      - computed_at_utc
+      - source_tag
+      title: CoordinateDistanceResponse
+    DistanceEndpointSide:
+      properties:
+        kind:
+          type: string
+          enum:
+          - place
+          - coordinates
+          title: Kind
+        query:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+        place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place Id
+        place_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place Name
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        latitude:
+          type: number
+          title: Latitude
+        longitude:
+          type: number
+          title: Longitude
+        confidence:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Confidence
+      type: object
+      required:
+      - kind
+      - latitude
+      - longitude
+      title: DistanceEndpointSide
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        latest_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Latest Date
+        latest_run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Latest Run
+        storage_backend:
+          type: string
+          title: Storage Backend
+        environment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Environment
+      type: object
+      required:
+      - status
+      - latest_date
+      - storage_backend
+      title: HealthResponse
+    LocationQuestionRequest:
+      properties:
+        question:
+          type: string
+          minLength: 1
+          title: Question
+          description: Captain question about a shared GPS position.
+        latitude:
+          type: number
+          maximum: 90.0
+          minimum: -90.0
+          title: Latitude
+          description: Required shared GPS latitude for the location question.
+        longitude:
+          type: number
+          maximum: 180.0
+          minimum: -180.0
+          title: Longitude
+          description: Required shared GPS longitude for the location question.
+        date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+        run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+        vessel_class:
+          type: string
+          enum:
+          - small
+          - medium
+          - large
+          title: Vessel Class
+          default: medium
+        location_label:
+          type: string
+          title: Location Label
+          default: shared GPS position
+        current_time:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Time
+        current_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Date
+        time:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time
+        position_age_minutes:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Position Age Minutes
+      type: object
+      required:
+      - question
+      - latitude
+      - longitude
+      title: LocationQuestionRequest
+    MixedDistanceResponse:
+      properties:
+        method:
+          type: string
+          enum:
+          - place_to_place
+          - place_to_coordinates
+          - coordinates_to_place
+          - coordinates_to_coordinates
+          title: Method
+        origin:
+          $ref: '#/components/schemas/DistanceEndpointSide'
+        destination:
+          $ref: '#/components/schemas/DistanceEndpointSide'
+        distance_nm:
+          type: number
+          title: Distance Nm
+        estimated_time_h:
+          type: number
+          title: Estimated Time H
+        source_tag:
+          type: string
+          title: Source Tag
+        computed_at_utc:
+          type: string
+          title: Computed At Utc
+      type: object
+      required:
+      - method
+      - origin
+      - destination
+      - distance_nm
+      - estimated_time_h
+      - source_tag
+      - computed_at_utc
+      title: MixedDistanceResponse
+    PlaceConnectionMetricsResponse:
+      properties:
+        origin_place_id:
+          type: string
+          title: Origin Place Id
+        origin_place_name:
+          type: string
+          title: Origin Place Name
+        destination_place_id:
+          type: string
+          title: Destination Place Id
+        destination_place_name:
+          type: string
+          title: Destination Place Name
+        distance_nm:
+          type: number
+          title: Distance Nm
+        typical_speed_kn:
+          type: number
+          title: Typical Speed Kn
+        typical_travel_time_minutes:
+          type: integer
+          title: Typical Travel Time Minutes
+        computed_at_utc:
+          type: string
+          title: Computed At Utc
+        source_tag:
+          type: string
+          title: Source Tag
+      type: object
+      required:
+      - origin_place_id
+      - origin_place_name
+      - destination_place_id
+      - destination_place_name
+      - distance_nm
+      - typical_speed_kn
+      - typical_travel_time_minutes
+      - computed_at_utc
+      - source_tag
+      title: PlaceConnectionMetricsResponse
+    PlaceResolutionResponse:
+      properties:
+        query:
+          type: string
+          title: Query
+        matched:
+          type: boolean
+          title: Matched
+        place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place Id
+        place_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place Name
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        latitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Latitude
+        longitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Longitude
+        confidence:
+          type: string
+          title: Confidence
+        resolved_via:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved Via
+      type: object
+      required:
+      - query
+      - matched
+      - confidence
+      title: PlaceResolutionResponse
+    PlaceSummary:
+      properties:
+        place_id:
+          type: string
+          title: Place Id
+        place_name:
+          type: string
+          title: Place Name
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        latitude:
+          type: number
+          title: Latitude
+        longitude:
+          type: number
+          title: Longitude
+        parent_place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Parent Place Id
+        children:
+          items:
+            type: string
+          type: array
+          title: Children
+        aliases:
+          items:
+            type: string
+          type: array
+          title: Aliases
+        observation_candidates:
+          items:
+            type: string
+          type: array
+          title: Observation Candidates
+        observation_sources:
+          items:
+            type: string
+          type: array
+          title: Observation Sources
+      type: object
+      required:
+      - place_id
+      - place_name
+      - latitude
+      - longitude
+      title: PlaceSummary
+    PlaceWeatherResponse:
+      properties:
+        place_id:
+          type: string
+          title: Place Id
+        requested_place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requested Place Id
+        place_name:
+          type: string
+          title: Place Name
+        place_kind:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place Kind
+        parent_place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Parent Place Id
+        place_children:
+          items:
+            type: string
+          type: array
+          title: Place Children
+        requested_latitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Requested Latitude
+        requested_longitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Requested Longitude
+        resolved_latitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Resolved Latitude
+        resolved_longitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Resolved Longitude
+        distance_to_place_nm:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Distance To Place Nm
+        inside_domain:
+          type: boolean
+          title: Inside Domain
+          default: true
+        domain_warning:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain Warning
+        date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+        run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+        generated_at_utc:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Generated At Utc
+        timezone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timezone
+        time_utc:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Utc
+        time_local:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Time Local
+        wave_height_m:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wave Height M
+        wave_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wave Direction Deg
+        wave_sea_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Wave Sea State
+        swell_1_height_m:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Swell 1 Height M
+        swell_1_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Swell 1 Direction Deg
+        swell_2_height_m:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Swell 2 Height M
+        swell_2_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Swell 2 Direction Deg
+        wind_wave_height_m:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wind Wave Height M
+        wind_wave_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wind Wave Direction Deg
+        wind_kn:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wind Kn
+          description: Optional observed wind speed. Present only when the selected
+            observation source provides it.
+        wind_gust_kn:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wind Gust Kn
+          description: Optional observed wind gust speed in knots. Present only when
+            the selected observation source provides it.
+        wind_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wind Direction Deg
+          description: Optional observed wind direction in degrees. Present only when
+            the selected observation source provides it.
+        water_temperature_c:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Water Temperature C
+          description: Optional observed water temperature in Celsius. Present only
+            when the selected observation source provides it.
+        air_temperature_c:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Air Temperature C
+          description: Optional observed air temperature in Celsius. Present only
+            when the selected observation source provides it.
+        current_kn:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Current Kn
+          description: Current speed in knots from the forecast layer when available.
+        current_direction_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Current Direction Deg
+          description: Current flow direction in degrees from the forecast layer when
+            available.
+        source:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source
+        source_system:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source System
+        source_time_coordinate_utc:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source Time Coordinate Utc
+        freshness_status:
+          type: string
+          title: Freshness Status
+        freshness_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Freshness State
+        freshness_warning:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Freshness Warning
+        observation:
+          additionalProperties: true
+          type: object
+          title: Observation
+        hourly:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Hourly
+        metadata:
+          additionalProperties: true
+          type: object
+          title: Metadata
+      type: object
+      required:
+      - place_id
+      - place_name
+      - freshness_status
+      title: PlaceWeatherResponse
+    PlacesResponse:
+      properties:
+        places:
+          items:
+            $ref: '#/components/schemas/PlaceSummary'
+          type: array
+          title: Places
+      type: object
+      title: PlacesResponse
+    QuestionRequest:
+      properties:
+        question:
+          type: string
+          minLength: 1
+          title: Question
+          description: Captain question about a stored route snapshot.
+        date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+        run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+        vessel_class:
+          type: string
+          enum:
+          - small
+          - medium
+          - large
+          title: Vessel Class
+          default: medium
+        departure_time:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Departure Time
+        priority:
+          type: string
+          enum:
+          - comfort
+          - safety
+          - schedule
+          title: Priority
+          default: comfort
+        current_latitude:
+          anyOf:
+          - type: number
+            maximum: 90.0
+            minimum: -90.0
+          - type: 'null'
+          title: Current Latitude
+          description: Optional shared GPS latitude used by route questions when the
+            current position matters.
+        current_longitude:
+          anyOf:
+          - type: number
+            maximum: 180.0
+            minimum: -180.0
+          - type: 'null'
+          title: Current Longitude
+          description: Optional shared GPS longitude used by route questions when
+            the current position matters.
+        position_age_minutes:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Position Age Minutes
+        location_label:
+          type: string
+          title: Location Label
+          default: shared location
+        current_time:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Time
+        current_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Date
+      type: object
+      required:
+      - question
+      title: QuestionRequest
+    QuestionResponse:
+      properties:
+        route_id:
+          type: string
+          title: Route Id
+        route:
+          type: string
+          title: Route
+        date:
+          type: string
+          title: Date
+        run:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Run
+        question:
+          type: string
+          title: Question
+        answer:
+          type: string
+          title: Answer
+        intent:
+          type: string
+          title: Intent
+        evidence_timestamp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evidence Timestamp
+        freshness_status:
+          type: string
+          title: Freshness Status
+        freshness_warning:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Freshness Warning
+        captain_knowledge:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Captain Knowledge
+        operational_stance:
+          additionalProperties: true
+          type: object
+          title: Operational Stance
+        reliability:
+          additionalProperties: true
+          type: object
+          title: Reliability
+        evidence_used:
+          additionalProperties: true
+          type: object
+          title: Evidence Used
+      type: object
+      required:
+      - route_id
+      - route
+      - date
+      - question
+      - answer
+      - intent
+      - freshness_status
+      - evidence_used
+      title: QuestionResponse
+    RouteWaypoint:
+      properties:
+        lat:
+          type: number
+          title: Lat
+        lng:
+          type: number
+          title: Lng
+        true_heading_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: True Heading Deg
+        magnetic_variation_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Magnetic Variation Deg
+        magnetic_heading_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Magnetic Heading Deg
+      type: object
+      required:
+      - lat
+      - lng
+      title: RouteWaypoint
+    RouteWaypointCheckpoint:
+      properties:
+        waypoint_index:
+          type: integer
+          title: Waypoint Index
+        lat:
+          type: number
+          title: Lat
+        lng:
+          type: number
+          title: Lng
+        eta_local:
+          type: string
+          title: Eta Local
+        distance_from_origin_nm:
+          type: number
+          title: Distance From Origin Nm
+        forecast_time_local:
+          type: string
+          title: Forecast Time Local
+        weather:
+          additionalProperties: true
+          type: object
+          title: Weather
+        true_heading_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: True Heading Deg
+        magnetic_variation_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Magnetic Variation Deg
+        magnetic_heading_deg:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Magnetic Heading Deg
+      type: object
+      required:
+      - waypoint_index
+      - lat
+      - lng
+      - eta_local
+      - distance_from_origin_nm
+      - forecast_time_local
+      title: RouteWaypointCheckpoint
+    RouteWaypointsResponse:
+      properties:
+        origin_place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin Place Id
+        origin_place_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin Place Name
+        origin_latitude:
+          type: number
+          title: Origin Latitude
+        origin_longitude:
+          type: number
+          title: Origin Longitude
+        destination_place_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Destination Place Id
+        destination_place_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Destination Place Name
+        destination_latitude:
+          type: number
+          title: Destination Latitude
+        destination_longitude:
+          type: number
+          title: Destination Longitude
+        distance_nm:
+          type: number
+          title: Distance Nm
+        estimated_time_h:
+          type: number
+          title: Estimated Time H
+        waypoints:
+          items:
+            $ref: '#/components/schemas/RouteWaypoint'
+          type: array
+          title: Waypoints
+        checkpoints:
+          items:
+            $ref: '#/components/schemas/RouteWaypointCheckpoint'
+          type: array
+          title: Checkpoints
+        backup_safe_havens:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Backup Safe Havens
+        source_tag:
+          type: string
+          title: Source Tag
+        computed_at_local:
+          type: string
+          title: Computed At Local
+        environment:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Environment
+      type: object
+      required:
+      - origin_latitude
+      - origin_longitude
+      - destination_latitude
+      - destination_longitude
+      - distance_nm
+      - estimated_time_h
+      - source_tag
+      - computed_at_local
+      title: RouteWaypointsResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WarningItem:
+      properties:
+        source:
+          type: string
+          title: Source
+        severity:
+          type: string
+          enum:
+          - severe
+          - moderate
+          - info
+          title: Severity
+        variable:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variable
+        label:
+          type: string
+          title: Label
+        description:
+          type: string
+          title: Description
+        value:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Value
+        unit:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Unit
+        z_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Z Score
+        baseline_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Baseline Type
+        station_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Station Id
+        station_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Station Name
+        latitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Latitude
+        longitude:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Longitude
+        issued_at_utc:
+          type: string
+          title: Issued At Utc
+        valid_from_utc:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Valid From Utc
+        valid_to_utc:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Valid To Utc
+        route:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Route
+        aemet_event:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Aemet Event
+        aemet_area:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Aemet Area
+        extra:
+          additionalProperties: true
+          type: object
+          title: Extra
+      type: object
+      required:
+      - source
+      - severity
+      - label
+      - description
+      - issued_at_utc
+      title: WarningItem
+    WarningsContext:
+      properties:
+        route:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Route
+        place:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Place
+        date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+        lookback_hours:
+          type: integer
+          title: Lookback Hours
+          default: 240
+        min_window_hours:
+          type: integer
+          title: Min Window Hours
+          default: 240
+        min_sample_count:
+          type: integer
+          title: Min Sample Count
+          default: 10
+        z_threshold:
+          type: number
+          title: Z Threshold
+          default: 1.5
+      type: object
+      title: WarningsContext
+    WarningsResponse:
+      properties:
+        generated_at_utc:
+          type: string
+          title: Generated At Utc
+        context:
+          $ref: '#/components/schemas/WarningsContext'
+        summary:
+          $ref: '#/components/schemas/WarningsSummary'
+        operational_stance:
+          type: string
+          title: Operational Stance
+        warnings:
+          items:
+            $ref: '#/components/schemas/WarningItem'
+          type: array
+          title: Warnings
+        sources_available:
+          items:
+            type: string
+          type: array
+          title: Sources Available
+      type: object
+      required:
+      - generated_at_utc
+      - context
+      - summary
+      - operational_stance
+      title: WarningsResponse
+    WarningsSummary:
+      properties:
+        total:
+          type: integer
+          title: Total
+          default: 0
+        severe:
+          type: integer
+          title: Severe
+          default: 0
+        moderate:
+          type: integer
+          title: Moderate
+          default: 0
+        info:
+          type: integer
+          title: Info
+          default: 0
+        aemet_official:
+          type: integer
+          title: Aemet Official
+          default: 0
+        predsea_anomaly:
+          type: integer
+          title: Predsea Anomaly
+          default: 0
+        sources_available:
+          items:
+            type: string
+          type: array
+          title: Sources Available
+      type: object
+      title: WarningsSummary

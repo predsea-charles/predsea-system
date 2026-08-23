@@ -1,0 +1,39 @@
+Creating a startup is about learning.
+
+Creating a business is about trust.
+
+When you combine learning and trust, you reach the moment every startup is looking for: you are ready to go to market.
+
+That is where we are with PredSea.
+
+Over the last weeks, we have been learning fast.
+
+We learned that SOCIB and Copernicus can offer high-resolution, high-quality marine data for the Balearics: waves, currents, buoy observations, and enough context to start building serious route intelligence.
+
+We also learned that the real product is not just the forecast.
+
+Captains do not need another raw map under pressure. They need a trusted operational read:
+
+- Is this crossing comfortable for my vessel?
+- What is the best departure window?
+- Where is the local risk building?
+- What evidence supports the recommendation?
+
+That is why we are building PredSea as a visual and conversational co-captain: marine forecast data, validated against real observations, translated into clear route advice.
+
+This week we checked PredSea route forecasts against SOCIB buoy observations around the Balearics.
+
+A few early numbers:
+- 21 matched wave-height checks across Palma-Ibiza, Ibiza-Formentera, and Palma-Cabrera
+- Overall mean absolute error: 0.20 m
+- Palma-Ibiza: 0.18 m MAE
+- Ibiza-Formentera: 0.20 m MAE
+- Palma-Cabrera: 0.24 m MAE
+
+The metric matters because trust has to be earned. But the bigger point is the learning loop: forecast, compare with ground truth, improve, and then make the result useful for the people making decisions at sea.
+
+Now it is time to leave the lab and speak with captains.
+
+We are ready to offer value to their work, listen carefully, and understand what PredSea needs to become in real operations.
+
+If you operate yachts in the Balearics, manage routes, or make weather decisions for vessels, I would love to talk.

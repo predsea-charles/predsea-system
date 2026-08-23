@@ -1,0 +1,68 @@
+[
+  {
+    "id": "avoid_departure_at_peak_wave",
+    "source": "graham",
+    "condition": {
+      "question_intents": ["leave_window", "route_timing"],
+      "near_peak": true
+    },
+    "operational_consequence": "Departing near the forecast wave peak reduces comfort margin and gives little room if the model timing is late or early.",
+    "preferred_action": "Prefer a lower sea-state window before the peak, then confirm with the latest run and observations.",
+    "confidence": "high"
+  },
+  {
+    "id": "wave_direction_more_important_than_height_for_comfort",
+    "source": "graham",
+    "condition": {
+      "sea_state_in": ["beam sea", "bow quartering sea", "stern quartering sea"]
+    },
+    "operational_consequence": "Passenger comfort can deteriorate even when significant wave height looks moderate, because direction changes vessel motion.",
+    "preferred_action": "Explain the route-relative sea state and avoid treating wave height alone as a green light.",
+    "confidence": "high"
+  },
+  {
+    "id": "forecast_over_48h_reduce_confidence",
+    "source": "graham",
+    "condition": {
+      "forecast_horizon_hours_gt": 48
+    },
+    "operational_consequence": "Forecast confidence drops materially beyond 48 hours for operational departure decisions.",
+    "preferred_action": "Use the answer for planning only and require a fresh run before committing.",
+    "confidence": "high"
+  },
+  {
+    "id": "small_vessels_need_conservative_timing",
+    "source": "graham",
+    "condition": {
+      "vessel_classes": ["small"],
+      "min_wave_m": 1.2
+    },
+    "operational_consequence": "A sea state that is manageable for larger vessels can feel uncomfortable or limiting for vessels under 15m.",
+    "preferred_action": "Use the calmest available window and avoid exposed peak periods.",
+    "confidence": "high"
+  },
+  {
+    "id": "menorca_channel_northerly_more_exposed",
+    "source": "graham",
+    "condition": {
+      "route_ids": ["alcudia_ciutadella"],
+      "direction_sector": "N",
+      "min_wave_m": 1.2
+    },
+    "operational_consequence": "The Menorca Channel deserves a more conservative read with northerly sea states than the same height on more protected routes.",
+    "preferred_action": "Prefer early conservative timing or wait for the easing period, especially for smaller vessels.",
+    "confidence": "high"
+  },
+  {
+    "id": "palma_ibiza_nw_swell_channel_caution",
+    "source": "graham",
+    "condition": {
+      "route_ids": ["palma_ibiza"],
+      "direction_sector": "NW",
+      "min_wave_m": 1.0
+    },
+    "operational_consequence": "NW swell can make the Ibiza Channel feel worse than the route-average forecast, especially for smaller vessels.",
+    "preferred_action": "Flag the channel/open-water segment and prefer a departure before the exposed peak.",
+    "confidence": "medium"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "small": {
+    "label": "under 15m",
+    "comfort_caution_wave_m": 1.2,
+    "restricted_wave_m": 1.8,
+    "notes": "Prioritize comfort and timing. Moderate wave heights can become operationally relevant quickly."
+  },
+  "medium": {
+    "label": "15-24m",
+    "comfort_caution_wave_m": 1.5,
+    "restricted_wave_m": 2.2,
+    "notes": "Generally tolerant of moderate sea state, but direction and guest comfort still matter."
+  },
+  "large": {
+    "label": "over 24m",
+    "comfort_caution_wave_m": 2.0,
+    "restricted_wave_m": 2.8,
+    "notes": "Greater margin in wave height, with operational constraints increasingly tied to ports, regulations, and maneuvering."
+  }
+}

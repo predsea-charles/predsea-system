@@ -1,0 +1,131 @@
+Querying 72 geographic tiles...
+Tile 1: received 119 elements from https://overpass-api.de/api/interpreter
+Tile 2: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 2: received 45 elements from https://overpass.kumi.systems/api/interpreter
+Tile 3: received 27 elements from https://overpass-api.de/api/interpreter
+Tile 4: received 10 elements from https://overpass-api.de/api/interpreter
+Tile 5: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 5: received 34 elements from https://overpass.kumi.systems/api/interpreter
+Tile 6: received 15 elements from https://overpass-api.de/api/interpreter
+Tile 7: attempt 1 failed: Temporary Overpass error: HTTP 504. Retrying in 5 seconds.
+Tile 7: received 16 elements from https://overpass.kumi.systems/api/interpreter
+Tile 8: received 10 elements from https://overpass-api.de/api/interpreter
+Tile 9: received 42 elements from https://overpass-api.de/api/interpreter
+Tile 10: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 10: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 10: received 11 elements from https://overpass-api.de/api/interpreter
+Tile 11: received 67 elements from https://overpass-api.de/api/interpreter
+Tile 12: attempt 1 failed: Temporary Overpass error: HTTP 504. Retrying in 5 seconds.
+Tile 12: received 0 elements from https://overpass.kumi.systems/api/interpreter
+Tile 13: received 9 elements from https://overpass-api.de/api/interpreter
+Tile 14: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 15: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 15: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 15: received 43 elements from https://overpass-api.de/api/interpreter
+Tile 16: received 81 elements from https://overpass-api.de/api/interpreter
+Tile 17: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 17: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 17: received 13 elements from https://overpass-api.de/api/interpreter
+Tile 18: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 19: received 3 elements from https://overpass-api.de/api/interpreter
+Tile 20: received 18 elements from https://overpass-api.de/api/interpreter
+Tile 21: received 9 elements from https://overpass-api.de/api/interpreter
+Tile 22: received 84 elements from https://overpass-api.de/api/interpreter
+Tile 23: received 146 elements from https://overpass-api.de/api/interpreter
+Tile 24: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 24: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 24: received 57 elements from https://overpass-api.de/api/interpreter
+Tile 25: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 26: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 26: received 12 elements from https://overpass.kumi.systems/api/interpreter
+Tile 27: received 2 elements from https://overpass-api.de/api/interpreter
+Tile 28: received 80 elements from https://overpass-api.de/api/interpreter
+Tile 29: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 29: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 29: received 227 elements from https://overpass-api.de/api/interpreter
+Tile 30: received 112 elements from https://overpass-api.de/api/interpreter
+Tile 31: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 31: received 0 elements from https://overpass.kumi.systems/api/interpreter
+Tile 32: received 106 elements from https://overpass-api.de/api/interpreter
+Tile 33: received 62 elements from https://overpass-api.de/api/interpreter
+Tile 34: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 34: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 34: received 34 elements from https://overpass-api.de/api/interpreter
+Tile 35: received 133 elements from https://overpass-api.de/api/interpreter
+Tile 36: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 36: received 22 elements from https://overpass.kumi.systems/api/interpreter
+Tile 37: received 1 elements from https://overpass-api.de/api/interpreter
+Tile 38: attempt 1 failed: Temporary Overpass error: HTTP 504. Retrying in 5 seconds.
+Tile 38: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 38: received 5 elements from https://overpass-api.de/api/interpreter
+Tile 39: received 7 elements from https://overpass-api.de/api/interpreter
+Tile 40: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 40: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 40: received 23 elements from https://overpass-api.de/api/interpreter
+Tile 41: attempt 1 failed: Temporary Overpass error: HTTP 504. Retrying in 5 seconds.
+Tile 41: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 41: received 114 elements from https://overpass-api.de/api/interpreter
+Tile 42: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 43: received 1 elements from https://overpass-api.de/api/interpreter
+Tile 44: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 44: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 44: received 175 elements from https://overpass-api.de/api/interpreter
+Tile 45: received 167 elements from https://overpass-api.de/api/interpreter
+Tile 46: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 46: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 46: received 62 elements from https://overpass-api.de/api/interpreter
+Tile 47: received 43 elements from https://overpass-api.de/api/interpreter
+Tile 48: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 48: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 48: received 35 elements from https://overpass-api.de/api/interpreter
+Tile 49: received 17 elements from https://overpass-api.de/api/interpreter
+Tile 50: attempt 1 failed: Temporary Overpass error: HTTP 504. Retrying in 5 seconds.
+Tile 50: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 50: attempt 3 failed: Temporary Overpass error: HTTP 504. Retrying in 15 seconds.
+Tile 50: received 57 elements from https://overpass.kumi.systems/api/interpreter
+Tile 51: received 131 elements from https://overpass-api.de/api/interpreter
+Tile 52: received 50 elements from https://overpass-api.de/api/interpreter
+Tile 53: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 53: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 53: received 55 elements from https://overpass-api.de/api/interpreter
+Tile 54: received 222 elements from https://overpass-api.de/api/interpreter
+Tile 55: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 55: received 211 elements from https://overpass.kumi.systems/api/interpreter
+Tile 56: received 145 elements from https://overpass-api.de/api/interpreter
+Tile 57: received 130 elements from https://overpass-api.de/api/interpreter
+Tile 58: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 58: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 58: received 88 elements from https://overpass-api.de/api/interpreter
+Tile 59: received 343 elements from https://overpass-api.de/api/interpreter
+Tile 60: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 60: attempt 2 failed: HTTPSConnectionPool(host='overpass.kumi.systems', port=443): Read timed out. (read timeout=180). Retrying in 10 seconds.
+Tile 60: received 242 elements from https://overpass-api.de/api/interpreter
+Tile 61: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 62: received 0 elements from https://overpass-api.de/api/interpreter
+Tile 63: received 16 elements from https://overpass-api.de/api/interpreter
+Tile 64: received 3 elements from https://overpass-api.de/api/interpreter
+Tile 65: received 1 elements from https://overpass-api.de/api/interpreter
+Tile 66: received 9 elements from https://overpass-api.de/api/interpreter
+Tile 67: received 1 elements from https://overpass-api.de/api/interpreter
+Tile 68: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 68: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 68: received 14 elements from https://overpass-api.de/api/interpreter
+Tile 69: received 59 elements from https://overpass-api.de/api/interpreter
+Tile 70: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 70: attempt 2 failed: Temporary Overpass error: HTTP 504. Retrying in 10 seconds.
+Tile 70: received 225 elements from https://overpass-api.de/api/interpreter
+Tile 71: received 112 elements from https://overpass-api.de/api/interpreter
+Tile 72: attempt 1 failed: Temporary Overpass error: HTTP 429. Retrying in 5 seconds.
+Tile 72: received 3 elements from https://overpass.kumi.systems/api/interpreter
+
+Raw named records: 3155
+Deduplicated destinations: 2955
+JSON: /Users/charles.santana/Kultrip/predsea-system/humanintheloop/osm_maritime_destinations.json
+CSV:  /Users/charles.santana/Kultrip/predsea-system/humanintheloop/osm_maritime_destinations.csv
+
+Destinations by category:
+  anchorage: 308
+  commercial_port: 184
+  ferry_terminal: 719
+  harbour: 168
+  marina: 1576

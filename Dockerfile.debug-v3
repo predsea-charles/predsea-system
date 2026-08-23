@@ -1,0 +1,2 @@
+FROM europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:164c921bae33d23094a8f0103d4b6f6cec8c2112671a26d7700d4fe86d4ca31d
+COPY real_patched_prepare_croco_forcing.py /app/scripts/prepare_croco_forcing.py

@@ -1,0 +1,117 @@
+FROM debian:bookworm-slim AS swan_builder
+
+ARG SWAN_VERSION=4151
+ARG SWAN_SHA256=325c229f3dde0b812db4ec9ae6fa1cd4086d2109562c389576590ce8f94b26bb
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl gfortran libnetcdf-dev libnetcdff-dev make \
+        openmpi-bin libopenmpi-dev perl \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+RUN curl --fail --location --retry 4 \
+      "https://swanmodel.sourceforge.io/download/zip/swan${SWAN_VERSION}.tar.gz" \
+      --output swan.tar.gz \
+    && echo "${SWAN_SHA256}  swan.tar.gz" | sha256sum --check \
+    && tar -xzf swan.tar.gz
+WORKDIR /src/swan4151
+RUN make config \
+    && sed -i 's|^NETCDFROOT =.*|NETCDFROOT = /usr|' macros.inc \
+    && sed -i 's|^  LIBS_SER = $(LIBS_SER) |  LIBS_SER += |' macros.inc \
+    && sed -i 's|^  LIBS_OMP = $(LIBS_OMP) |  LIBS_OMP += |' macros.inc \
+    && sed -i 's|^  LIBS_MPI = $(LIBS_MPI) |  LIBS_MPI += |' macros.inc \
+    && sed -i 's|^  swch = $(swch) -netcdf|  swch += -netcdf|' macros.inc \
+    && make mpi \
+    && sed -i 's|echo "localhost" > machinefile|echo "localhost slots=$npmpi" > machinefile|' swanrun \
+    && test -x swan.exe
+
+FROM debian:bookworm-slim AS croco_builder
+
+ARG CROCO_VERSION=2.1.3
+ARG CROCO_SHA256=4b7464365f3e6197ed83b5ae8842cc1efc736add2c86e16a0ff188e7650661c1
+ARG PREDSEA_CROCO_LM=499
+ARG PREDSEA_CROCO_MM=399
+ARG PREDSEA_CROCO_N=32
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl gfortran libnetcdf-dev libnetcdff-dev make \
+      openmpi-bin libopenmpi-dev python3 \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+RUN curl --fail --location --retry 4 \
+      "https://gitlab.inria.fr/croco-ocean/croco/-/archive/v${CROCO_VERSION}/croco-v${CROCO_VERSION}.tar.gz" \
+      --output croco.tar.gz \
+    && echo "${CROCO_SHA256}  croco.tar.gz" | sha256sum --check \
+    && mkdir -p tmp/croco_build \
+    && tar -xzf croco.tar.gz -C tmp/croco_build \
+    && mv "tmp/croco_build/croco-v${CROCO_VERSION}" tmp/croco_build/croco_src
+COPY simulation/marine/croco/patch_croco_source.py /build/patch_croco_source.py
+RUN mkdir -p /usr/local/bin \
+    && for region in alboran_1km:499:249:4:2 algerian_1km:949:299:6:2 balearic_1km:499:399:4:4 gulf_of_lion_1km:498:198:2:2 tyrrhenian_1km:648:649:6:4; do \
+         name=$(echo $region | cut -d: -f1); \
+         lm=$(echo $region | cut -d: -f2); \
+         mm=$(echo $region | cut -d: -f3); \
+         np_xi=$(echo $region | cut -d: -f4); \
+         np_eta=$(echo $region | cut -d: -f5); \
+         echo "🔨 Building CROCO binary for $name (LM=$lm, MM=$mm, NP_XI=$np_xi, NP_ETA=$np_eta)..."; \
+         rm -rf /build/tmp/croco_build/Build /build/tmp/croco_build/Compile; \
+         PREDSEA_CROCO_LM=$lm PREDSEA_CROCO_MM=$mm PREDSEA_CROCO_NP_XI=$np_xi PREDSEA_CROCO_NP_ETA=$np_eta PREDSEA_CROCO_N=32 python3 /build/patch_croco_source.py; \
+         cp /build/tmp/croco_build/croco_src/OCEAN/jobcomp /build/tmp/croco_build/jobcomp; \
+         chmod 0755 /build/tmp/croco_build/jobcomp; \
+         (cd /build/tmp/croco_build && ./jobcomp --src croco_src/OCEAN --jobs 8 && test -x croco && mv croco /usr/local/bin/croco_${name}); \
+       done \
+    && ln -s /usr/local/bin/croco_balearic_1km /usr/local/bin/croco_balearic
+
+FROM python:3.11-slim-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl libeccodes-tools libgfortran5 libnetcdf19 \
+      libnetcdff7 openmpi-bin \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/local/bin/python3 /usr/bin/python3
+RUN curl -sSL \
+      https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
+      -o /tmp/google-cloud-sdk.tar.gz \
+    && tar -xzf /tmp/google-cloud-sdk.tar.gz -C /opt \
+    && /opt/google-cloud-sdk/install.sh --quiet \
+    && rm /tmp/google-cloud-sdk.tar.gz
+ENV PATH="/opt/google-cloud-sdk/bin:${PATH}" \
+    PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/app
+COPY --from=croco_builder /usr/local/bin/croco_* /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/croco_*
+COPY --from=swan_builder /src/swan4151/swan.exe /usr/local/bin/swan.exe
+COPY --from=swan_builder /src/swan4151/swanrun /usr/local/bin/swanrun
+RUN chmod 0755 /usr/local/bin/swan.exe /usr/local/bin/swanrun
+WORKDIR /app
+COPY simulation/marine/swan/requirements.batch.txt /app/requirements.batch.txt
+RUN pip install --no-cache-dir -r /app/requirements.batch.txt
+COPY scripts /app/scripts
+COPY simulation/marine/regions /app/simulation/marine/regions
+COPY simulation/marine/croco/croco.in.balearic /app/simulation/marine/croco/croco.in.balearic
+COPY simulation/marine/croco/prepare_croco_in.py /app/simulation/marine/croco/prepare_croco_in.py
+# Per-region SWAN bathymetry, generated via scripts/prepare_bathymetry.py --region
+# {region}. All 5 must exist in assets/static_grids/ before building this image;
+# see docs/bathymetry-integration-guide.md.
+COPY assets/static_grids/balearic_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/balearic_1km_bathymetry_swan.nc
+COPY assets/static_grids/alboran_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/alboran_1km_bathymetry_swan.nc
+COPY assets/static_grids/gulf_of_lion_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/gulf_of_lion_1km_bathymetry_swan.nc
+COPY assets/static_grids/tyrrhenian_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/tyrrhenian_1km_bathymetry_swan.nc
+COPY assets/static_grids/algerian_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/algerian_1km_bathymetry_swan.nc
+# Basin-wide SWAN-only profile (simulation/marine/regions/med_basin_1km.json).
+# Must be generated first -- e.g. `python3 scripts/prepare_bathymetry.py
+# --region med_basin_1km --output-dir assets/static_grids --no-upload` -- and
+# committed here before this Dockerfile.batch will build; resolve_swan_bathymetry()
+# in scripts/run_marine_simulation.py has no dynamic-fetch fallback, it only
+# looks for a pre-baked {region}_bathymetry_swan.nc under simulation/inputs.
+COPY assets/static_grids/med_basin_1km_bathymetry_swan.nc \
+     /app/simulation/inputs/med_basin_1km_bathymetry_swan.nc
+RUN test -x /usr/local/bin/croco_balearic \
+    && test -x /usr/local/bin/swan.exe \
+    && test -x /usr/local/bin/swanrun \
+    && python3 -c "import copernicusmarine, netCDF4, numpy, scipy, xarray" \
+    && python3 /app/scripts/prepare_croco_bulk_forcing.py --help \
+    && python3 /app/scripts/run_marine_simulation.py --help
+ENTRYPOINT ["python3", "/app/scripts/run_marine_simulation.py"]

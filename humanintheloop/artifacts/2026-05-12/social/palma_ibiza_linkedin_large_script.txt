@@ -1,0 +1,6 @@
+Captain: [Shared live location]
+Captain: Palma to Ibiza today. Best time to leave?
+PredSea: Go earlier. The route is calm this morning, but exposed wave energy builds later.
+PredSea: Palma -> Ibiza peaks near 1.5 m late evening.
+PredSea: Operational read: workable for 15-24m vessels, but avoid a late crossing if comfort matters.
+PredSea: Confidence: medium.

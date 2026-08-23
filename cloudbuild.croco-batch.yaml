@@ -1,0 +1,17 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "simulation/marine/croco/Dockerfile.batch"
+      - "-t"
+      - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch:latest"
+      - "."
+
+images:
+  - "europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch:latest"
+
+timeout: 5400s
+options:
+  machineType: "E2_HIGHCPU_32"
+  logging: CLOUD_LOGGING_ONLY

@@ -1,0 +1,6 @@
+Illustrative WhatsApp screenshot script
+Captain: [Shared live location]
+PredSea: Got it. You're near Palma Marina. For Ibiza -> Formentera, the best window looks before midday.
+PredSea: Watch-out: waves build toward 1.4 m around 02:00; current may reach 1.1 kn around 02:00.
+PredSea: Confidence: medium.
+Caption note: illustrative product example based on public marine data.
