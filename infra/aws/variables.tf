@@ -63,6 +63,33 @@ variable "simulation_image_tag" {
   type    = string
   default = "latest"
 }
+variable "ww3_image_digest" {
+  type        = string
+  description = "Immutable ECR digest for the WW3 AWS Batch image"
+  default     = "sha256:6ad5b323114b0f0bced2b1c434e4143d48e8519ed8574cb361ee671daa8f78db"
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.ww3_image_digest))
+    error_message = "ww3_image_digest must be a sha256 digest."
+  }
+}
+variable "batch_instance_types" {
+  type        = list(string)
+  description = "128-vCPU x86_64 compute-optimized instance types available to AWS Batch"
+  default     = ["c6i.32xlarge"]
+  validation {
+    condition     = length(var.batch_instance_types) > 0 && alltrue([for instance_type in var.batch_instance_types : instance_type == "c6i.32xlarge"])
+    error_message = "batch_instance_types must contain only the approved 128-vCPU type: c6i.32xlarge."
+  }
+}
+variable "batch_root_volume_size_gib" {
+  type        = number
+  description = "Encrypted gp3 root volume size for ephemeral Batch compute nodes"
+  default     = 300
+  validation {
+    condition     = var.batch_root_volume_size_gib >= 50
+    error_message = "batch_root_volume_size_gib must be at least 50 GiB."
+  }
+}
 variable "croco_grid_version" {
   type        = string
   description = "Validated immutable CROCO grid version present for every region in S3"

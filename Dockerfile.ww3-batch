@@ -129,12 +129,11 @@ COPY simulation/marine/croco/croco.in.balearic /app/simulation/marine/croco/croc
 COPY simulation/marine/croco/prepare_croco_in.py /app/simulation/marine/croco/prepare_croco_in.py
 COPY simulation/marine/ww3/switch_predsea /app/simulation/marine/ww3/switch_predsea
 
-# Phase 0 target regions only (tyrrhenian_1km, balearic_1km) -- bathymetry
-# for these still needs to be regenerated in WW3's native grid format via a
-# new script analogous to scripts/prepare_bathymetry.py (see
-# docs/ww3-migration-plan-2026-08-04.md section 3, "must be built new").
-# Not yet included in this image; add COPY lines here once that script
-# exists and has produced WW3 grid files for these regions.
+# WW3 static grids are not baked into this image. The AWS runner downloads the
+# explicitly selected region's promoted mod_def.ww3 and ST4TABUHF2.bin from its
+# region-scoped S3 prefix. Alboran is the currently staged AWS canary region;
+# the older migration plan's Tyrrhenian/Balearic Phase 0 choice was planning
+# guidance before those Alboran artifacts were promoted.
 
 RUN mkdir -p /app/simulation/inputs /workspace/inputs /workspace/outputs
 RUN test -x /usr/local/bin/croco_balearic \

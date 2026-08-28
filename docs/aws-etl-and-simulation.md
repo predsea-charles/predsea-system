@@ -235,7 +235,7 @@ After WRF completes, `scripts/prepare_ww3_wind_from_wrf.py`:
 2. Extracts `U10`, `V10`, timestamps, latitude, and longitude.
 3. Interpolates WRF winds onto each WW3 regional grid.
 4. Writes `wind.nc`.
-5. Writes `ww3_prnc.nml` and `ww3_shel.nml`.
+5. Writes `ww3_prnc.nml`, `ww3_shel.nml`, and `ww3_ounf.nml`.
 6. Creates a forcing manifest for all five regions.
 
 Generated forcing is uploaded to:
