@@ -63,7 +63,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "outputs" {
 }
 
 resource "aws_ecr_repository" "repos" {
-  for_each             = toset(["api", "orchestrator", "wrf", "croco", "ww3"])
+  for_each             = toset(["api", "orchestrator", "wrf", "croco", "ww3", "ecmwf"])
   name                 = "${var.name_prefix}-${each.key}"
   image_tag_mutability = "MUTABLE"
   image_scanning_configuration { scan_on_push = true }
@@ -325,6 +325,10 @@ resource "aws_codebuild_project" "images" {
     environment_variable {
       name  = "WW3_REPOSITORY"
       value = aws_ecr_repository.repos["ww3"].repository_url
+    }
+    environment_variable {
+      name  = "ECMWF_REPOSITORY"
+      value = aws_ecr_repository.repos["ecmwf"].repository_url
     }
   }
   source {

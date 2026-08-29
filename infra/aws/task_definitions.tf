@@ -3,6 +3,7 @@ locals {
     wrf   = {}
     croco = {}
     ww3   = {}
+    ecmwf = {}
   }
 }
 

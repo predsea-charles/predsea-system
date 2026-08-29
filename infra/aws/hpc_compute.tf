@@ -8,9 +8,25 @@ locals {
   }
 
   fixed_hpc_jobs = {
+    ecmwf = {
+      vcpus        = 4
+      memory       = 8000
+      image_digest = var.ecmwf_image_digest
+      command = [
+        "--run-date", "Ref::run_date",
+        "--lead-hours", "Ref::lead_hours",
+        "--s3-bucket", aws_s3_bucket.outputs.id,
+      ]
+      environment = []
+      parameters = {
+        run_date   = "override-at-submission"
+        lead_hours = "24"
+      }
+    }
     wrf = {
-      vcpus  = 128
-      memory = 240000
+      vcpus        = 128
+      memory       = 240000
+      image_digest = var.wrf_image_digest
       command = [
         "--run-date", "Ref::run_date",
         "--run-id", "Ref::run_id",
@@ -32,8 +48,9 @@ locals {
     }
     ww3 = {
       # Reserve the full node while retaining the validated 24-rank runtime.
-      vcpus  = 24
-      memory = 48000
+      vcpus        = 24
+      memory       = 48000
+      image_digest = var.ww3_image_digest
       command = [
         "--model", "ww3",
         "--region", "Ref::region",
@@ -82,8 +99,9 @@ locals {
         run_date       = "override-at-submission"
         run_id         = "override-at-submission"
       }
-      image_key = "croco"
-      log_key   = "croco"
+      image_key    = "croco"
+      log_key      = "croco"
+      image_digest = var.croco_image_digest
     }
   }
 
@@ -279,7 +297,7 @@ resource "aws_batch_job_definition" "model" {
   parameters            = each.value.parameters
 
   container_properties = jsonencode({
-    image            = each.key == "ww3" ? "${aws_ecr_repository.repos[each.value.image_key].repository_url}@${var.ww3_image_digest}" : "${aws_ecr_repository.repos[each.value.image_key].repository_url}:${var.simulation_image_tag}"
+    image            = try(each.value.image_digest, "") != "" ? "${aws_ecr_repository.repos[each.value.image_key].repository_url}@${each.value.image_digest}" : "${aws_ecr_repository.repos[each.value.image_key].repository_url}:${var.simulation_image_tag}"
     command          = each.value.command
     executionRoleArn = aws_iam_role.ecs_execution.arn
     jobRoleArn       = aws_iam_role.task.arn

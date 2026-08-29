@@ -72,6 +72,33 @@ variable "ww3_image_digest" {
     error_message = "ww3_image_digest must be a sha256 digest."
   }
 }
+variable "ecmwf_image_digest" {
+  type        = string
+  description = "Immutable ECR digest for the ECMWF AWS Batch image"
+  default     = "sha256:8540cf54751bb95ea23df9794dc7268eaf65b76b4b2b6598ea678ac2794bb93c"
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.ecmwf_image_digest))
+    error_message = "ecmwf_image_digest must be a sha256 digest."
+  }
+}
+variable "wrf_image_digest" {
+  type        = string
+  description = "Immutable ECR digest for the WRF AWS Batch image"
+  default     = "sha256:1204c998a332fd00c26e316a1367e365423cc3f01f6379fffb272065db89da5e"
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.wrf_image_digest))
+    error_message = "wrf_image_digest must be a sha256 digest."
+  }
+}
+variable "croco_image_digest" {
+  type        = string
+  description = "Immutable ECR digest for the CROCO AWS Batch image"
+  default     = "sha256:366c3821178d9a5f11fad02e42536714a5a631b9e514334c13d79c38ba0cd60b"
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.croco_image_digest))
+    error_message = "croco_image_digest must be a sha256 digest."
+  }
+}
 variable "batch_instance_types" {
   type        = list(string)
   description = "128-vCPU x86_64 compute-optimized instance types available to AWS Batch"

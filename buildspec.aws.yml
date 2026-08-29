@@ -13,8 +13,10 @@ phases:
       - docker build -f simulation/marine/croco/Dockerfile.aws --build-arg BASE_IMAGE=predsea-croco-base:$IMAGE_TAG -t "$CROCO_REPOSITORY:$IMAGE_TAG" -t "$CROCO_REPOSITORY:latest" .
       - docker build --pull -f Dockerfile.ww3-batch -t predsea-ww3-base:$IMAGE_TAG .
       - docker build -f Dockerfile.ww3-aws --build-arg BASE_IMAGE=predsea-ww3-base:$IMAGE_TAG -t "$WW3_REPOSITORY:$IMAGE_TAG" -t "$WW3_REPOSITORY:latest" .
+      - docker build --pull -f Dockerfile.ecmwf -t "$ECMWF_REPOSITORY:$IMAGE_TAG" -t "$ECMWF_REPOSITORY:latest" .
   post_build:
     commands:
       - docker push --all-tags "$WRF_REPOSITORY"
       - docker push --all-tags "$CROCO_REPOSITORY"
       - docker push --all-tags "$WW3_REPOSITORY"
+      - docker push --all-tags "$ECMWF_REPOSITORY"

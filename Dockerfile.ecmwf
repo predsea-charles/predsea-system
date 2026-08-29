@@ -1,0 +1,8 @@
+FROM python:3.11-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl awscli \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY requirements-aws.txt .
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements-aws.txt
+COPY scripts/fetch_ecmwf_forcing.py /app/scripts/fetch_ecmwf_forcing.py
+ENTRYPOINT ["python3", "/app/scripts/fetch_ecmwf_forcing.py"]
