@@ -1,0 +1,2 @@
+run_id,run_date,phase,region,horizon_hours,queue,status,wrf_job_id,croco_job_id,ww3_job_id,compute_cost_usd,other_cost_usd,total_cost_usd,authorized_max_usd,notes
+phase2-preflight-20260825,2026-08-25,2,alboran_1km,6,predsea-models-canary,BLOCKED,,,,0.00,0.00,0.00,40.00,"No jobs submitted: Spot-only canary queue absent and active CROCO definition requests 16 MPI ranks instead of 8."

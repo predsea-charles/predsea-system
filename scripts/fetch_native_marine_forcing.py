@@ -200,6 +200,8 @@ def main() -> int:
             buffer = 0.5
             kwargs = {
                 "dataset_id": spec["dataset_id"],
+                "username": username,
+                "password": password,
                 "variables": spec["variables"],
                 "minimum_longitude": bbox["longitude_min"] - buffer,
                 "maximum_longitude": bbox["longitude_max"] + buffer,

@@ -19,7 +19,7 @@ BUILD_PROJECT="$(terraform -chdir="$TF_DIR" output -raw codebuild_project)"
 
 zip -q -r "$SOURCE_ZIP" . \
   -x '.git/*' '.terraform/*' 'infra/aws/.terraform/*' '*.pyc' '*/__pycache__/*' \
-     'predictions/*' 'observations/*' 'simulation/inputs/*' '*.nc' '*.grib2' '*.zip'
+     'predictions/*' 'observations/*' 'simulation/inputs/*' '*.grib2' '*.zip'
 aws s3 cp "$SOURCE_ZIP" "s3://$BUCKET/codebuild-source/source.zip" --region "$AWS_REGION" --sse AES256
 
 BUILD_ID="$(aws codebuild start-build --project-name "$BUILD_PROJECT" --region "$AWS_REGION" --query 'build.id' --output text)"

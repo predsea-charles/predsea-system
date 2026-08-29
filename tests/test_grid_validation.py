@@ -9,7 +9,7 @@ import xarray as xr
 import scripts.grid_validation as grid_validation
 
 
-def _write_region(tmp_path, region_id="test_1km"):
+def _write_region(tmp_path, region_id="test_1km", *, compiled_shape=None):
     region_dir = tmp_path / "regions"
     region_dir.mkdir()
     (region_dir / f"{region_id}.json").write_text(
@@ -20,7 +20,10 @@ def _write_region(tmp_path, region_id="test_1km"):
                     "longitude_max": 5.5,
                     "latitude_min": 37.5,
                     "latitude_max": 41.5,
-                }
+                },
+                "models": {"croco": {"compiled_grid_shape": compiled_shape}}
+                if compiled_shape is not None
+                else {},
             }
         ),
         encoding="utf-8",
@@ -76,4 +79,16 @@ def test_grid_geography_rejects_declared_region_mismatch(tmp_path, monkeypatch):
     path = _write_grid(tmp_path, region_id="other_1km")
 
     with pytest.raises(ValueError, match="region_id mismatch"):
+        grid_validation.validate_grid_matches_region(path, "test_1km")
+
+
+def test_grid_rejects_compiled_shape_mismatch(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        grid_validation,
+        "REGION_CONFIG_DIR",
+        _write_region(tmp_path, compiled_shape={"xi_rho": 7, "eta_rho": 5}),
+    )
+    path = _write_grid(tmp_path)
+
+    with pytest.raises(ValueError, match="do not match compiled CROCO shape"):
         grid_validation.validate_grid_matches_region(path, "test_1km")

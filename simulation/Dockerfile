@@ -25,6 +25,7 @@ ENV DIR=/opt \
     WRF_EM_CORE=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    awscli \
     build-essential \
     ca-certificates \
     cmake \
@@ -77,7 +78,7 @@ RUN git clone --branch v${WRF_VERSION} --depth 1 https://github.com/wrf-model/WR
 WORKDIR /opt/WRF
 
 RUN printf "%s\n1\n" "${WRF_CONFIGURE_OPTION}" | ./configure \
-    && ./compile -j 1 em_real \
+    && ./compile em_real -j 1 \
     && test -x run/real.exe \
     && test -x run/wrf.exe
 
@@ -108,6 +109,7 @@ ENV WRF_DIR=/opt/WRF \
     PATH=/opt/WRF/run:/opt/WPS:${PATH}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    awscli \
     csh \
     libeccodes-tools \
     libgfortran5 \
@@ -134,9 +136,11 @@ COPY --from=wrf-builder /opt/WRF/run/wrf.exe /opt/predsea/bin/wrf.exe
 COPY --from=wrf-builder /opt/WPS/geogrid.exe /opt/predsea/bin/geogrid.exe
 COPY --from=wrf-builder /opt/WPS/ungrib.exe /opt/predsea/bin/ungrib.exe
 COPY --from=wrf-builder /opt/WPS/metgrid.exe /opt/predsea/bin/metgrid.exe
-COPY setup_domain.py /opt/predsea/setup_domain.py
-COPY run_pipeline.sh /opt/predsea/run_pipeline.sh
+COPY simulation/Vtable.ECMWF_grib2 /data/Vtable.ECMWF_grib2
+COPY simulation/setup_domain.py /opt/predsea/setup_domain.py
+COPY simulation/run_pipeline.sh /opt/predsea/run_pipeline.sh
+COPY scripts/aws_wrf_runner.py /opt/predsea/aws_wrf_runner.py
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["python3", "/opt/predsea/aws_wrf_runner.py"]

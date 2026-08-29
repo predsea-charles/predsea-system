@@ -1,4 +1,9 @@
 # Environments & Build
+.venv-aws/
+.DS_Store
+**/.DS_Store
+infra/aws/terraform.tfvars
+
 venv/
 to_ignore/
 *.pyc

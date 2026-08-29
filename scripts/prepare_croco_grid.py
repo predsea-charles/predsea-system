@@ -41,6 +41,12 @@ CROCO_REQUIRED_GRID_VARIABLES = frozenset(
     }
 )
 
+SWAN_VARIABLE_ALIASES = {
+    "bathy": ("bathy", "depth"),
+    "nav_lon": ("nav_lon", "longitude", "lon"),
+    "nav_lat": ("nav_lat", "latitude", "lat"),
+}
+
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -60,6 +66,92 @@ def _distance_m(
     dx = np.deg2rad(lon_b - lon_a) * np.cos(mean_lat)
     dy = np.deg2rad(lat_b - lat_a)
     return EARTH_RADIUS_M * np.hypot(dx, dy)
+
+
+def normalize_bathymetry(bathymetry: xr.Dataset) -> xr.Dataset:
+    """Normalize supported 1-D SWAN or 2-D navigation grids."""
+    resolved: dict[str, xr.DataArray] = {}
+    for canonical, aliases in SWAN_VARIABLE_ALIASES.items():
+        source_name = next((name for name in aliases if name in bathymetry), None)
+        if source_name is None:
+            raise ValueError(
+                f"bathymetry is missing {canonical}; supported names: "
+                + ", ".join(aliases)
+            )
+        resolved[canonical] = bathymetry[source_name]
+
+    depth = resolved["bathy"]
+    if depth.ndim != 2:
+        raise ValueError("bathymetry depth must be a two-dimensional grid")
+    lon = resolved["nav_lon"]
+    lat = resolved["nav_lat"]
+    if lon.ndim == 1 and lat.ndim == 1:
+        if depth.dims != (lat.dims[0], lon.dims[0]):
+            raise ValueError(
+                "one-dimensional latitude/longitude dimensions do not match "
+                f"bathymetry dimensions: depth={depth.dims}, "
+                f"latitude={lat.dims}, longitude={lon.dims}"
+            )
+        lon_values, lat_values = np.meshgrid(lon.values, lat.values)
+    elif lon.ndim == 2 and lat.ndim == 2:
+        if lon.dims != depth.dims or lat.dims != depth.dims:
+            raise ValueError("two-dimensional navigation dimensions must match bathymetry")
+        lon_values = lon.values
+        lat_values = lat.values
+    else:
+        raise ValueError(
+            "latitude and longitude must both be one-dimensional or both be two-dimensional"
+        )
+
+    return xr.Dataset(
+        {
+            "bathy": (depth.dims, np.asarray(depth.values, dtype=float)),
+            "nav_lon": (depth.dims, np.asarray(lon_values, dtype=float)),
+            "nav_lat": (depth.dims, np.asarray(lat_values, dtype=float)),
+        }
+    )
+
+
+def resample_bathymetry(
+    bathymetry: xr.Dataset,
+    *,
+    eta_rho: int,
+    xi_rho: int,
+) -> xr.Dataset:
+    """Linearly resample a rectilinear source to a compiled CROCO rho shape."""
+    if eta_rho < 3 or xi_rho < 3:
+        raise ValueError("compiled CROCO rho-grid dimensions must be at least 3")
+    depth = bathymetry["bathy"]
+    y_dim, x_dim = depth.dims
+    lon = np.asarray(bathymetry["nav_lon"].values, dtype=float)
+    lat = np.asarray(bathymetry["nav_lat"].values, dtype=float)
+    if not (
+        np.allclose(lon, lon[0:1, :])
+        and np.allclose(lat, lat[:, 0:1])
+    ):
+        raise ValueError("compiled-shape resampling requires a rectilinear source grid")
+
+    source_lon = lon[0, :]
+    source_lat = lat[:, 0]
+    if np.any(np.diff(source_lon) <= 0) or np.any(np.diff(source_lat) <= 0):
+        raise ValueError("SWAN latitude/longitude coordinates must increase monotonically")
+    target_lon = np.linspace(float(lon.min()), float(lon.max()), xi_rho)
+    target_lat = np.linspace(float(lat.min()), float(lat.max()), eta_rho)
+    depth_values = np.asarray(depth.values, dtype=float)
+    along_x = np.vstack(
+        [np.interp(target_lon, source_lon, row) for row in depth_values]
+    )
+    interpolated = np.vstack(
+        [np.interp(target_lat, source_lat, along_x[:, column]) for column in range(xi_rho)]
+    ).T
+    target_lon_2d, target_lat_2d = np.meshgrid(target_lon, target_lat)
+    return xr.Dataset(
+        {
+            "bathy": ((y_dim, x_dim), interpolated),
+            "nav_lon": ((y_dim, x_dim), target_lon_2d),
+            "nav_lat": ((y_dim, x_dim), target_lat_2d),
+        }
+    )
 
 
 def _maximum_rx0(depth: np.ndarray, wet: np.ndarray) -> float:
@@ -347,7 +439,18 @@ def main(argv: list[str] | None = None) -> int:
         )
     region = json.loads(args.region.read_text())
     with xr.open_dataset(args.bathymetry) as source_bathymetry:
-        bathymetry = crop_bathymetry_to_bbox(source_bathymetry, region["bbox"])
+        bathymetry = normalize_bathymetry(source_bathymetry)
+        bathymetry = crop_bathymetry_to_bbox(bathymetry, region["bbox"])
+        compiled_shape = region["models"]["croco"].get("compiled_grid_shape")
+        if not isinstance(compiled_shape, dict):
+            raise ValueError(
+                f"region {region['region_id']} is missing models.croco.compiled_grid_shape"
+            )
+        bathymetry = resample_bathymetry(
+            bathymetry,
+            eta_rho=int(compiled_shape["eta_rho"]),
+            xi_rho=int(compiled_shape["xi_rho"]),
+        )
         grid, report = build_grid(
             bathymetry,
             minimum_depth_m=args.minimum_depth_m,

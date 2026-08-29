@@ -13,6 +13,11 @@ from pathlib import Path
 
 import boto3
 
+try:
+    from scripts.aws.run_cost_ledger import RunCostLedger
+except ModuleNotFoundError:  # Direct execution from the scripts directory.
+    from aws.run_cost_ledger import RunCostLedger
+
 ROOT = Path(__file__).resolve().parents[1]
 MARINE_REGIONS = (
     "alboran_1km",
@@ -127,8 +132,17 @@ def main() -> int:
     if args.forecast_hours != 72:
         p.error("AWS production runs are fixed at 72 forecast hours")
     bucket = os.getenv("PREDSEA_S3_BUCKET", "predsea-daily-outputs")
-    if not args.dry_run: load_runtime_secrets()
-    publish_status(bucket, run_date, run_id, "STARTED", "AWS daily run started") if not args.dry_run else None
+    ledger = None
+    if not args.dry_run:
+        load_runtime_secrets()
+        s3 = boto3.client("s3", region_name=os.getenv("AWS_REGION", "eu-west-1"))
+        ledger = RunCostLedger(
+            bucket, run_date, run_id, s3,
+            provisional_s3_cost_usd=os.getenv("PREDSEA_PROVISIONAL_S3_COST_USD"),
+            provisional_cloudwatch_cost_usd=os.getenv("PREDSEA_PROVISIONAL_CLOUDWATCH_COST_USD"),
+        )
+        ledger.publish()
+        publish_status(bucket, run_date, run_id, "STARTED", "AWS daily run started", s3=s3)
     try:
         common = [f"--run-date={run_date}", f"--lead-hours={args.forecast_hours}", f"--s3-bucket={bucket}", "--gcs-bucket="]
         run([sys.executable, "scripts/fetch_ecmwf_forcing.py", *common], dry_run=args.dry_run)
@@ -142,10 +156,13 @@ def main() -> int:
             local_run = ROOT / "predictions" / run_date / "runs" / run_id
             if local_run.exists():
                 run(["aws", "s3", "sync", str(local_run), f"s3://{bucket}/predictions/{run_date}/runs/{run_id}/", "--only-show-errors"])
-            publish_status(bucket, run_date, run_id, "SUCCEEDED", "AWS daily run completed")
+            publish_status(bucket, run_date, run_id, "SUCCEEDED", "AWS daily run completed", s3=s3)
+            ledger.finish("SUCCEEDED", "AWS daily run completed")
         return 0
     except Exception as error:
-        if not args.dry_run: publish_status(bucket, run_date, run_id, "FAILED", str(error))
+        if not args.dry_run:
+            publish_status(bucket, run_date, run_id, "FAILED", str(error), s3=s3)
+            ledger.finish("FAILED", str(error))
         raise
 
 

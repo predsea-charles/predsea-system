@@ -13,6 +13,25 @@ import boto3
 from botocore.exceptions import ClientError
 
 TERMINAL_STATES = {"shutting-down", "terminated", "stopping", "stopped"}
+CROCO_REGION_RANKS = {
+    "alboran_1km": 16,
+    "algerian_1km": 24,
+    "balearic_1km": 32,
+    "gulf_of_lion_1km": 8,
+    "tyrrhenian_1km": 48,
+}
+
+
+def validate_region_rank_pairings(pairings: dict[str, int]) -> None:
+    """Reject any CROCO submission plan that differs from compiled binaries."""
+    if pairings != CROCO_REGION_RANKS:
+        details = []
+        for region in sorted(set(pairings) | set(CROCO_REGION_RANKS)):
+            actual = pairings.get(region)
+            expected = CROCO_REGION_RANKS.get(region)
+            if actual != expected:
+                details.append(f"{region}: got {actual!r}, expected {expected!r}")
+        raise ValueError("CROCO region/rank preflight failed: " + "; ".join(details))
 
 
 def _q(value: str) -> str:
@@ -24,8 +43,12 @@ def build_user_data(
     wrf_image_uri: str, croco_image_uri: str, ww3_image_uri: str,
     forecast_hours: int, mpi_ranks: int, croco_grid_version: str,
     worker_max_age_hours: float = 26,
+    croco_inputs_prefix: str = "",
+    croco_region_ranks: dict[str, int] | None = None,
 ) -> str:
     """Create the boot script for the sequential WRF, CROCO, and WW3 chain."""
+    rank_plan = dict(croco_region_ranks or CROCO_REGION_RANKS)
+    validate_region_rank_pairings(rank_plan)
     registries = sorted({uri.split("/", 1)[0] for uri in (wrf_image_uri, croco_image_uri, ww3_image_uri)})
     output_uri = f"s3://{bucket}/predictions/{run_date}/runs/{run_id}"
     forcing_uri = f"s3://{bucket}/forcing"
@@ -41,6 +64,7 @@ CROCO_IMAGE_URI={_q(croco_image_uri)}
 WW3_IMAGE_URI={_q(ww3_image_uri)}
 MPI_RANKS={int(mpi_ranks)}
 CROCO_GRID_VERSION={_q(croco_grid_version)}
+CROCO_INPUTS_PREFIX={_q(croco_inputs_prefix)}
 OUTPUT_URI={_q(output_uri)}
 STATUS=FAILED
 WORKER_MAX_AGE_HOURS={float(worker_max_age_hours)}
@@ -62,7 +86,6 @@ mkdir -p /workspace/inputs/ecmwf /workspace/outputs/wrf /workspace/outputs/croco
 chmod 0775 /workspace/inputs
 {os.linesep.join(f'aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin {_q(registry)}' for registry in registries)}
 aws s3 sync {_q(forcing_uri)}/ecmwf/$RUN_DATE/ /workspace/inputs/ecmwf/ --only-show-errors
-aws s3 sync {_q(forcing_uri)}/cmems/$RUN_DATE/ /workspace/inputs/ --only-show-errors
 docker pull "$WRF_IMAGE_URI"
 docker pull "$CROCO_IMAGE_URI"
 docker pull "$WW3_IMAGE_URI"
@@ -91,15 +114,21 @@ docker run --rm --entrypoint python3 \
 aws s3 sync /workspace/inputs/ww3/ "s3://$BUCKET/forcing/ww3/$RUN_DATE/" --only-show-errors
 
 echo "[2/3] Running five regional CROCO simulations"
-for REGION_ID in alboran_1km algerian_1km balearic_1km gulf_of_lion_1km tyrrhenian_1km; do
+for REGION_RANK_PAIR in {' '.join(f'{region}:{ranks}' for region, ranks in rank_plan.items())}; do
+  REGION_ID="${{REGION_RANK_PAIR%%:*}}"
+  CROCO_MPI_RANKS="${{REGION_RANK_PAIR##*:}}"
+  CROCO_INPUTS_URI=""
+  if [ -n "$CROCO_INPUTS_PREFIX" ]; then CROCO_INPUTS_URI="$CROCO_INPUTS_PREFIX/$REGION_ID/"; fi
   docker run --rm --name "predsea-croco-${{REGION_ID//_/-}}" --shm-size=16g \
     -e AWS_REGION="$AWS_REGION" -e PREDSEA_STORAGE_BACKEND=s3 \
     -e PREDSEA_RUN_DATE="$RUN_DATE" -e PREDSEA_RUN_ID="$RUN_ID" \
     -e PREDSEA_CROCO_GRID_S3_URI="s3://$BUCKET/static/native-marine/$REGION_ID/croco-grid/$CROCO_GRID_VERSION/croco_grid.nc" \
     -e PREDSEA_WRF_S3_URI="$OUTPUT_URI/wrf/" \
+    -e PREDSEA_CROCO_OCEAN_SOURCE=staged \
+    -e PREDSEA_CROCO_INPUTS_S3_URI="$CROCO_INPUTS_URI" \
     -v /workspace/inputs:/workspace/inputs:rw -v /workspace/outputs:/workspace/outputs \
     "$CROCO_IMAGE_URI" --model=croco --region="$REGION_ID" \
-    --forecast-hours={int(forecast_hours)} --mpi-ranks=16 --s3-bucket="$BUCKET"
+    --forecast-hours={int(forecast_hours)} --mpi-ranks="$CROCO_MPI_RANKS" --s3-bucket="$BUCKET"
 done
 
 echo "[3/3] Running five regional WW3 simulations"
@@ -124,12 +153,16 @@ class SpotOrchestrator:
     def launch(self, args) -> str:
         run_date = args.run_date or datetime.now(timezone.utc).date().isoformat()
         run_id = args.run_id or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%MZ")
+        rank_plan = dict(getattr(args, "croco_region_ranks", CROCO_REGION_RANKS))
+        validate_region_rank_pairings(rank_plan)
         user_data = build_user_data(
             region=self.region, bucket=args.bucket, run_date=run_date, run_id=run_id,
             wrf_image_uri=args.wrf_image_uri, croco_image_uri=args.croco_image_uri,
             ww3_image_uri=args.ww3_image_uri, forecast_hours=args.forecast_hours,
             mpi_ranks=args.mpi_ranks, croco_grid_version=args.croco_grid_version,
             worker_max_age_hours=args.worker_max_age_hours,
+            croco_inputs_prefix=getattr(args, "croco_inputs_prefix", ""),
+            croco_region_ranks=rank_plan,
         )
         request = {
             "ImageId": args.ami_id,
@@ -197,6 +230,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--volume-iops", type=int, default=3000); p.add_argument("--volume-throughput", type=int, default=500)
     p.add_argument("--forecast-hours", type=int, default=72); p.add_argument("--mpi-ranks", type=int, default=128)
     p.add_argument("--croco-grid-version", default=os.getenv("PREDSEA_CROCO_GRID_VERSION"), required=not bool(os.getenv("PREDSEA_CROCO_GRID_VERSION")))
+    p.add_argument("--croco-inputs-prefix", default=os.getenv("PREDSEA_CROCO_INPUTS_S3_PREFIX", ""), help="S3 prefix containing one directory per region with croco_ini.nc, croco_bry.nc, and croco_clm.nc")
     p.add_argument("--run-date"); p.add_argument("--run-id"); p.add_argument("--timeout-hours", type=float, default=24)
     p.add_argument("--worker-max-age-hours", type=float, default=26)
     return p
@@ -209,6 +243,11 @@ def main() -> int:
         cli_parser.error("AWS production runs are fixed at 72 forecast hours")
     if args.mpi_ranks != 128:
         cli_parser.error("c6i.32xlarge WRF runs require 128 MPI ranks")
+    if not args.croco_inputs_prefix.startswith("s3://"):
+        cli_parser.error(
+            "--croco-inputs-prefix must be an s3:// prefix with validated "
+            "region-scoped CROCO state files"
+        )
     if args.worker_max_age_hours <= args.timeout_hours:
         cli_parser.error("worker max age must exceed the supervisor timeout")
     now = datetime.now(timezone.utc); args.run_date = args.run_date or now.date().isoformat(); args.run_id = args.run_id or now.strftime("%Y-%m-%dT%H%MZ")

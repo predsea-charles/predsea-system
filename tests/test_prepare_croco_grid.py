@@ -7,8 +7,45 @@ from scripts.prepare_croco_grid import (
     CROCO_REQUIRED_GRID_VARIABLES,
     build_grid,
     crop_bathymetry_to_bbox,
+    normalize_bathymetry,
+    resample_bathymetry,
     smooth_bathymetry,
 )
+
+
+def test_normalize_bathymetry_meshgrids_one_dimensional_swan_coordinates():
+    source = xr.Dataset(
+        {
+            "depth": (("latitude", "longitude"), np.arange(12).reshape(3, 4)),
+        },
+        coords={
+            "longitude": [1.0, 1.1, 1.2, 1.3],
+            "latitude": [38.0, 38.1, 38.2],
+        },
+    )
+
+    normalized = normalize_bathymetry(source)
+
+    assert normalized["bathy"].shape == (3, 4)
+    assert normalized["nav_lon"].shape == (3, 4)
+    assert normalized["nav_lat"].shape == (3, 4)
+    np.testing.assert_allclose(normalized["nav_lon"][0], source["longitude"])
+    np.testing.assert_allclose(normalized["nav_lat"][:, 0], source["latitude"])
+
+
+def test_resample_bathymetry_matches_compiled_rho_shape():
+    source = normalize_bathymetry(
+        xr.Dataset(
+            {"depth": (("latitude", "longitude"), np.arange(12).reshape(3, 4))},
+            coords={"longitude": [1.0, 1.1, 1.2, 1.3], "latitude": [38.0, 38.1, 38.2]},
+        )
+    )
+
+    resampled = resample_bathymetry(source, eta_rho=5, xi_rho=6)
+
+    assert resampled["bathy"].shape == (5, 6)
+    assert float(resampled["nav_lon"].min()) == 1.0
+    assert float(resampled["nav_lon"].max()) == 1.3
 
 
 def test_smooth_bathymetry_enforces_rx0():

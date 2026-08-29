@@ -60,6 +60,13 @@ class BalearicDomain:
     forcing_prefix: str = "ECMWF"
     max_dom: int = 2
 
+    @property
+    def geog_data_res(self) -> str:
+        return os.environ.get(
+            "PREDSEA_WRF_GEOG_RES",
+            "modis_landuse_20class_30s_with_lakes+default",
+        )
+
     @classmethod
     def ultra_1km(cls, **kwargs) -> "BalearicDomain":
         """Return the preserved seven-domain 1 km regional configuration."""
@@ -149,7 +156,7 @@ def render_namelist(domain: BalearicDomain) -> str:
     starts_j = (1, domain.d02_j_parent_start, domain.d03_j_parent_start, domain.d04_j_parent_start, domain.d05_j_parent_start, domain.d06_j_parent_start, domain.d07_j_parent_start)[:count]
     e_we = tuple(grid[0] for grid in domain.grids)
     e_sn = tuple(grid[1] for grid in domain.grids)
-    geog_res = tuple("'modis_landuse_20class_30s_with_lakes+default'" for _ in range(count))
+    geog_res = tuple(f"'{domain.geog_data_res}'" for _ in range(count))
     return f"""&share
  wrf_core = 'ARW',
  max_dom = {count},

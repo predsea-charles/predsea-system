@@ -256,15 +256,20 @@ Regions execute sequentially in this order:
 4. `gulf_of_lion_1km`
 5. `tyrrhenian_1km`
 
-Current allocation per region:
+Each CROCO binary has a fixed compile-time decomposition. The AWS Batch job
+definition and runtime rank count must use the matching regional allocation:
 
-```text
-MPI ranks: 16
-Regions running concurrently: 1
-Approximate active vCPUs: 16
-```
+| Region | Decomposition | MPI ranks / requested vCPUs |
+| --- | ---: | ---: |
+| `alboran_1km` | 4 × 2 | 8 |
+| `algerian_1km` | 6 × 2 | 12 |
+| `balearic_1km` | 4 × 4 | 16 |
+| `gulf_of_lion_1km` | 2 × 2 | 4 |
+| `tyrrhenian_1km` | 6 × 4 | 24 |
 
-CROCO is not configured for 128 ranks. Its binaries are compiled for fixed regional grid decompositions and the runtime currently accepts only 1, 8, or 16 ranks. Increasing the rank count requires rebuilding every regional binary and validating the grid decomposition.
+Regions run sequentially. Changing any rank count requires rebuilding and
+validating that regional binary; a successful process exit alone is not
+evidence of scientific validity.
 
 Each CROCO run:
 
@@ -272,11 +277,42 @@ Each CROCO run:
 2. Calls `validate_grid_matches_region()` locally.
 3. Verifies grid dimensions match the compiled regional binary.
 4. Downloads WRF output from the same run ID.
-5. Acquires and validates three-dimensional CMEMS forcing.
-6. Builds CROCO boundary, initial, forcing, and bulk-atmosphere files.
-7. Runs the regional CROCO executable with 16 MPI ranks.
+5. Resolves the configured ocean-state provider. `alboran_1km` defaults to
+   pre-staged CROCO files; legacy regions may explicitly select `cmems`.
+6. Stages or builds the ocean files and builds WRF-derived bulk-atmosphere
+   forcing.
+7. Runs the regional CROCO executable with its compiled rank count from the
+   table above.
 8. Validates the resulting NetCDF fields.
 9. Uploads the canonical forecast and `CROCO_SUCCESS` marker.
+
+### Alboran CROCO runtime contract
+
+The Batch image does not compile a distinct Alboran physics profile. All five
+regional executables are compiled from the patched `BALEARIC_1KM` branch, with
+region-specific grid dimensions and MPI decomposition. That active branch has
+all four `OBC_*` sides, `CLIMATOLOGY`, `FRC_BRY` (including `Z_FRC_BRY`,
+`M2_FRC_BRY`, `M3_FRC_BRY`, and `T_FRC_BRY`), and `BULK_FLUX` enabled.
+`ANA_INITIAL` and `ANA_BRY` are not enabled.
+
+Consequently, the current Alboran binary requires these staged ocean files:
+
+```text
+croco_ini.nc
+croco_bry.nc
+croco_clm.nc
+```
+
+WRF conversion generates `croco_blk.nc` and `croco_frc.nc`. The canonical
+grid is staged as `croco_grid.nc`. Set `PREDSEA_CROCO_INPUTS_S3_URI` (or the
+GCS equivalent) to a region-scoped prefix containing the three ocean files,
+or mount them under `/workspace/inputs/croco/alboran_1km/`. CMEMS is available
+only when explicitly selected with `--croco-ocean-source cmems` or
+`PREDSEA_CROCO_OCEAN_SOURCE=cmems`; it is not acquired on the default Alboran
+path.
+
+This corrects the earlier description in sections 4 and 7: those sections
+describe the legacy five-region CMEMS ETL, not the no-CMEMS Alboran canary.
 
 Canonical grid path:
 
@@ -413,6 +449,25 @@ Publication includes:
 - Athena-backed forecast and observation queries.
 
 The daily run publishes `STARTED`, `SUCCEEDED`, or `FAILED` status documents to the run prefix and latest-status path.
+
+Each non-dry run also publishes and terminally updates:
+
+```text
+s3://<bucket>/predictions/<run-date>/runs/<run-id>/run_cost_ledger.json
+```
+
+The ledger keeps EC2 Spot, EBS, transfer, Fargate, and Athena costs visibly
+pending until attributed billing data is available. S3 and CloudWatch amounts
+are always labeled `provisional_estimate`; reviewed estimates may be supplied
+with `PREDSEA_PROVISIONAL_S3_COST_USD` and
+`PREDSEA_PROVISIONAL_CLOUDWATCH_COST_USD`. If either assumption is absent, its
+amount is `null` and `pricing_status` is `unpriced`, rather than reporting a
+misleading zero.
+
+Before the EC2 request is submitted, the control plane validates the complete
+CROCO region/rank plan against the compiled contract (8, 12, 16, 4, and 24
+ranks in canonical region order). The validated plan is also used to render
+the worker commands, so a mismatch fails before paid compute starts.
 
 ## 17. No-cost local verification
 

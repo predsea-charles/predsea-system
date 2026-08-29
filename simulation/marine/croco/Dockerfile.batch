@@ -46,7 +46,7 @@ RUN curl --fail --location --retry 4 \
     && mv "tmp/croco_build/croco-v${CROCO_VERSION}" tmp/croco_build/croco_src
 COPY simulation/marine/croco/patch_croco_source.py /build/patch_croco_source.py
 RUN mkdir -p /usr/local/bin \
-    && for region in alboran_1km:499:249:4:2 algerian_1km:949:299:6:2 balearic_1km:499:399:4:4 gulf_of_lion_1km:498:198:2:2 tyrrhenian_1km:648:649:6:4; do \
+    && for region in alboran_1km:499:249:8:2 algerian_1km:949:299:6:2 balearic_1km:499:399:4:4 gulf_of_lion_1km:498:198:2:2 tyrrhenian_1km:648:649:6:4; do \
          name=$(echo $region | cut -d: -f1); \
          lm=$(echo $region | cut -d: -f2); \
          mm=$(echo $region | cut -d: -f3); \

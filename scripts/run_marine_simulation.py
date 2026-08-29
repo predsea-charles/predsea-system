@@ -18,6 +18,14 @@ from pathlib import Path
 
 import xarray as xr
 
+CROCO_MPI_RANKS = {
+    "alboran_1km": 16,
+    "algerian_1km": 24,
+    "balearic_1km": 32,
+    "gulf_of_lion_1km": 8,
+    "tyrrhenian_1km": 48,
+}
+
 try:
     from scripts.fetch_swan_wind import fetch_wind, validate_wind
     from scripts.grid_validation import validate_grid_matches_region
@@ -143,6 +151,21 @@ def croco_mpi_command(mpi_ranks: int, executable: Path, namelist: Path) -> list[
     ]
 
 
+def validate_croco_mpi_ranks(region_id: str, mpi_ranks: int) -> None:
+    """Require the rank count compiled into the selected regional binary."""
+    expected_mpi_ranks = CROCO_MPI_RANKS.get(region_id)
+    if expected_mpi_ranks is None:
+        raise ValueError(
+            f"unsupported CROCO region_id: {region_id}; expected one of "
+            + ", ".join(sorted(CROCO_MPI_RANKS))
+        )
+    if mpi_ranks != expected_mpi_ranks:
+        raise ValueError(
+            f"CROCO mpi_ranks mismatch for {region_id}: got {mpi_ranks}, "
+            f"compiled decomposition requires {expected_mpi_ranks}"
+        )
+
+
 def require_one(directory: Path, patterns: tuple[str, ...], label: str) -> Path:
     """Resolve one explicit input product and reject ambiguous discovery."""
     matches: list[Path] = []
@@ -223,16 +246,56 @@ def stage_cmems_forcing(staged_cmems: Path, croco_work: Path) -> Path:
     return destination
 
 
+def croco_ocean_source(region_id: str, configured: str | None = None) -> str:
+    """Select the ocean-state provider without making CMEMS a CROCO invariant."""
+    value = (configured or os.environ.get("PREDSEA_CROCO_OCEAN_SOURCE") or
+             ("staged" if region_id == "alboran_1km" else "cmems"))
+    value = value.strip().lower()
+    if value not in {"staged", "cmems"}:
+        raise ValueError("CROCO ocean source must be 'staged' or 'cmems'")
+    return value
+
+
+def stage_croco_ocean_inputs(inputs_dir: Path, croco_work: Path,
+                             region_id: str) -> tuple[Path, ...]:
+    """Stage the files required by the current REGIONAL/FRC_BRY compile."""
+    required = ("croco_ini.nc", "croco_bry.nc", "croco_clm.nc")
+    search_dirs = (inputs_dir / "croco" / region_id, inputs_dir / region_id, inputs_dir)
+    staged: list[Path] = []
+    for name in required:
+        matches = [directory / name for directory in search_dirs
+                   if (directory / name).is_file()]
+        if not matches:
+            raise FileNotFoundError(
+                f"Missing staged CROCO input {name} for {region_id}; searched: "
+                + ", ".join(str(directory) for directory in search_dirs)
+            )
+        source = matches[0]
+        if source.stat().st_size == 0:
+            raise ValueError(f"Staged CROCO input is empty: {source}")
+        destination = croco_work / name
+        shutil.copy2(source, destination)
+        staged.append(destination)
+    return tuple(staged)
+
+
 def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: Path,
                          region_id: str, run_date: str, run_id: str,
-                         forecast_hours: int, mpi_ranks: int, gcs_bucket: str) -> None:
+                         forecast_hours: int, mpi_ranks: int, gcs_bucket: str,
+                         ocean_source: str | None = None) -> None:
     """Run the bounded regional CROCO path from explicit real inputs."""
-    if mpi_ranks not in (1, 8, 16):
-        raise ValueError(
-            f"unsupported mpi_ranks value: {mpi_ranks}; expected 1, 8, or 16"
-        )
+
+    # --- ADD THIS QUICK FIX ---
+    if "Ref::" in run_date: run_date = os.environ.get("RUN_DATE", run_date)
+    if "Ref::" in run_id: run_id = os.environ.get("RUN_ID", run_id)
+    # --------------------------
+
+    validate_croco_mpi_ranks(region_id, mpi_ranks)
+
     grid_uri = os.environ.get("PREDSEA_CROCO_GRID_S3_URI") or os.environ.get("PREDSEA_CROCO_GRID_GCS_URI")
-    wrf_uri = os.environ.get("PREDSEA_WRF_S3_URI") or os.environ.get("PREDSEA_WRF_GCS_URI")
+    expected_scheme_prefix = "s3" if storage_backend() == "s3" else "gs"
+    wrf_uri = f"{expected_scheme_prefix}://{gcs_bucket}/predictions/{run_date}/runs/{run_id}/wrf/"
+
     expected_scheme = "s3://" if storage_backend() == "s3" else "gs://"
     if not grid_uri or not grid_uri.startswith(expected_scheme):
         raise ValueError(f"CROCO grid URI must identify an immutable {expected_scheme} object")
@@ -315,78 +378,89 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
 
     vertical_levels = int(croco_spec.get("vertical_levels", 32))
 
-    log_step("2. Acquiring validated three-dimensional CMEMS ocean forcing")
-    staged_cmems = inputs_dir / "cmems_ocean_forcing.nc"
-    # inputs_dir is populated by a shared, run_date-only (not per-region) GCS
-    # sync, so any cache entry checked here must be region-scoped in its
-    # filename -- otherwise one region's CMEMS ocean state could be silently
-    # reused for a different region's grid with no error (CROCO has no
-    # equivalent of SWAN's finite-value check to catch this at runtime).
-    croco_product_stems = (
-        "cmems_croco_currents_3d",
-        "cmems_croco_temperature_3d",
-        "cmems_croco_salinity_3d",
-        "cmems_croco_sea_level",
-    )
-    staged_products = tuple(
-        inputs_dir / f"{stem}_{region_id}.nc" for stem in croco_product_stems
-    )
-    use_staged_cmems = False
-    if staged_cmems.exists():
-        log_step(f"--> Validating pre-staged CMEMS forcing at {staged_cmems}...")
-        try:
-            stage_cmems_forcing(staged_cmems, croco_work)
-            use_staged_cmems = True
-        except ValueError as exc:
-            log_step(
-                "--> Rejecting structurally invalid CMEMS cache and "
-                f"reacquiring real 3-D forcing: {exc}"
+    selected_ocean_source = croco_ocean_source(region_id, ocean_source)
+
+    if selected_ocean_source == "staged":
+        inputs_uri = (os.environ.get("PREDSEA_CROCO_INPUTS_S3_URI") or
+                      os.environ.get("PREDSEA_CROCO_INPUTS_GCS_URI"))
+        if inputs_uri:
+            if not inputs_uri.startswith(expected_scheme):
+                raise ValueError(
+                    f"CROCO inputs URI must use the active {expected_scheme} backend"
+                )
+            run_checked(
+                cloud_sync(inputs_uri, str(inputs_dir / "croco" / region_id)),
+                stage="staged CROCO ocean-input download",
             )
-    elif all(path.is_file() and path.stat().st_size > 0 for path in staged_products):
-        log_step(f"--> Found validated region-scoped CMEMS product set for {region_id}; staging for interpolation...")
-        for source in staged_products:
-            plain_name = source.name[: -len(f"_{region_id}.nc")] + ".nc"
-            shutil.copy2(source, croco_work / plain_name)
-        use_staged_cmems = True
-    if not use_staged_cmems:
+        log_step("2. Staging configured CROCO initial, boundary, and climatology files")
+        stage_croco_ocean_inputs(inputs_dir, croco_work, region_id)
+    else:
+        log_step("2. Acquiring validated three-dimensional CMEMS ocean forcing")
+
+    if selected_ocean_source == "cmems":
+        staged_cmems = inputs_dir / "cmems_ocean_forcing.nc"
+        # Shared run-date caches must use region-scoped filenames.
+        croco_product_stems = (
+            "cmems_croco_currents_3d",
+            "cmems_croco_temperature_3d",
+            "cmems_croco_salinity_3d",
+            "cmems_croco_sea_level",
+        )
+        staged_products = tuple(
+            inputs_dir / f"{stem}_{region_id}.nc" for stem in croco_product_stems
+        )
+        use_staged_cmems = False
+        if staged_cmems.exists():
+            log_step(f"--> Validating pre-staged CMEMS forcing at {staged_cmems}...")
+            try:
+                stage_cmems_forcing(staged_cmems, croco_work)
+                use_staged_cmems = True
+            except ValueError as exc:
+                log_step(
+                    "--> Rejecting structurally invalid CMEMS cache and "
+                    f"reacquiring real 3-D forcing: {exc}"
+                )
+        elif all(path.is_file() and path.stat().st_size > 0 for path in staged_products):
+            log_step(f"--> Found validated region-scoped CMEMS product set for {region_id}; staging for interpolation...")
+            for source in staged_products:
+                plain_name = source.name[: -len(f"_{region_id}.nc")] + ".nc"
+                shutil.copy2(source, croco_work / plain_name)
+            use_staged_cmems = True
+        if not use_staged_cmems:
+            run_checked(
+                [
+                    "python3", "/app/scripts/fetch_native_marine_forcing.py",
+                    "--run-date", run_date,
+                    "--forecast-hours", str(forecast_hours),
+                    "--region", str(region_profile),
+                    "--output-dir", str(croco_work),
+                    "--models", "croco",
+                    "--overwrite",
+                ],
+                stage="CROCO CMEMS acquisition and validation",
+            )
+            for stem in croco_product_stems:
+                fetched_path = croco_work / f"{stem}.nc"
+                if fetched_path.is_file() and fetched_path.stat().st_size > 0:
+                    region_scoped_name = f"{stem}_{region_id}.nc"
+                    shutil.copy2(fetched_path, inputs_dir / region_scoped_name)
+                    run_checked(
+                        cloud_copy(
+                            str(inputs_dir / region_scoped_name),
+                            cloud_uri(gcs_bucket, f"forcing/cmems/{run_date}/{region_scoped_name}"),
+                        ),
+                        stage=f"validated CROCO CMEMS cache upload ({stem})",
+                    )
         run_checked(
             [
-                "python3", "/app/scripts/fetch_native_marine_forcing.py",
-                "--run-date", run_date,
-                "--forecast-hours", str(forecast_hours),
-                "--region", str(region_profile),
+                "python3", "/app/scripts/prepare_croco_forcing.py",
+                "--grid", str(grid_path),
+                "--forcing-dir", str(croco_work),
                 "--output-dir", str(croco_work),
-                "--models", "croco",
-                "--overwrite",
+                "--vertical-levels", str(vertical_levels),
             ],
-            stage="CROCO CMEMS acquisition and validation",
+            stage="CROCO ocean forcing interpolation",
         )
-        # Cache the freshly-fetched per-region products under region-scoped
-        # names so a later run of this SAME region can validly reuse them,
-        # without any risk of collision with another region sharing this
-        # run_date's cache directory.
-        for stem in croco_product_stems:
-            fetched_path = croco_work / f"{stem}.nc"
-            if fetched_path.is_file() and fetched_path.stat().st_size > 0:
-                region_scoped_name = f"{stem}_{region_id}.nc"
-                shutil.copy2(fetched_path, inputs_dir / region_scoped_name)
-                run_checked(
-                    cloud_copy(
-                        str(inputs_dir / region_scoped_name),
-                        cloud_uri(gcs_bucket, f"forcing/cmems/{run_date}/{region_scoped_name}"),
-                    ),
-                    stage=f"validated CROCO CMEMS cache upload ({stem})",
-                )
-    run_checked(
-        [
-            "python3", "/app/scripts/prepare_croco_forcing.py",
-            "--grid", str(grid_path),
-            "--forcing-dir", str(croco_work),
-            "--output-dir", str(croco_work),
-            "--vertical-levels", str(vertical_levels),
-        ],
-        stage="CROCO ocean forcing interpolation",
-    )
 
     domain = os.environ.get("PREDSEA_WRF_DOMAIN", "d02")
     wrf_files = sorted(wrf_dir.rglob(f"wrfout_{domain}_*"))
@@ -469,7 +543,7 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
     run_checked(cloud_copy(str(history), target), stage="canonical CROCO upload")
     marker = outputs_dir / "CROCO_SUCCESS"
     marker.write_text(
-        f"status=SUCCESS\nmodel=croco\nforcing=predsea_wrf+cmems\n"
+        f"status=SUCCESS\nmodel=croco\nforcing=predsea_wrf+{selected_ocean_source}\n"
         f"timestamp={dt.datetime.now(dt.timezone.utc).isoformat()}\n"
     )
     run_checked(
@@ -484,6 +558,14 @@ def main():
     parser.add_argument("--model", choices=["swan", "croco", "both"], default="both", help="Model to run")
     parser.add_argument("--forecast-hours", type=int, default=24, help="Forecast horizon hours")
     parser.add_argument("--mpi-ranks", type=int, default=4, help="MPI rank count")
+    parser.add_argument("--run-date", help="Run date (YYYY-MM-DD); overrides PREDSEA_RUN_DATE")
+    parser.add_argument("--run-id", help="Run ID; overrides PREDSEA_RUN_ID")
+    parser.add_argument(
+        "--croco-ocean-source", choices=["staged", "cmems"],
+        help=("CROCO initial/boundary provider. Defaults to staged for "
+              "alboran_1km, CMEMS for legacy regional runs; environment: "
+              "PREDSEA_CROCO_OCEAN_SOURCE"),
+    )
     bucket_group = parser.add_mutually_exclusive_group(required=True)
     bucket_group.add_argument("--gcs-bucket", help="Output GCS bucket")
     bucket_group.add_argument("--s3-bucket", help="Output S3 bucket")
@@ -501,15 +583,15 @@ def main():
             "combined execution is intentionally disabled; submit SWAN and CROCO "
             "as separate parallel Batch jobs"
         )
-
-    # Determine dates and run IDs from environment or fallback to today
-    run_date = os.environ.get("PREDSEA_RUN_DATE")
+    # Determine dates and run IDs from CLI args, then environment, then fallback to today
+    run_date = args.run_date or os.environ.get("PREDSEA_RUN_DATE")
     if not run_date:
         run_date = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
 
-    run_id = os.environ.get("PREDSEA_RUN_ID")
+    run_id = args.run_id or os.environ.get("PREDSEA_RUN_ID")
     if not run_id:
         run_id = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H%MZ")
+
 
     log_step(f"Initializing simulation shard: region={args.region}, model={args.model}, hours={args.forecast_hours}")
     print(f"📅 Run Date: {run_date}")
@@ -550,11 +632,16 @@ def main():
             "the minimal SWAN wind product directly."
         )
 
-    print(f"📥 Syncing CMEMS forcing from {cmems_gcs_src}...")
-    run_checked(
-        cloud_sync(cmems_gcs_src, str(inputs_dir)),
-        stage="CMEMS forcing download",
+    selected_croco_source = (
+        croco_ocean_source(args.region, args.croco_ocean_source)
+        if args.model == "croco" else None
     )
+    if args.model != "croco" or selected_croco_source == "cmems":
+        print(f"📥 Syncing CMEMS forcing from {cmems_gcs_src}...")
+        run_checked(
+            cloud_sync(cmems_gcs_src, str(inputs_dir)),
+            stage="CMEMS forcing download",
+        )
 
     if args.model == "croco":
         try:
@@ -568,6 +655,7 @@ def main():
                 forecast_hours=args.forecast_hours,
                 mpi_ranks=args.mpi_ranks,
                 gcs_bucket=args.gcs_bucket,
+                ocean_source=selected_croco_source,
             )
         except Exception as exc:
             upload_rc = upload_croco_failure_diagnostics(

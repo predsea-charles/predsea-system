@@ -2,12 +2,66 @@ from pathlib import Path
 
 import pytest
 from scripts.run_marine_simulation import (
+    CROCO_MPI_RANKS,
+    croco_ocean_source,
     croco_mpi_command,
     require_one,
     resolve_swan_tools,
+    stage_croco_ocean_inputs,
     run_subprocess,
     upload_croco_failure_diagnostics,
+    validate_croco_mpi_ranks,
 )
+
+
+def test_croco_mpi_rank_contract_covers_all_regional_binaries():
+    assert CROCO_MPI_RANKS == {
+        "alboran_1km": 8,
+        "algerian_1km": 12,
+        "balearic_1km": 16,
+        "gulf_of_lion_1km": 4,
+        "tyrrhenian_1km": 24,
+    }
+    for region_id, mpi_ranks in CROCO_MPI_RANKS.items():
+        validate_croco_mpi_ranks(region_id, mpi_ranks)
+
+
+def test_croco_mpi_rank_contract_rejects_region_mismatch():
+    with pytest.raises(ValueError, match="compiled decomposition requires 8"):
+        validate_croco_mpi_ranks("alboran_1km", 16)
+
+
+def test_alboran_defaults_to_staged_ocean_inputs(monkeypatch):
+    monkeypatch.delenv("PREDSEA_CROCO_OCEAN_SOURCE", raising=False)
+    assert croco_ocean_source("alboran_1km") == "staged"
+    assert croco_ocean_source("alboran_1km", "cmems") == "cmems"
+
+
+def test_stage_croco_ocean_inputs_requires_compiled_contract(tmp_path: Path):
+    source = tmp_path / "inputs" / "croco" / "alboran_1km"
+    work = tmp_path / "work"
+    source.mkdir(parents=True)
+    work.mkdir()
+    for name in ("croco_ini.nc", "croco_bry.nc", "croco_clm.nc"):
+        (source / name).write_bytes(b"netcdf")
+
+    staged = stage_croco_ocean_inputs(tmp_path / "inputs", work, "alboran_1km")
+
+    assert [path.name for path in staged] == [
+        "croco_ini.nc", "croco_bry.nc", "croco_clm.nc"
+    ]
+
+
+def test_stage_croco_ocean_inputs_fails_closed_when_boundary_missing(tmp_path: Path):
+    source = tmp_path / "inputs" / "alboran_1km"
+    work = tmp_path / "work"
+    source.mkdir(parents=True)
+    work.mkdir()
+    (source / "croco_ini.nc").write_bytes(b"netcdf")
+    (source / "croco_clm.nc").write_bytes(b"netcdf")
+
+    with pytest.raises(FileNotFoundError, match="croco_bry.nc"):
+        stage_croco_ocean_inputs(tmp_path / "inputs", work, "alboran_1km")
 from scripts.submit_gcp_batch_simulation import (
     build_batch_job_json,
     default_timeout_seconds,
