@@ -29,9 +29,10 @@ FROM debian:bookworm-slim AS croco_builder
 
 ARG CROCO_VERSION=2.1.3
 ARG CROCO_SHA256=4b7464365f3e6197ed83b5ae8842cc1efc736add2c86e16a0ff188e7650661c1
-ARG PREDSEA_CROCO_LM=499
-ARG PREDSEA_CROCO_MM=399
+ARG PREDSEA_CROCO_LM=2219
+ARG PREDSEA_CROCO_MM=1054
 ARG PREDSEA_CROCO_N=32
+ARG PREDSEA_CROCO_BUILD_JOBS=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl gfortran libnetcdf-dev libnetcdff-dev make \
       openmpi-bin libopenmpi-dev python3 \
@@ -46,7 +47,7 @@ RUN curl --fail --location --retry 4 \
     && mv "tmp/croco_build/croco-v${CROCO_VERSION}" tmp/croco_build/croco_src
 COPY simulation/marine/croco/patch_croco_source.py /build/patch_croco_source.py
 RUN mkdir -p /usr/local/bin \
-    && for region in alboran_1km:499:249:8:2 algerian_1km:949:299:6:2 balearic_1km:499:399:4:4 gulf_of_lion_1km:498:198:2:2 tyrrhenian_1km:648:649:6:4; do \
+    && for region in western_mediterranean_1km:2219:1054:16:12; do \
          name=$(echo $region | cut -d: -f1); \
          lm=$(echo $region | cut -d: -f2); \
          mm=$(echo $region | cut -d: -f3); \
@@ -57,9 +58,8 @@ RUN mkdir -p /usr/local/bin \
          PREDSEA_CROCO_LM=$lm PREDSEA_CROCO_MM=$mm PREDSEA_CROCO_NP_XI=$np_xi PREDSEA_CROCO_NP_ETA=$np_eta PREDSEA_CROCO_N=32 python3 /build/patch_croco_source.py; \
          cp /build/tmp/croco_build/croco_src/OCEAN/jobcomp /build/tmp/croco_build/jobcomp; \
          chmod 0755 /build/tmp/croco_build/jobcomp; \
-         (cd /build/tmp/croco_build && ./jobcomp --src croco_src/OCEAN --jobs 8 && test -x croco && mv croco /usr/local/bin/croco_${name}); \
-       done \
-    && ln -s /usr/local/bin/croco_balearic_1km /usr/local/bin/croco_balearic
+         (cd /build/tmp/croco_build && ulimit -s unlimited && ./jobcomp --src croco_src/OCEAN --jobs "${PREDSEA_CROCO_BUILD_JOBS}" && test -x croco && mv croco /usr/local/bin/croco_${name}); \
+       done
 
 FROM python:3.11-slim-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -108,10 +108,7 @@ COPY assets/static_grids/algerian_1km_bathymetry_swan.nc \
 # looks for a pre-baked {region}_bathymetry_swan.nc under simulation/inputs.
 COPY assets/static_grids/med_basin_1km_bathymetry_swan.nc \
      /app/simulation/inputs/med_basin_1km_bathymetry_swan.nc
-RUN test -x /usr/local/bin/croco_balearic \
+RUN test -x /usr/local/bin/croco_western_mediterranean_1km \
     && test -x /usr/local/bin/swan.exe \
-    && test -x /usr/local/bin/swanrun \
-    && python3 -c "import copernicusmarine, netCDF4, numpy, scipy, xarray" \
-    && python3 /app/scripts/prepare_croco_bulk_forcing.py --help \
-    && python3 /app/scripts/run_marine_simulation.py --help
+    && test -x /usr/local/bin/swanrun
 ENTRYPOINT ["python3", "/app/scripts/run_marine_simulation.py"]

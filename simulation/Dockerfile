@@ -1,10 +1,10 @@
 # PredSea WRF/WPS image.
 #
-# This build follows the proven Debian Bullseye WRF pattern and builds Jasper
+# This build follows the proven Debian WRF pattern and builds Jasper
 # from source to avoid stale architecture-specific binary URLs.
 # It is intended for linux/amd64 cloud runners. On Apple Silicon, build with:
-# docker build --platform linux/amd64 -t predsea-wrf:4.5 -f simulation/Dockerfile simulation
-FROM debian:bullseye AS wrf-builder
+# docker build --platform linux/amd64 -t predsea-wrf:4.5 -f simulation/Dockerfile .
+FROM debian:bookworm AS wrf-builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG WRF_VERSION=4.5
@@ -97,7 +97,7 @@ RUN printf "%s\n" "${WPS_CONFIGURE_OPTION}" | ./configure \
     && test -x ungrib.exe \
     && test -x metgrid.exe
 
-FROM debian:bullseye-slim AS wrf-runtime
+FROM debian:bookworm-slim AS wrf-runtime
 
 ARG DEBIAN_FRONTEND=noninteractive
 
