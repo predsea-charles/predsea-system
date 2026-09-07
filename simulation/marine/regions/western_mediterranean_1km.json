@@ -1,0 +1,53 @@
+{
+  "schema_version": "predsea.marine_region.v1",
+  "region_id": "western_mediterranean_1km",
+  "label": "Unified Western Mediterranean CROCO domain",
+  "bbox": {
+    "longitude_min": -6.0,
+    "longitude_max": 14.0,
+    "latitude_min": 35.0,
+    "latitude_max": 44.5
+  },
+  "horizontal_resolution_m": 1000,
+  "output_interval_hours": 1,
+  "models_enabled": ["croco"],
+  "models": {
+    "croco": {
+      "vertical_levels": 32,
+      "compiled_grid_shape": {
+        "xi_rho": 2221,
+        "eta_rho": 1056
+      },
+      "mpi_decomposition": {
+        "np_xi": 16,
+        "np_eta": 12,
+        "mpi_ranks": 192
+      },
+      "timestep_seconds": 3,
+      "ndtfast": 60,
+      "required_variables": [
+        "eastward_current",
+        "northward_current",
+        "sea_surface_temperature",
+        "sea_surface_salinity",
+        "sea_surface_height"
+      ],
+      "physical_ranges": {
+        "eastward_current": [-5.0, 5.0],
+        "northward_current": [-5.0, 5.0],
+        "sea_surface_temperature": [-2.5, 40.0],
+        "sea_surface_salinity": [0.0, 45.0],
+        "sea_surface_height": [-5.0, 5.0]
+      }
+    }
+  },
+  "forcing": {
+    "atmosphere": "wrf",
+    "ocean_initial_and_boundary": "cmems"
+  },
+  "notes": [
+    "Bounds are the exact union of the five legacy CROCO profiles.",
+    "The compiled shape matches baked_med_basin_bathy.nc; the grid must be generated and scientifically reviewed before promotion.",
+    "The 3-second timestep and 60 fast steps are conservative candidates requiring stability and scientific approval."
+  ]
+}

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGION="alboran_1km"
+REGION="western_mediterranean_1km"
 FORECAST_HOURS="${1:-24}"
-MPI_RANKS="16"
+MPI_RANKS="192"
 MAX_AUTHORIZED_COST_USD="15.00"
 RUN_DATE=$(date -u +%Y-%m-%d)
 RUN_ID="${RUN_DATE}T0000Z-${FORECAST_HOURS}h"
@@ -35,7 +35,7 @@ echo "WRF job: $WRF_JOB_ID (depends on ECMWF)"
 CROCO_JOB_ID=$(aws batch submit-job \
   --job-name "croco-${FORECAST_HOURS}h" \
   --job-queue predsea-models-canary \
-  --job-definition predsea-croco_alboran_1km-hpc \
+  --job-definition predsea-croco_western_mediterranean_1km-hpc \
   --parameters region=$REGION,forecast_hours=$FORECAST_HOURS,mpi_ranks=$MPI_RANKS,run_date=$RUN_DATE,run_id=$RUN_ID \
   --depends-on jobId=$WRF_JOB_ID,type=SEQUENTIAL \
   --region eu-west-1 --query 'jobId' --output text)
@@ -45,7 +45,7 @@ WW3_JOB_ID=$(aws batch submit-job \
   --job-name "ww3-${FORECAST_HOURS}h" \
   --job-queue predsea-models-canary \
   --job-definition predsea-ww3-hpc \
-  --parameters region=$REGION,forecast_hours=$FORECAST_HOURS,run_date=$RUN_DATE,run_id=$RUN_ID \
+  --parameters region=$REGION,forecast_hours=$FORECAST_HOURS,mpi_ranks=64,run_date=$RUN_DATE,run_id=$RUN_ID \
   --depends-on jobId=$WRF_JOB_ID,type=SEQUENTIAL \
   --region eu-west-1 --query 'jobId' --output text)
 echo "WW3 job: $WW3_JOB_ID (depends on WRF)"

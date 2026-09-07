@@ -14,16 +14,13 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import xarray as xr
 
 CROCO_MPI_RANKS = {
-    "alboran_1km": 16,
-    "algerian_1km": 24,
-    "balearic_1km": 32,
-    "gulf_of_lion_1km": 8,
-    "tyrrhenian_1km": 48,
+    "western_mediterranean_1km": 192,
 }
 
 try:
@@ -209,9 +206,9 @@ def resolve_swan_bathymetry(project_root: Path, region_id: str) -> Path:
 
 import tempfile
 
-
-def stage_cmems_forcing(staged_cmems: Path, croco_work: Path) -> Path:
-    """Copy a pre-staged CMEMS file only when it is complete 3-D forcing."""
+def stage_cmems_forcing(staged_cmems: Path, croco_work: Path, forecast_hours: int) -> Path:
+    """Copy a pre-staged CMEMS file only when it is complete 3-D forcing that
+    actually covers the requested forecast horizon."""
     if not staged_cmems.is_file():
         raise FileNotFoundError(f"Pre-staged CMEMS forcing is missing: {staged_cmems}")
     source_size = staged_cmems.stat().st_size
@@ -235,6 +232,15 @@ def stage_cmems_forcing(staged_cmems: Path, croco_work: Path) -> Path:
             )
         if any(int(dataset.sizes[name]) <= 0 for name in required_dimensions):
             raise ValueError("Pre-staged CMEMS forcing contains empty dimensions")
+        expected_timestamps = forecast_hours + 1
+        actual_timestamps = int(dataset.sizes["time"])
+        if actual_timestamps < expected_timestamps:
+            raise ValueError(
+                "Pre-staged CMEMS forcing does not cover the requested forecast "
+                f"horizon: needs {expected_timestamps} hourly timestamps for "
+                f"{forecast_hours}h, found only {actual_timestamps} — likely a "
+                "cache left over from a shorter-horizon run"
+            )
 
     destination = croco_work / "cmems_ocean_forcing.nc"
     shutil.copy2(staged_cmems, destination)
@@ -283,7 +289,8 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
                          region_id: str, run_date: str, run_id: str,
                          forecast_hours: int, mpi_ranks: int, gcs_bucket: str,
                          ocean_source: str | None = None) -> None:
-    """Run the bounded regional CROCO path from explicit real inputs."""
+    """Run the unified CROCO path from explicit real inputs."""
+    total_started = time.monotonic()
 
     # --- ADD THIS QUICK FIX ---
     if "Ref::" in run_date: run_date = os.environ.get("RUN_DATE", run_date)
@@ -397,6 +404,7 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
     else:
         log_step("2. Acquiring validated three-dimensional CMEMS ocean forcing")
 
+    forcing_started = time.monotonic()
     if selected_ocean_source == "cmems":
         staged_cmems = inputs_dir / "cmems_ocean_forcing.nc"
         # Shared run-date caches must use region-scoped filenames.
@@ -410,10 +418,11 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
             inputs_dir / f"{stem}_{region_id}.nc" for stem in croco_product_stems
         )
         use_staged_cmems = False
+
         if staged_cmems.exists():
             log_step(f"--> Validating pre-staged CMEMS forcing at {staged_cmems}...")
             try:
-                stage_cmems_forcing(staged_cmems, croco_work)
+                stage_cmems_forcing(staged_cmems, croco_work, forecast_hours)
                 use_staged_cmems = True
             except ValueError as exc:
                 log_step(
@@ -421,11 +430,23 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
                     f"reacquiring real 3-D forcing: {exc}"
                 )
         elif all(path.is_file() and path.stat().st_size > 0 for path in staged_products):
-            log_step(f"--> Found validated region-scoped CMEMS product set for {region_id}; staging for interpolation...")
-            for source in staged_products:
-                plain_name = source.name[: -len(f"_{region_id}.nc")] + ".nc"
-                shutil.copy2(source, croco_work / plain_name)
-            use_staged_cmems = True
+            expected_timestamps = forecast_hours + 1
+            with xr.open_dataset(staged_products[0]) as probe:
+                actual_timestamps = int(probe.sizes.get("time", 0))
+            if actual_timestamps >= expected_timestamps:
+                log_step(f"--> Found validated region-scoped CMEMS product set for {region_id}; staging for interpolation...")
+                for source in staged_products:
+                    plain_name = source.name[: -len(f"_{region_id}.nc")] + ".nc"
+                    shutil.copy2(source, croco_work / plain_name)
+                use_staged_cmems = True
+            else:
+                log_step(
+                    f"--> Region-scoped CMEMS cache for {region_id} only covers "
+                    f"{actual_timestamps} timestamps (need {expected_timestamps} for "
+                    f"{forecast_hours}h); reacquiring real 3-D forcing instead of "
+                    "reusing a shorter-horizon cache"
+                )
+
         if not use_staged_cmems:
             run_checked(
                 [
@@ -481,6 +502,7 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
         ],
         stage="real WRF-to-CROCO bulk forcing conversion",
     )
+    print(f"PERFORMANCE forcing_preparation_seconds={time.monotonic() - forcing_started:.3f}")
 
     # Ensure both croco_blk.nc and croco_frc.nc are present in croco_work and
     # mirrored to relative template directory tmp/forcing-croco-24h
@@ -515,6 +537,7 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
     )
 
     log_step("3. Running native CROCO ocean forecast")
+    simulation_started = time.monotonic()
     os.environ["OMPI_ALLOW_RUN_AS_ROOT"] = "1"
     os.environ["OMPI_ALLOW_RUN_AS_ROOT_CONFIRM"] = "1"
     run_checked(
@@ -523,6 +546,8 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
         cwd=croco_work,
         log_path=croco_work / "croco.stdout.log",
     )
+    simulation_finished = time.monotonic()
+    print(f"PERFORMANCE croco_simulation_seconds={simulation_finished - simulation_started:.3f}")
     history = croco_work / "croco_his.nc"
     if not history.is_file() or history.stat().st_size == 0:
         raise RuntimeError("CROCO returned without a non-empty croco_his.nc")
@@ -550,11 +575,12 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
         cloud_copy(str(marker), cloud_uri(gcs_bucket, f"{prefix}CROCO_SUCCESS")),
         stage="CROCO success-marker upload",
     )
+    print(f"PERFORMANCE total_job_seconds={time.monotonic() - total_started:.3f}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Run SWAN/CROCO simulation shard.")
-    parser.add_argument("--region", required=True, help="Region ID (e.g., balearic_1km, alboran_1km)")
+    parser.add_argument("--region", required=True, help="CROCO or wave-model domain ID")
     parser.add_argument("--model", choices=["swan", "croco", "both"], default="both", help="Model to run")
     parser.add_argument("--forecast-hours", type=int, default=24, help="Forecast horizon hours")
     parser.add_argument("--mpi-ranks", type=int, default=4, help="MPI rank count")

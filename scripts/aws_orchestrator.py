@@ -13,13 +13,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 TERMINAL_STATES = {"shutting-down", "terminated", "stopping", "stopped"}
-CROCO_REGION_RANKS = {
-    "alboran_1km": 16,
-    "algerian_1km": 24,
-    "balearic_1km": 32,
-    "gulf_of_lion_1km": 8,
-    "tyrrhenian_1km": 48,
-}
+CROCO_REGION_RANKS = {"western_mediterranean_1km": 192}
 
 
 def validate_region_rank_pairings(pairings: dict[str, int]) -> None:
@@ -113,25 +107,22 @@ docker run --rm --entrypoint python3 \
   --wrf-dir /workspace/wrf --output-base-dir /workspace/ww3
 aws s3 sync /workspace/inputs/ww3/ "s3://$BUCKET/forcing/ww3/$RUN_DATE/" --only-show-errors
 
-echo "[2/3] Running five regional CROCO simulations"
+echo "[2/3] Running unified Western Mediterranean CROCO simulation"
 for REGION_RANK_PAIR in {' '.join(f'{region}:{ranks}' for region, ranks in rank_plan.items())}; do
   REGION_ID="${{REGION_RANK_PAIR%%:*}}"
   CROCO_MPI_RANKS="${{REGION_RANK_PAIR##*:}}"
-  CROCO_INPUTS_URI=""
-  if [ -n "$CROCO_INPUTS_PREFIX" ]; then CROCO_INPUTS_URI="$CROCO_INPUTS_PREFIX/$REGION_ID/"; fi
   docker run --rm --name "predsea-croco-${{REGION_ID//_/-}}" --shm-size=16g \
     -e AWS_REGION="$AWS_REGION" -e PREDSEA_STORAGE_BACKEND=s3 \
     -e PREDSEA_RUN_DATE="$RUN_DATE" -e PREDSEA_RUN_ID="$RUN_ID" \
     -e PREDSEA_CROCO_GRID_S3_URI="s3://$BUCKET/static/native-marine/$REGION_ID/croco-grid/$CROCO_GRID_VERSION/croco_grid.nc" \
     -e PREDSEA_WRF_S3_URI="$OUTPUT_URI/wrf/" \
-    -e PREDSEA_CROCO_OCEAN_SOURCE=staged \
-    -e PREDSEA_CROCO_INPUTS_S3_URI="$CROCO_INPUTS_URI" \
+    -e PREDSEA_CROCO_OCEAN_SOURCE=cmems \
     -v /workspace/inputs:/workspace/inputs:rw -v /workspace/outputs:/workspace/outputs \
     "$CROCO_IMAGE_URI" --model=croco --region="$REGION_ID" \
     --forecast-hours={int(forecast_hours)} --mpi-ranks="$CROCO_MPI_RANKS" --s3-bucket="$BUCKET"
 done
 
-echo "[3/3] Running five regional WW3 simulations"
+echo "[3/3] Running regional WW3 simulations"
 for REGION_ID in alboran_1km algerian_1km balearic_1km gulf_of_lion_1km tyrrhenian_1km; do
   docker run --rm --name "predsea-ww3-${{REGION_ID//_/-}}" --shm-size=16g \
     -e AWS_REGION="$AWS_REGION" -e PREDSEA_STORAGE_BACKEND=s3 \
@@ -243,11 +234,8 @@ def main() -> int:
         cli_parser.error("AWS production runs are fixed at 72 forecast hours")
     if args.mpi_ranks != 128:
         cli_parser.error("c6i.32xlarge WRF runs require 128 MPI ranks")
-    if not args.croco_inputs_prefix.startswith("s3://"):
-        cli_parser.error(
-            "--croco-inputs-prefix must be an s3:// prefix with validated "
-            "region-scoped CROCO state files"
-        )
+    if args.croco_inputs_prefix and not args.croco_inputs_prefix.startswith("s3://"):
+        cli_parser.error("--croco-inputs-prefix must be an s3:// prefix")
     if args.worker_max_age_hours <= args.timeout_hours:
         cli_parser.error("worker max age must exceed the supervisor timeout")
     now = datetime.now(timezone.utc); args.run_date = args.run_date or now.date().isoformat(); args.run_id = args.run_id or now.strftime("%Y-%m-%dT%H%MZ")

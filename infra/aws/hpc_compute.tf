@@ -1,10 +1,56 @@
 locals {
   croco_regions = {
-    alboran_1km      = { mpi_ranks = 16 }
-    algerian_1km     = { mpi_ranks = 24 }
-    balearic_1km     = { mpi_ranks = 32 }
-    gulf_of_lion_1km = { mpi_ranks = 8 }
-    tyrrhenian_1km   = { mpi_ranks = 48 }
+    western_mediterranean_1km = { mpi_ranks = 192 }
+  }
+
+  croco_hpc_jobs = {
+    for region, spec in local.croco_regions : "croco_${region}" => {
+      vcpus  = 192
+      memory = 240000
+
+      command = [
+        "--region", "Ref::region",
+        "--model", "croco",
+        "--forecast-hours", "Ref::forecast_hours",
+        "--mpi-ranks", "Ref::mpi_ranks",
+        "--run-date", "Ref::run_date",
+        "--run-id", "Ref::run_id",
+        "--s3-bucket", aws_s3_bucket.outputs.id,
+      ]
+
+      environment = [
+        {
+          name  = "PREDSEA_CROCO_OCEAN_SOURCE"
+          value = "cmems"
+        },
+        {
+          name  = "PREDSEA_CROCO_GRID_S3_URI"
+          value = "s3://${aws_s3_bucket.outputs.id}/static/native-marine/${region}/croco-grid/v1.0/croco_grid.nc"
+        },
+      ]
+
+      secrets = [
+        {
+          name      = "COPERNICUS_USERNAME"
+          valueFrom = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:predsea/COPERNICUS_USERNAME-ZJe5L0"
+        },
+        {
+          name      = "COPERNICUS_PASSWORD"
+          valueFrom = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:predsea/COPERNICUS_PASSWORD-7QNNi2"
+        },
+      ]
+
+      parameters = {
+        mpi_ranks      = tostring(spec.mpi_ranks)
+        forecast_hours = "72"
+        run_date       = "override-at-submission"
+        run_id         = "override-at-submission"
+      }
+
+      image_key    = "croco"
+      log_key      = "croco"
+      image_digest = var.croco_image_digest
+    }
   }
 
   fixed_hpc_jobs = {
@@ -24,7 +70,7 @@ locals {
       }
     }
     wrf = {
-      vcpus        = 128
+      vcpus        = 192
       memory       = 240000
       image_digest = var.wrf_image_digest
       command = [
@@ -34,74 +80,38 @@ locals {
         "--s3-bucket", aws_s3_bucket.outputs.id,
       ]
       environment = [
-        { name = "MPI_PROCS", value = "128" },
+        { name = "MPI_PROCS", value = "192" },
         { name = "MPI_NPROC_X", value = "16" },
-        { name = "MPI_NPROC_Y", value = "8" },
-        { name = "MPI_EXTRA_ARGS", value = "--use-hwthread-cpus --bind-to hwthread --map-by hwthread" },
+        { name = "MPI_NPROC_Y", value = "12" },
+        { name = "MPI_EXTRA_ARGS", value = "" },
         { name = "PREDSEA_WRF_GEOG_RES", value = "lowres+modis_30s_lake+default" },
       ]
       parameters = {
         run_date       = "override-at-submission"
         run_id         = "override-at-submission"
-        forecast_hours = "6"
+        forecast_hours = "72"
       }
     }
     ww3 = {
-      # Reserve the full node while retaining the validated 24-rank runtime.
-      vcpus        = 24
+      vcpus        = 64
       memory       = 48000
       image_digest = var.ww3_image_digest
       command = [
         "--model", "ww3",
         "--region", "Ref::region",
         "--forecast-hours", "Ref::forecast_hours",
-        "--mpi-ranks", "24",
+        "--mpi-ranks", "Ref::mpi_ranks",
         "--s3-bucket", aws_s3_bucket.outputs.id,
         "--run-date", "Ref::run_date",
         "--run-id", "Ref::run_id",
       ]
       environment = []
       parameters = {
-        forecast_hours = "6"
-        run_date       = "override-at-submission"
-        run_id         = "override-at-submission"
-      }
-    }
-  }
-
-  croco_hpc_jobs = {
-    for region, spec in local.croco_regions : "croco_${region}" => {
-      vcpus  = spec.mpi_ranks
-      memory = 30000
-      command = [
-        "--region", "Ref::region",
-        "--model", "croco",
-        "--forecast-hours", "Ref::forecast_hours",
-        "--mpi-ranks", "Ref::mpi_ranks",
-        "--run-date", "Ref::run_date",
-        "--run-id", "Ref::run_id",
-        "--s3-bucket", aws_s3_bucket.outputs.id,
-      ]
-      environment = [
-        { name = "PREDSEA_CROCO_OCEAN_SOURCE", value = "cmems" },
-        { name = "PREDSEA_CROCO_GRID_S3_URI", value = "s3://${aws_s3_bucket.outputs.id}/static/native-marine/${region}/croco-grid/v1.0/croco_grid.nc" },
-        { name = "PREDSEA_WRF_S3_URI", value = "s3://${aws_s3_bucket.outputs.id}/predictions/Ref::run_date/runs/Ref::run_id/wrf/" },
-        { name = "PREDSEA_RUN_DATE", value = "Ref::run_date" },
-        { name = "PREDSEA_RUN_ID", value = "Ref::run_id" },
-      ]
-      secrets = [
-        { name = "COPERNICUS_USERNAME", valueFrom = "arn:aws:secretsmanager:eu-west-1:671460501982:secret:predsea/COPERNICUS_USERNAME-ZJe5L0" },
-        { name = "COPERNICUS_PASSWORD", valueFrom = "arn:aws:secretsmanager:eu-west-1:671460501982:secret:predsea/COPERNICUS_PASSWORD-7QNNi2" },
-      ]
-      parameters = {
-        mpi_ranks      = tostring(spec.mpi_ranks)
         forecast_hours = "72"
+        mpi_ranks      = "64" # Synchronized with vcpus = 64
         run_date       = "override-at-submission"
         run_id         = "override-at-submission"
       }
-      image_key    = "croco"
-      log_key      = "croco"
-      image_digest = var.croco_image_digest
     }
   }
 
@@ -121,6 +131,7 @@ resource "aws_iam_role" "batch_instance" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 }
 
+# Updated to non-deprecated managed policy
 resource "aws_iam_role_policy_attachment" "batch_instance_ecs" {
   role       = aws_iam_role.batch_instance.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
@@ -201,9 +212,9 @@ resource "aws_batch_compute_environment" "spot" {
   compute_resources {
     type                = "SPOT"
     allocation_strategy = "SPOT_PRICE_CAPACITY_OPTIMIZED"
-    min_vcpus           = 0
+    min_vcpus           = 1
     desired_vcpus       = 0
-    max_vcpus           = 128
+    max_vcpus           = 300 # Covers unified CROCO (192 vCPUs) and WW3 (64 vCPUs) concurrently.
     instance_type       = var.batch_instance_types
     instance_role       = aws_iam_instance_profile.batch.arn
     spot_iam_fleet_role = aws_iam_role.batch_spot_fleet.arn
@@ -227,8 +238,6 @@ resource "aws_batch_compute_environment" "spot" {
   ]
 }
 
-# AWS Batch job queues try compute environments in order. The scale-to-zero
-# On-Demand pool is used only when the preferred Spot pool cannot place a job.
 resource "aws_batch_compute_environment" "on_demand" {
   compute_environment_name = "${var.name_prefix}-models-on-demand"
   state                    = "ENABLED"
@@ -237,9 +246,9 @@ resource "aws_batch_compute_environment" "on_demand" {
   compute_resources {
     type                = "EC2"
     allocation_strategy = "BEST_FIT_PROGRESSIVE"
-    min_vcpus           = 0
+    min_vcpus           = 1
     desired_vcpus       = 0
-    max_vcpus           = 128
+    max_vcpus           = 300
     instance_type       = var.batch_instance_types
     instance_role       = aws_iam_instance_profile.batch.arn
     subnets             = local.subnets
@@ -275,8 +284,6 @@ resource "aws_batch_job_queue" "models" {
   }
 }
 
-# Paid canaries must never fall back to On-Demand capacity. Scale-to-zero Spot
-# plus bounded job timeouts keeps the experiment inside its authorized ceiling.
 resource "aws_batch_job_queue" "canary" {
   name     = "${var.name_prefix}-models-canary"
   state    = "ENABLED"
@@ -328,6 +335,6 @@ resource "aws_batch_job_definition" "model" {
   }
 
   timeout {
-    attempt_duration_seconds = each.key == "wrf" ? 5400 : 3600
+    attempt_duration_seconds = each.key == "ecmwf" ? 3600 : (1800 + tonumber(try(each.value.parameters.forecast_hours, "6")) * 600)
   }
 }

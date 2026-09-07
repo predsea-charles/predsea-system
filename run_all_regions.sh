@@ -1,56 +1,69 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "========================================================================="
-echo "🚀 Launching All 5 Western Mediterranean CROCO Shards (v20)"
-echo "========================================================================="
+FORECAST_HOURS="${1:-72}"
+MAX_AUTHORIZED_COST_USD="15.00"
+RUN_DATE=$(date -u +%Y-%m-%d)
+RUN_ID="${RUN_DATE}T0000Z-${FORECAST_HOURS}h"
+REGION_AWS="eu-west-1"
 
-.venv/bin/python3 scripts/submit_gcp_batch_simulation.py \
-  --region balearic_1km --model croco --forecast-hours 72 \
-  --image-uri europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:f8313ce5d43624d055321ba769f7a7da315c6aad5c7e16c30ab10ba063953ba8 \
-  --wrf-gcs-uri gs://predsea-daily-outputs-test/predictions/2026-07-16/runs/2026-07-16T0733Z \
-  --run-date 2026-07-16 --project predsea-api --location europe-west1 \
-  --run-id 2026-07-27-croco-balearic-72h-dt30-ndtfast45 \
-  --croco-timestep-seconds 30 --croco-ndtfast 45 \
-  --machine-type c2d-highcpu-16 --cpu-milli 16000 --memory-mib 32768 --mpi-ranks 16 --provisioning-model STANDARD
+CROCO_REGION="western_mediterranean_1km"
+CROCO_MPI_RANKS="192"
 
-.venv/bin/python3 scripts/submit_gcp_batch_simulation.py \
-  --region algerian_1km --model croco --forecast-hours 72 \
-  --image-uri europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:f8313ce5d43624d055321ba769f7a7da315c6aad5c7e16c30ab10ba063953ba8 \
-  --wrf-gcs-uri gs://predsea-daily-outputs-test/predictions/2026-07-16/runs/2026-07-16T0733Z \
-  --run-date 2026-07-16 --project predsea-api --location europe-west1 \
-  --run-id 2026-07-27-croco-algerian-72h-dt30-ndtfast45 \
-  --croco-timestep-seconds 30 --croco-ndtfast 45 \
-  --machine-type c2d-highcpu-16 --cpu-milli 16000 --memory-mib 32768 --mpi-ranks 16 --provisioning-model STANDARD
+echo "Forecast Hours: $FORECAST_HOURS | run_date: $RUN_DATE | run_id: $RUN_ID"
+echo "Maximum authorized cost: USD $MAX_AUTHORIZED_COST_USD"
+echo "Execution Profile: ECMWF -> WRF -> [parallel CROCO + WW3]"
+echo "----------------------------------------------------------------------------------"
 
-.venv/bin/python3 scripts/submit_gcp_batch_simulation.py \
-  --region tyrrhenian_1km --model croco --forecast-hours 72 \
-  --image-uri europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:f8313ce5d43624d055321ba769f7a7da315c6aad5c7e16c30ab10ba063953ba8 \
-  --wrf-gcs-uri gs://predsea-daily-outputs-test/predictions/2026-07-16/runs/2026-07-16T0733Z \
-  --run-date 2026-07-16 --project predsea-api --location europe-west1 \
-  --run-id 2026-07-27-croco-tyrrhenian-72h-dt30-ndtfast45 \
-  --croco-timestep-seconds 30 --croco-ndtfast 45 \
-  --machine-type c2d-highcpu-16 --cpu-milli 16000 --memory-mib 32768 --mpi-ranks 16 --provisioning-model STANDARD
+# 1. Submit ECMWF
+ECMWF_JOB_ID=$(aws batch submit-job \
+  --job-name "ecmwf-${FORECAST_HOURS}h" \
+  --job-queue predsea-models-canary \
+  --job-definition predsea-ecmwf-hpc \
+  --parameters run_date="$RUN_DATE",lead_hours="$FORECAST_HOURS" \
+  --region "$REGION_AWS" --query 'jobId' --output text)
+echo "ECMWF job: $ECMWF_JOB_ID"
 
-.venv/bin/python3 scripts/submit_gcp_batch_simulation.py \
-  --region alboran_1km --model croco --forecast-hours 72 \
-  --image-uri europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:f8313ce5d43624d055321ba769f7a7da315c6aad5c7e16c30ab10ba063953ba8 \
-  --wrf-gcs-uri gs://predsea-daily-outputs-test/predictions/2026-07-16/runs/2026-07-16T0733Z \
-  --run-date 2026-07-16 --project predsea-api --location europe-west1 \
-  --run-id 2026-07-27-croco-alboran-72h-dt30-ndtfast45 \
-  --croco-timestep-seconds 30 --croco-ndtfast 45 \
-  --machine-type c2d-highcpu-16 --cpu-milli 16000 --memory-mib 32768 --mpi-ranks 16 --provisioning-model STANDARD
+# 2. Submit WRF (Depends on ECMWF)
+WRF_JOB_ID=$(aws batch submit-job \
+  --job-name "wrf-${FORECAST_HOURS}h" \
+  --job-queue predsea-models-canary \
+  --job-definition predsea-wrf-hpc \
+  --parameters run_date="$RUN_DATE",run_id="$RUN_ID",forecast_hours="$FORECAST_HOURS" \
+  --depends-on jobId="$ECMWF_JOB_ID" \
+  --region "$REGION_AWS" --query 'jobId' --output text)
+echo "WRF job:   $WRF_JOB_ID (depends on ECMWF)"
 
-.venv/bin/python3 scripts/submit_gcp_batch_simulation.py \
-  --region gulf_of_lion_1km --model croco --forecast-hours 72 \
-  --image-uri europe-west1-docker.pkg.dev/predsea-api/predsea-simulations/croco-batch@sha256:f8313ce5d43624d055321ba769f7a7da315c6aad5c7e16c30ab10ba063953ba8 \
-  --wrf-gcs-uri gs://predsea-daily-outputs-test/predictions/2026-07-16/runs/2026-07-16T0733Z \
-  --run-date 2026-07-16 --project predsea-api --location europe-west1 \
-  --run-id 2026-07-27-croco-gulf_of_lion-72h-dt30-ndtfast45 \
-  --croco-timestep-seconds 30 --croco-ndtfast 45 \
-  --machine-type c2d-highcpu-16 --cpu-milli 16000 --memory-mib 32768 --mpi-ranks 16 --provisioning-model STANDARD
+ALL_JOB_IDS=("$ECMWF_JOB_ID" "$WRF_JOB_ID")
 
-wait
-echo "========================================================================="
-echo "✅ All 5 Western Mediterranean regional jobs successfully submitted to GCP Batch!"
-echo "========================================================================="
+# 3. Submit the unified CROCO simulation after WRF.
+CROCO_JOB_ID=$(aws batch submit-job \
+  --job-name "croco-${CROCO_REGION}-${FORECAST_HOURS}h" \
+  --job-queue predsea-models-canary \
+  --job-definition "predsea-croco_${CROCO_REGION}-hpc" \
+  --parameters region="$CROCO_REGION",mpi_ranks="$CROCO_MPI_RANKS",forecast_hours="$FORECAST_HOURS",run_date="$RUN_DATE",run_id="$RUN_ID" \
+  --depends-on jobId="$WRF_JOB_ID" \
+  --region "$REGION_AWS" --query 'jobId' --output text)
+echo "CROCO job: $CROCO_JOB_ID (depends on WRF)"
+ALL_JOB_IDS+=("$CROCO_JOB_ID")
+
+
+# 4. Submit WW3 concurrently (Depends on WRF)
+WW3_JOB_ID=$(aws batch submit-job \
+  --job-name "ww3-${FORECAST_HOURS}h" \
+  --job-queue predsea-models-canary \
+  --job-definition predsea-ww3-hpc \
+  --parameters region="alboran_1km",forecast_hours="$FORECAST_HOURS",mpi_ranks=64,run_date="$RUN_DATE",run_id="$RUN_ID" \
+  --depends-on jobId="$WRF_JOB_ID" \
+  --region "$REGION_AWS" --query 'jobId' --output text)
+echo "WW3 job:   $WW3_JOB_ID (depends on WRF)"
+ALL_JOB_IDS+=("$WW3_JOB_ID")
+
+echo "All 4 jobs successfully submitted."
+echo "Execution sequence:"
+echo "  1. ECMWF runs"
+echo "  2. WRF runs"
+echo "  3. Unified Western Mediterranean CROCO and WW3 run independently"
+echo ""
+echo "To check status anytime, run:"
+echo "aws batch describe-jobs --jobs ${ALL_JOB_IDS[*]} --region $REGION_AWS --query 'jobs[].{name:jobName,status:status}' --output table"

@@ -196,6 +196,7 @@ def main() -> int:
                 "variables": spec["variables"],
                 "path": str(target),
             }
+            continue
         if not target.exists() or args.overwrite:
             buffer = 0.5
             kwargs = {

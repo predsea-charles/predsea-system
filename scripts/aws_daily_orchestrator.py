@@ -26,11 +26,14 @@ MARINE_REGIONS = (
     "gulf_of_lion_1km",
     "tyrrhenian_1km",
 )
-NATIVE_MARINE_FILES = (
+UNIFIED_CROCO_REGION = "western_mediterranean_1km"
+CROCO_FILES = (
     "cmems_croco_currents_3d.nc",
     "cmems_croco_temperature_3d.nc",
     "cmems_croco_salinity_3d.nc",
     "cmems_croco_sea_level.nc",
+)
+WAVE_FILES = (
     "cmems_swan_boundary.nc",
 )
 
@@ -70,13 +73,17 @@ def stage_native_marine_forcing(
     dry_run: bool = False,
     s3=None,
 ) -> None:
-    """Fetch and validate every regional CROCO/SWAN input before EC2 launch."""
+    """Fetch CROCO once for the unified domain and retain regional wave inputs."""
     client = s3 or (None if dry_run else boto3.client(
         "s3", region_name=os.getenv("AWS_REGION", "eu-west-1")
     ))
     with tempfile.TemporaryDirectory(prefix="predsea-native-marine-") as temp_dir:
         staging_root = Path(temp_dir)
-        for region in MARINE_REGIONS:
+        forcing_plans = [
+            (UNIFIED_CROCO_REGION, ("croco",), CROCO_FILES),
+            *((region, ("swan",), WAVE_FILES) for region in MARINE_REGIONS),
+        ]
+        for region, models, expected_files in forcing_plans:
             output_dir = staging_root / region
             command = [
                 sys.executable,
@@ -85,7 +92,7 @@ def stage_native_marine_forcing(
                 "--forecast-hours", str(forecast_hours),
                 "--region", f"simulation/marine/regions/{region}.json",
                 "--output-dir", str(output_dir),
-                "--models", "croco", "swan",
+                "--models", *models,
                 "--overwrite",
             ]
             if dry_run:
@@ -100,7 +107,7 @@ def stage_native_marine_forcing(
                 raise RuntimeError(
                     f"Native marine forcing validation failed for {region}: {manifest}"
                 )
-            for filename in NATIVE_MARINE_FILES:
+            for filename in expected_files:
                 path = output_dir / filename
                 if not path.is_file() or path.stat().st_size == 0:
                     raise RuntimeError(f"Validated native marine artifact is missing: {path}")
