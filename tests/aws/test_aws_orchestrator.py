@@ -32,11 +32,10 @@ def test_user_data_has_durable_upload_and_termination_trap():
     assert "aws s3 sync /workspace/outputs/" in script
     assert "MPI_RANKS=128" in script
     assert "--use-hwthread-cpus" in script
-    assert "Running five regional CROCO" in script
-    assert "Running five regional WW3" in script
+    assert "Running unified Western Mediterranean CROCO" in script
+    assert "Running regional WW3" in script
     assert "cmems/$RUN_DATE/ /workspace/inputs/" not in script
-    assert "PREDSEA_CROCO_OCEAN_SOURCE=staged" in script
-    assert "PREDSEA_CROCO_INPUTS_S3_URI" in script
+    assert "PREDSEA_CROCO_OCEAN_SOURCE=cmems" in script
     for region, ranks in CROCO_REGION_RANKS.items():
         assert f"{region}:{ranks}" in script
     assert '--mpi-ranks="$CROCO_MPI_RANKS"' in script
@@ -79,9 +78,13 @@ def test_region_rank_preflight_rejects_mismatch_before_ec2_submission():
         croco_grid_version="v1", ami_id="ami-1", instance_type="c6i.32xlarge",
         instance_profile="profile", volume_gb=300, volume_iops=3000,
         volume_throughput=500, subnet_id=None, security_group_ids=[],
-        worker_max_age_hours=26, croco_region_ranks={**CROCO_REGION_RANKS, "alboran_1km": 16},
+        worker_max_age_hours=26,
+        croco_region_ranks={"western_mediterranean_1km": 96},
     )
-    with pytest.raises(ValueError, match="alboran_1km: got 16, expected 8"):
+    with pytest.raises(
+        ValueError,
+        match="western_mediterranean_1km: got 96, expected 192",
+    ):
         service.launch(args)
     assert ec2.request is None
 

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -14,21 +15,28 @@ from scripts.run_marine_simulation import (
 )
 
 
-def test_croco_mpi_rank_contract_covers_all_regional_binaries():
-    assert CROCO_MPI_RANKS == {
-        "alboran_1km": 8,
-        "algerian_1km": 12,
-        "balearic_1km": 16,
-        "gulf_of_lion_1km": 4,
-        "tyrrhenian_1km": 24,
-    }
+def test_croco_docker_build_matches_unified_grid_profile():
+    dockerfile = Path("simulation/marine/croco/Dockerfile.batch").read_text()
+    profile = json.loads(
+        Path("simulation/marine/regions/western_mediterranean_1km.json").read_text()
+    )
+    shape = profile["models"]["croco"]["compiled_grid_shape"]
+
+    assert f"ARG PREDSEA_CROCO_LM={shape['xi_rho'] - 2}" in dockerfile
+    assert f"ARG PREDSEA_CROCO_MM={shape['eta_rho'] - 2}" in dockerfile
+    assert "ARG PREDSEA_CROCO_N=32" in dockerfile
+    assert "sed -i 's/-mcmodel=medium//g'" not in dockerfile
+
+
+def test_croco_mpi_rank_contract_covers_unified_binary():
+    assert CROCO_MPI_RANKS == {"western_mediterranean_1km": 192}
     for region_id, mpi_ranks in CROCO_MPI_RANKS.items():
         validate_croco_mpi_ranks(region_id, mpi_ranks)
 
 
 def test_croco_mpi_rank_contract_rejects_region_mismatch():
-    with pytest.raises(ValueError, match="compiled decomposition requires 8"):
-        validate_croco_mpi_ranks("alboran_1km", 16)
+    with pytest.raises(ValueError, match="compiled decomposition requires 192"):
+        validate_croco_mpi_ranks("western_mediterranean_1km", 96)
 
 
 def test_alboran_defaults_to_staged_ocean_inputs(monkeypatch):

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 import xarray as xr
+import json
+from pathlib import Path
 
 from scripts.prepare_croco_grid import (
     CROCO_REQUIRED_GRID_VARIABLES,
@@ -150,3 +152,24 @@ def test_crop_bathymetry_rejects_uncovered_bbox():
                 "latitude_max": 37.5,
             },
         )
+
+
+def test_unified_croco_profile_matches_baked_basin_contract():
+    profile = json.loads(
+        Path("simulation/marine/regions/western_mediterranean_1km.json").read_text()
+    )
+    assert profile["bbox"] == {
+        "longitude_min": -6.0,
+        "longitude_max": 14.0,
+        "latitude_min": 35.0,
+        "latitude_max": 44.5,
+    }
+    assert profile["models"]["croco"]["compiled_grid_shape"] == {
+        "xi_rho": 2221,
+        "eta_rho": 1056,
+    }
+    assert profile["models"]["croco"]["mpi_decomposition"] == {
+        "np_xi": 16,
+        "np_eta": 12,
+        "mpi_ranks": 192,
+    }

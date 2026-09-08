@@ -1,0 +1,18 @@
+/*
+** param.h.western_mediterranean_1km - CROCO Compile-Time Dimensions for Western Mediterranean 1 km Grid
+*/
+
+      integer LM, MM, N
+      parameter (LM=2219, MM=1054, N=32)
+
+      integer NP_XI, NP_ETA, NSUB_X, NSUB_E
+      parameter (NP_XI=16, NP_ETA=12)
+      parameter (NSUB_X=1, NSUB_E=1)
+
+#ifdef MPI
+      integer LDe, MDe
+      parameter (LDe=(LM+NP_XI-1)/NP_XI, MDe=(MM+NP_ETA-1)/NP_ETA)
+#else
+      integer LDe, MDe
+      parameter (LDe=LM, MDe=MM)
+#endif

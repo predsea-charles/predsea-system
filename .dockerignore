@@ -7,6 +7,7 @@ venv
 **/.terraform
 *.tfstate
 *.tfstate.backup
+*.tfstate*
 predictions
 observations
 outputs

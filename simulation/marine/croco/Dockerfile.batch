@@ -47,7 +47,7 @@ RUN curl --fail --location --retry 4 \
     && mv "tmp/croco_build/croco-v${CROCO_VERSION}" tmp/croco_build/croco_src
 COPY simulation/marine/croco/patch_croco_source.py /build/patch_croco_source.py
 RUN mkdir -p /usr/local/bin \
-    && for region in western_mediterranean_1km:2219:1054:16:12; do \
+    && for region in western_mediterranean_1km:${PREDSEA_CROCO_LM}:${PREDSEA_CROCO_MM}:16:12; do \
          name=$(echo $region | cut -d: -f1); \
          lm=$(echo $region | cut -d: -f2); \
          mm=$(echo $region | cut -d: -f3); \
@@ -55,10 +55,10 @@ RUN mkdir -p /usr/local/bin \
          np_eta=$(echo $region | cut -d: -f5); \
          echo "🔨 Building CROCO binary for $name (LM=$lm, MM=$mm, NP_XI=$np_xi, NP_ETA=$np_eta)..."; \
          rm -rf /build/tmp/croco_build/Build /build/tmp/croco_build/Compile; \
-         PREDSEA_CROCO_LM=$lm PREDSEA_CROCO_MM=$mm PREDSEA_CROCO_NP_XI=$np_xi PREDSEA_CROCO_NP_ETA=$np_eta PREDSEA_CROCO_N=32 python3 /build/patch_croco_source.py; \
+         PREDSEA_CROCO_LM=$lm PREDSEA_CROCO_MM=$mm PREDSEA_CROCO_NP_XI=$np_xi PREDSEA_CROCO_NP_ETA=$np_eta PREDSEA_CROCO_N=${PREDSEA_CROCO_N} python3 /build/patch_croco_source.py; \
          cp /build/tmp/croco_build/croco_src/OCEAN/jobcomp /build/tmp/croco_build/jobcomp; \
          chmod 0755 /build/tmp/croco_build/jobcomp; \
-         (cd /build/tmp/croco_build && ulimit -s unlimited && ./jobcomp --src croco_src/OCEAN --jobs "${PREDSEA_CROCO_BUILD_JOBS}" && test -x croco && mv croco /usr/local/bin/croco_${name}); \
+         (cd /build/tmp/croco_build && ./jobcomp --src croco_src/OCEAN --jobs "${PREDSEA_CROCO_BUILD_JOBS}" && test -x croco && mv croco /usr/local/bin/croco_${name}); \
        done
 
 FROM python:3.11-slim-bookworm
@@ -87,9 +87,7 @@ COPY scripts /app/scripts
 COPY simulation/marine/regions /app/simulation/marine/regions
 COPY simulation/marine/croco/croco.in.balearic /app/simulation/marine/croco/croco.in.balearic
 COPY simulation/marine/croco/prepare_croco_in.py /app/simulation/marine/croco/prepare_croco_in.py
-# Per-region SWAN bathymetry, generated via scripts/prepare_bathymetry.py --region
-# {region}. All 5 must exist in assets/static_grids/ before building this image;
-# see docs/bathymetry-integration-guide.md.
+# Per-region SWAN bathymetry
 COPY assets/static_grids/balearic_1km_bathymetry_swan.nc \
      /app/simulation/inputs/balearic_1km_bathymetry_swan.nc
 COPY assets/static_grids/alboran_1km_bathymetry_swan.nc \
@@ -100,12 +98,7 @@ COPY assets/static_grids/tyrrhenian_1km_bathymetry_swan.nc \
      /app/simulation/inputs/tyrrhenian_1km_bathymetry_swan.nc
 COPY assets/static_grids/algerian_1km_bathymetry_swan.nc \
      /app/simulation/inputs/algerian_1km_bathymetry_swan.nc
-# Basin-wide SWAN-only profile (simulation/marine/regions/med_basin_1km.json).
-# Must be generated first -- e.g. `python3 scripts/prepare_bathymetry.py
-# --region med_basin_1km --output-dir assets/static_grids --no-upload` -- and
-# committed here before this Dockerfile.batch will build; resolve_swan_bathymetry()
-# in scripts/run_marine_simulation.py has no dynamic-fetch fallback, it only
-# looks for a pre-baked {region}_bathymetry_swan.nc under simulation/inputs.
+# Basin-wide SWAN profile
 COPY assets/static_grids/med_basin_1km_bathymetry_swan.nc \
      /app/simulation/inputs/med_basin_1km_bathymetry_swan.nc
 RUN test -x /usr/local/bin/croco_western_mediterranean_1km \

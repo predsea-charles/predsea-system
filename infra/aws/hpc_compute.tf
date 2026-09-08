@@ -7,7 +7,6 @@ locals {
     for region, spec in local.croco_regions : "croco_${region}" => {
       vcpus  = 192
       memory = 240000
-
       command = [
         "--region", "Ref::region",
         "--model", "croco",
@@ -212,7 +211,7 @@ resource "aws_batch_compute_environment" "spot" {
   compute_resources {
     type                = "SPOT"
     allocation_strategy = "SPOT_PRICE_CAPACITY_OPTIMIZED"
-    min_vcpus           = 1
+    min_vcpus           = 0
     desired_vcpus       = 0
     max_vcpus           = 300 # Covers unified CROCO (192 vCPUs) and WW3 (64 vCPUs) concurrently.
     instance_type       = var.batch_instance_types
@@ -246,7 +245,7 @@ resource "aws_batch_compute_environment" "on_demand" {
   compute_resources {
     type                = "EC2"
     allocation_strategy = "BEST_FIT_PROGRESSIVE"
-    min_vcpus           = 1
+    min_vcpus           = 0
     desired_vcpus       = 0
     max_vcpus           = 300
     instance_type       = var.batch_instance_types
@@ -295,8 +294,7 @@ resource "aws_batch_job_queue" "canary" {
 }
 
 resource "aws_batch_job_definition" "model" {
-  for_each = local.hpc_jobs
-
+  for_each              = local.hpc_jobs
   name                  = "${var.name_prefix}-${each.key}-hpc"
   type                  = "container"
   platform_capabilities = ["EC2"]
