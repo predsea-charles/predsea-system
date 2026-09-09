@@ -56,7 +56,7 @@ def main() -> int:
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--start-date", required=True)
     parser.add_argument("--forecast-hours", type=int, required=True)
-    parser.add_argument("--timestep-seconds", type=int, default=60)
+    parser.add_argument("--timestep-seconds", type=int, default=90)
     parser.add_argument("--ndtfast", type=int, default=30)
     args = parser.parse_args()
     rendered = render(

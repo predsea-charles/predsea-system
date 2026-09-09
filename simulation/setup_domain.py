@@ -301,7 +301,7 @@ def patch_namelist_input(path: Path, start_date_str: str, end_date_str: str, dom
         # WRF recommends no more than roughly 6 seconds per kilometre for the
         # parent domain. 45 seconds leaves margin for the 9 km grid and divides
         # cleanly through the 3:1 nested-domain time-step ratios.
-        r"(\btime_step\s*=)[^!\n/]+": f"\\1 45,",
+        r"(\btime_step\s*=)[^!\n/]+": f"\\1 60,",
         r"(\btime_step_fract_num\s*=)[^!\n/]+": f"\\1 0,",
         r"(\btime_step_fract_den\s*=)[^!\n/]+": f"\\1 1,",
         
