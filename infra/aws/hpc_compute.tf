@@ -335,6 +335,6 @@ resource "aws_batch_job_definition" "model" {
   }
 
   timeout {
-    attempt_duration_seconds = each.key == "ecmwf" ? 3600 : (1800 + tonumber(try(each.value.parameters.forecast_hours, "6")) * 600)
+    attempt_duration_seconds = each.key == "croco_western_mediterranean_1km" ? 604800 : (each.key == "ecmwf" ? 3600 : (1800 + tonumber(try(each.value.parameters.forecast_hours, "6")) * 600))
   }
 }
