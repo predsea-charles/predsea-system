@@ -5,8 +5,10 @@ locals {
 
   croco_hpc_jobs = {
     for region, spec in local.croco_regions : "croco_${region}" => {
-      vcpus  = 192
-      memory = 240000
+      vcpus = spec.mpi_ranks
+      # c6a.metal provides 393216 MiB physically, but Batch/ECS reserves host
+      # memory. Keep the 192-rank job below the schedulable container ceiling.
+      memory = 380000
       command = [
         "--region", "Ref::region",
         "--model", "croco",

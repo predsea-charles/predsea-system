@@ -93,7 +93,7 @@ variable "wrf_image_digest" {
 variable "croco_image_digest" {
   type        = string
   description = "Immutable ECR digest for the CROCO AWS Batch image"
-  default     = "sha256:68674e85aa72a6ae2d4e87362fa06901422b50c570a5a8c1cefab72dab77bcaa"
+  default     = "sha256:b569158f3a382a9dc558ef94cc9dabc2900870730165fe49ce3a4cd8a1fc658c"
   validation {
     condition     = can(regex("^sha256:[0-9a-f]{64}$", var.croco_image_digest))
     error_message = "croco_image_digest must be a sha256 digest."
