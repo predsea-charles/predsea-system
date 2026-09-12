@@ -7,6 +7,7 @@ from scripts.run_marine_simulation import (
     croco_ocean_source,
     croco_mpi_command,
     require_one,
+    require_wrf_forcing,
     resolve_swan_tools,
     stage_croco_ocean_inputs,
     run_subprocess,
@@ -37,6 +38,26 @@ def test_croco_mpi_rank_contract_covers_unified_binary():
 def test_croco_mpi_rank_contract_rejects_region_mismatch():
     with pytest.raises(ValueError, match="compiled decomposition requires 192"):
         validate_croco_mpi_ranks("western_mediterranean_1km", 96)
+
+
+def test_require_wrf_forcing_rejects_missing_and_empty_placeholders(tmp_path: Path):
+    with pytest.raises(RuntimeError, match="expected at least 7 hourly files, found 0"):
+        require_wrf_forcing(tmp_path, domain="d02", forecast_hours=6)
+
+    for hour in range(7):
+        (tmp_path / f"wrfout_d02_2026-09-09_{hour:02d}:00:00").touch()
+    with pytest.raises(RuntimeError, match="empty placeholder files"):
+        require_wrf_forcing(tmp_path, domain="d02", forecast_hours=6)
+
+
+def test_require_wrf_forcing_returns_six_hour_window(tmp_path: Path):
+    expected = []
+    for hour in range(8):
+        path = tmp_path / f"wrfout_d02_2026-09-09_{hour:02d}:00:00"
+        path.write_bytes(b"netcdf")
+        expected.append(path)
+
+    assert require_wrf_forcing(tmp_path, domain="d02", forecast_hours=6) == expected[:7]
 
 
 def test_alboran_defaults_to_staged_ocean_inputs(monkeypatch):

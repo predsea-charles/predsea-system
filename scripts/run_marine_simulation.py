@@ -163,6 +163,26 @@ def validate_croco_mpi_ranks(region_id: str, mpi_ranks: int) -> None:
         )
 
 
+def require_wrf_forcing(
+    wrf_dir: Path, *, domain: str, forecast_hours: int
+) -> list[Path]:
+    """Return the required real hourly WRF files, rejecting placeholders."""
+    wrf_files = sorted(wrf_dir.rglob(f"wrfout_{domain}_*"))
+    required_count = forecast_hours + 1
+    if len(wrf_files) < required_count:
+        raise RuntimeError(
+            f"WRF forcing is incomplete for {domain}: expected at least "
+            f"{required_count} hourly files, found {len(wrf_files)}"
+        )
+    selected = wrf_files[:required_count]
+    empty = [path.name for path in selected if path.stat().st_size == 0]
+    if empty:
+        raise RuntimeError(
+            "WRF forcing contains empty placeholder files: " + ", ".join(empty)
+        )
+    return selected
+
+
 def require_one(directory: Path, patterns: tuple[str, ...], label: str) -> Path:
     """Resolve one explicit input product and reject ambiguous discovery."""
     matches: list[Path] = []
@@ -292,11 +312,6 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
     """Run the unified CROCO path from explicit real inputs."""
     total_started = time.monotonic()
 
-    # --- ADD THIS QUICK FIX ---
-    if "Ref::" in run_date: run_date = os.environ.get("RUN_DATE", run_date)
-    if "Ref::" in run_id: run_id = os.environ.get("RUN_ID", run_id)
-    # --------------------------
-
     validate_croco_mpi_ranks(region_id, mpi_ranks)
 
     grid_uri = os.environ.get("PREDSEA_CROCO_GRID_S3_URI") or os.environ.get("PREDSEA_CROCO_GRID_GCS_URI")
@@ -382,6 +397,11 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
             f"compiled contract={expected_shape}"
         )
     run_checked(cloud_copy(wrf_uri, str(wrf_dir), recursive=True), stage="WRF forcing download")
+
+    domain = os.environ.get("PREDSEA_WRF_DOMAIN", "d02")
+    wrf_files = require_wrf_forcing(
+        wrf_dir, domain=domain, forecast_hours=forecast_hours
+    )
 
     vertical_levels = int(croco_spec.get("vertical_levels", 32))
 
@@ -483,18 +503,11 @@ def run_croco_simulation(*, project_root: Path, inputs_dir: Path, outputs_dir: P
             stage="CROCO ocean forcing interpolation",
         )
 
-    domain = os.environ.get("PREDSEA_WRF_DOMAIN", "d02")
-    wrf_files = sorted(wrf_dir.rglob(f"wrfout_{domain}_*"))
-    if len(wrf_files) < forecast_hours + 1:
-        raise RuntimeError(
-            f"WRF forcing is incomplete for {domain}: expected at least "
-            f"{forecast_hours + 1} hourly files, found {len(wrf_files)}"
-        )
     bulk_path = croco_work / "croco_blk.nc"
     run_checked(
         [
             "python3", "/app/scripts/prepare_croco_bulk_forcing.py",
-            "--wrf", *[str(path) for path in wrf_files[: forecast_hours + 1]],
+            "--wrf", *[str(path) for path in wrf_files],
             "--grid", str(grid_path),
             "--output", str(bulk_path),
             "--start-time", f"{run_date}T00:00:00",
