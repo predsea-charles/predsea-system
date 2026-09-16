@@ -38,7 +38,7 @@ def main() -> int:
         wrf_dir = Path("/workspace/inputs/wrf")
         generated = Path("/workspace/inputs/ww3")
         run(["aws", "s3", "sync", wrf_prefix, str(wrf_dir), "--exclude", "*", "--include", "wrfout_d02_*", "--only-show-errors"])
-        run(["python3", "/app/scripts/prepare_ww3_wind_from_wrf.py", "--wrf-dir", str(wrf_dir), "--output-base-dir", str(generated)])
+        run(["python3", "/app/scripts/prepare_ww3_wind_from_wrf.py", "--wrf-dir", str(wrf_dir), "--output-base-dir", str(generated), "--regions", args.region])
         region_forcing = generated / args.region
         run(["aws", "s3", "sync", str(region_forcing), forcing_prefix, "--only-show-errors"])
         run(["cp", "-r", f"{region_forcing}/.", str(work)])
