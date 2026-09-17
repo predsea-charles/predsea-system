@@ -7,12 +7,9 @@ RUN_DATE=$(date -u +%Y-%m-%d)
 RUN_ID="${RUN_DATE}T0000Z-${FORECAST_HOURS}h"
 REGION_AWS="eu-west-1"
 
-CROCO_REGION="western_mediterranean_1km"
-CROCO_MPI_RANKS="192"
-
 echo "Forecast Hours: $FORECAST_HOURS | run_date: $RUN_DATE | run_id: $RUN_ID"
 echo "Maximum authorized cost: USD $MAX_AUTHORIZED_COST_USD"
-echo "Execution Profile: ECMWF -> WRF -> [parallel CROCO + WW3]"
+echo "Execution Profile: ECMWF -> WRF -> WW3"
 echo "----------------------------------------------------------------------------------"
 
 # 1. Submit ECMWF
@@ -36,19 +33,7 @@ echo "WRF job:   $WRF_JOB_ID (depends on ECMWF)"
 
 ALL_JOB_IDS=("$ECMWF_JOB_ID" "$WRF_JOB_ID")
 
-# 3. Submit the unified CROCO simulation after WRF.
-CROCO_JOB_ID=$(aws batch submit-job \
-  --job-name "croco-${CROCO_REGION}-${FORECAST_HOURS}h" \
-  --job-queue predsea-models-canary \
-  --job-definition "predsea-croco_${CROCO_REGION}-hpc" \
-  --parameters region="$CROCO_REGION",mpi_ranks="$CROCO_MPI_RANKS",forecast_hours="$FORECAST_HOURS",run_date="$RUN_DATE",run_id="$RUN_ID" \
-  --depends-on jobId="$WRF_JOB_ID" \
-  --region "$REGION_AWS" --query 'jobId' --output text)
-echo "CROCO job: $CROCO_JOB_ID (depends on WRF)"
-ALL_JOB_IDS+=("$CROCO_JOB_ID")
-
-
-# 4. Submit WW3 concurrently (Depends on WRF)
+# 3. Submit WW3 (Depends on WRF)
 WW3_JOB_ID=$(aws batch submit-job \
   --job-name "ww3-${FORECAST_HOURS}h" \
   --job-queue predsea-models-canary \
@@ -59,11 +44,11 @@ WW3_JOB_ID=$(aws batch submit-job \
 echo "WW3 job:   $WW3_JOB_ID (depends on WRF)"
 ALL_JOB_IDS+=("$WW3_JOB_ID")
 
-echo "All 4 jobs successfully submitted."
+echo "All 3 jobs successfully submitted."
 echo "Execution sequence:"
 echo "  1. ECMWF runs"
 echo "  2. WRF runs"
-echo "  3. Unified Western Mediterranean CROCO and WW3 run independently"
+echo "  3. WW3 runs"
 echo ""
 echo "To check status anytime, run:"
 echo "aws batch describe-jobs --jobs ${ALL_JOB_IDS[*]} --region $REGION_AWS --query 'jobs[].{name:jobName,status:status}' --output table"
