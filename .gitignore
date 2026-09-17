@@ -36,3 +36,5 @@ humanintheloop/extracted_observations.json
 !package.json
 !tsconfig.json
 predsea-etl-writer-key.json
+*.tfplan
+infra/aws/daily_trigger.zip
