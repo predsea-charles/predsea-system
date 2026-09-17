@@ -102,7 +102,13 @@ variable "croco_image_digest" {
 variable "batch_instance_types" {
   type        = list(string)
   description = "Compute-optimized x86_64 instance types available to AWS Batch"
-  default     = ["c6i.metal", "c6a.metal", "c5.metal", "c6i.32xlarge", "c6a.32xlarge"]
+  default = [
+    "c5.metal",
+    "c6a.metal",
+    "c6i.metal",
+    "c6a.32xlarge",
+    "c6i.32xlarge"
+  ]
   validation {
     condition     = length(var.batch_instance_types) > 0
     error_message = "batch_instance_types must contain at least one valid instance type."

@@ -266,6 +266,11 @@ resource "aws_batch_compute_environment" "on_demand" {
     })
   }
 
+  update_policy {
+    job_execution_timeout_minutes = 30
+    terminate_jobs_on_update      = false
+  }
+
   depends_on = [aws_iam_role_policy_attachment.batch_instance_ecs]
 }
 
