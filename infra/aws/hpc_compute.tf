@@ -94,8 +94,8 @@ locals {
       }
     }
     ww3 = {
-      vcpus        = 64
-      memory       = 48000
+      vcpus        = 192
+      memory       = 350000
       image_digest = var.ww3_image_digest
       command = [
         "--model", "ww3",
@@ -109,7 +109,7 @@ locals {
       environment = []
       parameters = {
         forecast_hours = "72"
-        mpi_ranks      = "64" # Synchronized with vcpus = 64
+        mpi_ranks      = "192" # Synchronized with vcpus = 192
         run_date       = "override-at-submission"
         run_id         = "override-at-submission"
       }
