@@ -115,9 +115,9 @@ def handler(event, context):
             # this writing. Update this alongside the shell script once the
             # western_mediterranean_1km WW3 region config is built and
             # canary-validated. Do not change only one of the two places.
-            "region": "alboran_1km",
+            "region": "western_mediterranean_1km",
             "forecast_hours": str(forecast_hours),
-            "mpi_ranks": "64",
+            "mpi_ranks": "192",
             "run_date": run_date,
             "run_id": run_id,
         },

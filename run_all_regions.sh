@@ -38,7 +38,7 @@ WW3_JOB_ID=$(aws batch submit-job \
   --job-name "ww3-${FORECAST_HOURS}h" \
   --job-queue predsea-models-canary \
   --job-definition predsea-ww3-hpc \
-  --parameters region="alboran_1km",forecast_hours="$FORECAST_HOURS",mpi_ranks=64,run_date="$RUN_DATE",run_id="$RUN_ID" \
+  --parameters region="western_mediterranean_1km",forecast_hours="$FORECAST_HOURS",mpi_ranks=192,run_date="$RUN_DATE",run_id="$RUN_ID" \
   --depends-on jobId="$WRF_JOB_ID" \
   --region "$REGION_AWS" --query 'jobId' --output text)
 echo "WW3 job:   $WW3_JOB_ID (depends on WRF)"
