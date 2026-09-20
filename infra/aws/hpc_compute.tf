@@ -95,7 +95,7 @@ locals {
     }
     ww3 = {
       vcpus        = 192
-      memory       = 350000
+      memory       = 380000
       image_digest = var.ww3_image_digest
       command = [
         "--model", "ww3",
