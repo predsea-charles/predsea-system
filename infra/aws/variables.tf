@@ -66,7 +66,7 @@ variable "simulation_image_tag" {
 variable "ww3_image_digest" {
   type        = string
   description = "Immutable ECR digest for the WW3 AWS Batch image"
-  default     = "sha256:84ce2cd23f95b894fffc01b0b8bae341b641042d8c09bce243e27209d538f189"
+  default     = "sha256:d650a278a9ea030febfba50bbdb9d7ffed0ca84dcfe299a8008436f8ca876a5f"
   validation {
     condition     = can(regex("^sha256:[0-9a-f]{64}$", var.ww3_image_digest))
     error_message = "ww3_image_digest must be a sha256 digest."
