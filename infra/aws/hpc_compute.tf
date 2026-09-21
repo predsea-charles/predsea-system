@@ -294,9 +294,15 @@ resource "aws_batch_job_queue" "canary" {
   name     = "${var.name_prefix}-models-canary"
   state    = "ENABLED"
   priority = 20
+
   compute_environment_order {
     order               = 1
     compute_environment = aws_batch_compute_environment.spot.arn
+  }
+
+  compute_environment_order {
+    order               = 2
+    compute_environment = aws_batch_compute_environment.on_demand.arn
   }
 }
 
@@ -336,7 +342,7 @@ resource "aws_batch_job_definition" "model" {
   })
 
   retry_strategy {
-    attempts = 1
+    attempts = each.key == "ww3" ? 2 : 1
   }
 
   timeout {
