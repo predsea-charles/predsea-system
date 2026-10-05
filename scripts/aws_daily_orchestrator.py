@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AWS-native daily control plane: forcing, Spot simulation, and publication."""
+"""AWS-native daily control plane: ECMWF forcing, WRF, WW3, and publication."""
 from __future__ import annotations
 
 import argparse
@@ -7,7 +7,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -19,23 +18,7 @@ except ModuleNotFoundError:  # Direct execution from the scripts directory.
     from aws.run_cost_ledger import RunCostLedger
 
 ROOT = Path(__file__).resolve().parents[1]
-MARINE_REGIONS = (
-    "alboran_1km",
-    "algerian_1km",
-    "balearic_1km",
-    "gulf_of_lion_1km",
-    "tyrrhenian_1km",
-)
-UNIFIED_CROCO_REGION = "western_mediterranean_1km"
-CROCO_FILES = (
-    "cmems_croco_currents_3d.nc",
-    "cmems_croco_temperature_3d.nc",
-    "cmems_croco_salinity_3d.nc",
-    "cmems_croco_sea_level.nc",
-)
-WAVE_FILES = (
-    "cmems_swan_boundary.nc",
-)
+WW3_REGION = "western_mediterranean_2km"
 
 
 def run(command: list[str], *, dry_run: bool = False) -> None:
@@ -46,7 +29,9 @@ def run(command: list[str], *, dry_run: bool = False) -> None:
 
 def load_runtime_secrets() -> None:
     sm = boto3.client("secretsmanager", region_name=os.getenv("AWS_REGION", "eu-west-1"))
-    for name in ("AEMET_API_KEY", "SOCIB_API_KEY", "COPERNICUS_USERNAME", "COPERNICUS_PASSWORD"):
+    # AEMET and SOCIB are optional validation data sources (used by generate_daily_briefing.py).
+    # Copernicus Marine credentials are NOT required — the WRF+WW3 pipeline does not use them.
+    for name in ("AEMET_API_KEY", "SOCIB_API_KEY"):
         if os.getenv(name):
             continue
         try:
@@ -61,69 +46,9 @@ def load_runtime_secrets() -> None:
                 if value:
                     os.environ[name] = str(value)
         except sm.exceptions.ResourceNotFoundException:
-            if name.startswith("COPERNICUS_"):
-                raise RuntimeError(f"Required secret predsea/{name} has no value")
+            print(f"[secrets] predsea/{name} not found — skipping (optional)")
 
 
-def stage_native_marine_forcing(
-    bucket: str,
-    run_date: str,
-    forecast_hours: int,
-    *,
-    dry_run: bool = False,
-    s3=None,
-) -> None:
-    """Fetch CROCO once for the unified domain and retain regional wave inputs."""
-    client = s3 or (None if dry_run else boto3.client(
-        "s3", region_name=os.getenv("AWS_REGION", "eu-west-1")
-    ))
-    with tempfile.TemporaryDirectory(prefix="predsea-native-marine-") as temp_dir:
-        staging_root = Path(temp_dir)
-        forcing_plans = [
-            (UNIFIED_CROCO_REGION, ("croco",), CROCO_FILES),
-            *((region, ("swan",), WAVE_FILES) for region in MARINE_REGIONS),
-        ]
-        for region, models, expected_files in forcing_plans:
-            output_dir = staging_root / region
-            command = [
-                sys.executable,
-                "scripts/fetch_native_marine_forcing.py",
-                "--run-date", run_date,
-                "--forecast-hours", str(forecast_hours),
-                "--region", f"simulation/marine/regions/{region}.json",
-                "--output-dir", str(output_dir),
-                "--models", *models,
-                "--overwrite",
-            ]
-            if dry_run:
-                command.append("--dry-run")
-            run(command, dry_run=dry_run)
-            if dry_run:
-                continue
-
-            manifest_path = output_dir / "forcing_manifest.json"
-            manifest = json.loads(manifest_path.read_text())
-            if manifest.get("status") != "succeeded" or manifest.get("region_id") != region:
-                raise RuntimeError(
-                    f"Native marine forcing validation failed for {region}: {manifest}"
-                )
-            for filename in expected_files:
-                path = output_dir / filename
-                if not path.is_file() or path.stat().st_size == 0:
-                    raise RuntimeError(f"Validated native marine artifact is missing: {path}")
-                stem = path.stem
-                client.upload_file(
-                    str(path),
-                    bucket,
-                    f"forcing/cmems/{run_date}/{stem}_{region}.nc",
-                    ExtraArgs={"ServerSideEncryption": "AES256"},
-                )
-            client.upload_file(
-                str(manifest_path),
-                bucket,
-                f"forcing/cmems/{run_date}/forcing_manifest_{region}.json",
-                ExtraArgs={"ServerSideEncryption": "AES256"},
-            )
 
 
 def publish_status(bucket: str, run_date: str, run_id: str, status: str, message: str, *, s3=None) -> None:
@@ -153,9 +78,6 @@ def main() -> int:
     try:
         common = [f"--run-date={run_date}", f"--lead-hours={args.forecast_hours}", f"--s3-bucket={bucket}", "--gcs-bucket="]
         run([sys.executable, "scripts/fetch_ecmwf_forcing.py", *common], dry_run=args.dry_run)
-        stage_native_marine_forcing(
-            bucket, run_date, args.forecast_hours, dry_run=args.dry_run
-        )
         run([sys.executable, "scripts/aws_orchestrator.py", f"--run-date={run_date}", f"--run-id={run_id}", f"--forecast-hours={args.forecast_hours}", f"--bucket={bucket}"], dry_run=args.dry_run)
         run([sys.executable, "scripts/generate_daily_briefing.py", f"--date={run_date}", f"--run-id={run_id}", "--skip-bigquery", "--publication-phase=high_resolution", "--wrf-status=complete"], dry_run=args.dry_run)
         run([sys.executable, "scripts/export_validation_to_athena.py", f"--run-dir=predictions/{run_date}/runs/{run_id}", f"--run-date={run_date}", f"--run-id={run_id}", f"--bucket={bucket}"], dry_run=args.dry_run)

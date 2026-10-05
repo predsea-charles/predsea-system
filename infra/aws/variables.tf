@@ -21,7 +21,10 @@ variable "athena_bytes_scanned_cutoff_per_query" {
 }
 variable "schedule_expression" {
   type    = string
-  default = "cron(0 3 * * ? *)"
+  # 07:00 UTC daily — ECMWF 00Z data is typically available for download by ~06:30 UTC.
+  # Starting at 07:00 gives a comfortable margin and leaves the full 8h window for
+  # WRF (~3-6h) + WW3 (~1h) to complete before 15:00 UTC.
+  default = "cron(0 7 * * ? *)"
 }
 variable "schedule_state" {
   type    = string
@@ -65,11 +68,11 @@ variable "simulation_image_tag" {
 }
 variable "ww3_image_digest" {
   type        = string
-  description = "Immutable ECR digest for the WW3 AWS Batch image"
-  default     = "sha256:d650a278a9ea030febfba50bbdb9d7ffed0ca84dcfe299a8008436f8ca876a5f"
+  description = "Immutable ECR digest for the WW3 AWS Batch image. Set to \"\" to use :latest (simulation_image_tag)."
+  default     = ""
   validation {
-    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.ww3_image_digest))
-    error_message = "ww3_image_digest must be a sha256 digest."
+    condition     = var.ww3_image_digest == "" || can(regex("^sha256:[0-9a-f]{64}$", var.ww3_image_digest))
+    error_message = "ww3_image_digest must be empty (use simulation_image_tag) or a valid sha256 digest."
   }
 }
 variable "ecmwf_image_digest" {
@@ -88,15 +91,6 @@ variable "wrf_image_digest" {
   validation {
     condition     = can(regex("^sha256:[0-9a-f]{64}$", var.wrf_image_digest))
     error_message = "wrf_image_digest must be a sha256 digest."
-  }
-}
-variable "croco_image_digest" {
-  type        = string
-  description = "Immutable ECR digest for the CROCO AWS Batch image"
-  default     = "sha256:b569158f3a382a9dc558ef94cc9dabc2900870730165fe49ce3a4cd8a1fc658c"
-  validation {
-    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.croco_image_digest))
-    error_message = "croco_image_digest must be a sha256 digest."
   }
 }
 variable "batch_instance_types" {
@@ -123,10 +117,6 @@ variable "batch_root_volume_size_gib" {
     error_message = "batch_root_volume_size_gib must be at least 50 GiB."
   }
 }
-variable "croco_grid_version" {
-  type        = string
-  description = "Validated immutable CROCO grid version present for every region in S3"
-}
 variable "subnet_ids" {
   type    = list(string)
   default = []
@@ -145,7 +135,7 @@ variable "create_api_service" {
 }
 variable "secret_names" {
   type    = set(string)
-  default = ["AEMET_API_KEY", "SOCIB_API_KEY", "COPERNICUS_USERNAME", "COPERNICUS_PASSWORD"]
+  default = ["AEMET_API_KEY", "SOCIB_API_KEY"]
 }
 variable "tags" {
   type    = map(string)

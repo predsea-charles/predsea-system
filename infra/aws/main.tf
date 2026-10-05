@@ -63,9 +63,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "outputs" {
 }
 
 resource "aws_ecr_repository" "repos" {
-  for_each             = toset(["api", "orchestrator", "wrf", "croco", "ww3", "ecmwf"])
+  for_each             = toset(["api", "orchestrator", "wrf", "ww3", "ecmwf"])
   name                 = "${var.name_prefix}-${each.key}"
   image_tag_mutability = "MUTABLE"
+  force_delete         = true
   image_scanning_configuration { scan_on_push = true }
   encryption_configuration { encryption_type = "AES256" }
 }
@@ -249,7 +250,7 @@ data "aws_iam_policy_document" "runtime" {
   }
   statement {
     actions   = ["ecr:BatchCheckLayerAvailability", "ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage"]
-    resources = [aws_ecr_repository.repos["wrf"].arn, aws_ecr_repository.repos["croco"].arn, aws_ecr_repository.repos["ww3"].arn]
+    resources = [aws_ecr_repository.repos["wrf"].arn, aws_ecr_repository.repos["ww3"].arn, aws_ecr_repository.repos["ecmwf"].arn]
   }
 }
 resource "aws_iam_role_policy" "task_runtime" {
@@ -317,10 +318,6 @@ resource "aws_codebuild_project" "images" {
     environment_variable {
       name  = "WRF_REPOSITORY"
       value = aws_ecr_repository.repos["wrf"].repository_url
-    }
-    environment_variable {
-      name  = "CROCO_REPOSITORY"
-      value = aws_ecr_repository.repos["croco"].repository_url
     }
     environment_variable {
       name  = "WW3_REPOSITORY"
@@ -432,11 +429,9 @@ resource "aws_ecs_task_definition" "orchestrator" {
   container_definitions = jsonencode([{ name = "orchestrator", image = "${aws_ecr_repository.repos["orchestrator"].repository_url}:${var.orchestrator_image_tag}", essential = true, command = ["python", "scripts/aws_daily_orchestrator.py"], environment = [
     { name = "AWS_REGION", value = var.aws_region }, { name = "PREDSEA_S3_BUCKET", value = aws_s3_bucket.outputs.id },
     { name = "PREDSEA_FORECAST_HOURS", value = "72" },
-    { name = "PREDSEA_CROCO_GRID_VERSION", value = var.croco_grid_version },
     { name = "PREDSEA_ATHENA_DATABASE", value = aws_glue_catalog_database.validation.name }, { name = "PREDSEA_ATHENA_WORKGROUP", value = aws_athena_workgroup.predsea.name },
     { name = "PREDSEA_EC2_INSTANCE_PROFILE", value = aws_iam_instance_profile.simulation.name },
     { name = "PREDSEA_WRF_IMAGE", value = "${aws_ecr_repository.repos["wrf"].repository_url}:${var.simulation_image_tag}" },
-    { name = "PREDSEA_CROCO_IMAGE", value = "${aws_ecr_repository.repos["croco"].repository_url}:${var.simulation_image_tag}" },
     { name = "PREDSEA_WW3_IMAGE", value = "${aws_ecr_repository.repos["ww3"].repository_url}:${var.simulation_image_tag}" },
     { name = "PREDSEA_EC2_SUBNET_IDS", value = join(",", local.subnets) }, { name = "PREDSEA_EC2_SECURITY_GROUP_IDS", value = join(",", var.security_group_ids) }
   ], logConfiguration = { logDriver = "awslogs", options = { "awslogs-group" = aws_cloudwatch_log_group.orchestrator.name, "awslogs-region" = var.aws_region, "awslogs-stream-prefix" = "ecs" } } }])

@@ -1,59 +1,4 @@
 locals {
-  croco_regions = {
-    western_mediterranean_1km = { mpi_ranks = 192 }
-  }
-
-  croco_hpc_jobs = {
-    for region, spec in local.croco_regions : "croco_${region}" => {
-      vcpus = spec.mpi_ranks
-      # c6a.metal provides 393216 MiB physically, but Batch/ECS reserves host
-      # memory. Keep the 192-rank job below the schedulable container ceiling.
-      memory = 380000
-      command = [
-        "--region", "Ref::region",
-        "--model", "croco",
-        "--forecast-hours", "Ref::forecast_hours",
-        "--mpi-ranks", "Ref::mpi_ranks",
-        "--run-date", "Ref::run_date",
-        "--run-id", "Ref::run_id",
-        "--s3-bucket", aws_s3_bucket.outputs.id,
-      ]
-
-      environment = [
-        {
-          name  = "PREDSEA_CROCO_OCEAN_SOURCE"
-          value = "cmems"
-        },
-        {
-          name  = "PREDSEA_CROCO_GRID_S3_URI"
-          value = "s3://${aws_s3_bucket.outputs.id}/static/native-marine/${region}/croco-grid/v1.0/croco_grid.nc"
-        },
-      ]
-
-      secrets = [
-        {
-          name      = "COPERNICUS_USERNAME"
-          valueFrom = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:predsea/COPERNICUS_USERNAME-ZJe5L0"
-        },
-        {
-          name      = "COPERNICUS_PASSWORD"
-          valueFrom = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:predsea/COPERNICUS_PASSWORD-7QNNi2"
-        },
-      ]
-
-      parameters = {
-        mpi_ranks      = tostring(spec.mpi_ranks)
-        forecast_hours = "72"
-        run_date       = "override-at-submission"
-        run_id         = "override-at-submission"
-      }
-
-      image_key    = "croco"
-      log_key      = "croco"
-      image_digest = var.croco_image_digest
-    }
-  }
-
   fixed_hpc_jobs = {
     ecmwf = {
       vcpus        = 4
@@ -85,7 +30,7 @@ locals {
         { name = "MPI_NPROC_X", value = "16" },
         { name = "MPI_NPROC_Y", value = "12" },
         { name = "MPI_EXTRA_ARGS", value = "" },
-        { name = "PREDSEA_WRF_GEOG_RES", value = "lowres+modis_30s_lake+default" },
+        { name = "PREDSEA_WRF_GEOG_RES", value = "modis_landuse_20class_30s_with_lakes+default" },
       ]
       parameters = {
         run_date       = "override-at-submission"
@@ -108,6 +53,7 @@ locals {
       ]
       environment = []
       parameters = {
+        region         = "western_mediterranean_2km"
         forecast_hours = "72"
         mpi_ranks      = "192" # Synchronized with vcpus = 192
         run_date       = "override-at-submission"
@@ -116,15 +62,12 @@ locals {
     }
   }
 
-  hpc_jobs = merge(
-    {
-      for name, spec in local.fixed_hpc_jobs : name => merge(spec, {
-        image_key = name
-        log_key   = name
-      })
-    },
-    local.croco_hpc_jobs,
-  )
+  hpc_jobs = {
+    for name, spec in local.fixed_hpc_jobs : name => merge(spec, {
+      image_key = name
+      log_key   = name
+    })
+  }
 }
 
 resource "aws_iam_role" "batch_instance" {
@@ -215,7 +158,7 @@ resource "aws_batch_compute_environment" "spot" {
     allocation_strategy = "SPOT_PRICE_CAPACITY_OPTIMIZED"
     min_vcpus           = 0
     desired_vcpus       = 0
-    max_vcpus           = 300 # Covers unified CROCO (192 vCPUs) and WW3 (64 vCPUs) concurrently.
+    max_vcpus           = 300 # Covers WRF (192 vCPUs) and WW3 (192 vCPUs) concurrently.
     instance_type       = var.batch_instance_types
     instance_role       = aws_iam_instance_profile.batch.arn
     spot_iam_fleet_role = aws_iam_role.batch_spot_fleet.arn
@@ -346,6 +289,6 @@ resource "aws_batch_job_definition" "model" {
   }
 
   timeout {
-    attempt_duration_seconds = each.key == "croco_western_mediterranean_1km" ? 604800 : (each.key == "ww3" ? 86400 : (each.key == "ecmwf" ? 3600 : (1800 + tonumber(try(each.value.parameters.forecast_hours, "6")) * 600)))
+    attempt_duration_seconds = each.key == "ww3" ? 86400 : (each.key == "ecmwf" ? 3600 : (1800 + tonumber(try(each.value.parameters.forecast_hours, "6")) * 600))
   }
 }

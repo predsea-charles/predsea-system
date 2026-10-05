@@ -1,7 +1,6 @@
 locals {
   model_tasks = {
     wrf   = {}
-    croco = {}
     ww3   = {}
     ecmwf = {}
   }

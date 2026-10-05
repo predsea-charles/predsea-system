@@ -1,0 +1,38 @@
+FROM python:3.11-slim
+
+# libeccodes-tools provides the `grib_set` CLI used by fetch_ecmwf_forcing.py
+# to repack ECMWF CCSDS-encoded GRIB2 files into simple packing before WPS/ungrib.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates curl awscli libeccodes-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/app
+
+WORKDIR /app
+
+# Packages needed by the orchestrator and the scripts it calls directly:
+#   fetch_ecmwf_forcing.py  → ecmwf-opendata, eccodes, boto3
+#   aws_orchestrator.py     → boto3
+#   generate_daily_briefing.py, export_validation_to_athena.py → boto3, pandas, PyAthena
+# Heavy scientific packages (netCDF4, matplotlib, scipy, etc.) are NOT needed here —
+# those run inside the WRF/WW3 containers that the EC2 Spot instance launches.
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir \
+        boto3>=1.34 \
+        botocore>=1.34 \
+        ecmwf-opendata>=0.3.30 \
+        eccodes>=2.36.0 \
+        pandas>=2.2 \
+        PyAthena>=3.8 \
+        pyarrow>=16.0 \
+        tenacity>=8.2 \
+        requests>=2.31 \
+        python-dotenv>=1.0
+
+# All scripts (orchestrator, ECMWF fetch, post-run steps).
+COPY scripts/ /app/scripts/
+COPY scripts/aws/ /app/scripts/aws/
+
+# Region metadata (used locally and referenced in the EC2 boot script).
+COPY simulation/marine/regions/ /app/simulation/marine/regions/
+
+ENTRYPOINT ["python3", "scripts/aws_daily_orchestrator.py"]

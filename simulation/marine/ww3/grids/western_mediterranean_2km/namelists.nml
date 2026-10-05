@@ -1,0 +1,4 @@
+! Intentionally minimal -- relying on WW3's documented defaults
+! for ST4/STAB2/BT4/PR3/UQ physics tunables (see switch_predsea.md
+! for the switch choices this pairs with). Revisit during Phase 1
+! validation if output looks physically off vs. the SWAN baseline.

@@ -3,16 +3,15 @@
 PredSea WW3 Wind Forcing Adapter from WRF d02 outputs.
 
 Extracts 10m wind fields (U10, V10) from WRF NetCDF outputs (e.g. wrfout_d02_*),
-interpolates them onto regular 1D lat-lon grids covering each of the 5 regional
-domains, and generates CF-compliant wind.nc plus the ww3_prnc.nml,
-ww3_shel.nml, and ww3_ounf.nml files required by WW3.
+interpolates them onto regular 1D lat-lon grids covering the target domain,
+and generates CF-compliant wind.nc plus the ww3_prnc.nml, ww3_shel.nml, and
+ww3_ounf.nml files required by WW3.
 
-Supported regions:
-  - alboran_1km
-  - algerian_1km
-  - balearic_1km
-  - gulf_of_lion_1km
-  - tyrrhenian_1km
+Active region:
+  - western_mediterranean_2km  (Gibraltar → Messina, lon -6..14, lat 35..44.5)
+
+Legacy 1km regions (kept for reference, not used in production):
+  - alboran_1km, algerian_1km, balearic_1km, gulf_of_lion_1km, tyrrhenian_1km
 """
 from __future__ import annotations
 
@@ -35,11 +34,13 @@ SEARCH_REGIONS_DIRS = [
 ]
 
 ALL_REGIONS = [
-    "alboran_1km",
-    "algerian_1km",
-    "balearic_1km",
-    "gulf_of_lion_1km",
-    "tyrrhenian_1km",
+    "western_mediterranean_2km",  # production — Gibraltar → Messina, lon -6..14, lat 35..44.5
+    # Legacy 1km sub-domains (not used in production WRF+WW3 pipeline):
+    # "alboran_1km",
+    # "algerian_1km",
+    # "balearic_1km",
+    # "gulf_of_lion_1km",
+    # "tyrrhenian_1km",
 ]
 
 
@@ -295,7 +296,7 @@ def main() -> int:
         "--regions",
         nargs="+",
         default=ALL_REGIONS,
-        help="Regions to generate forcing for (default: all 5 regions)",
+        help="Regions to generate forcing for (default: western_mediterranean_2km)",
     )
     parser.add_argument(
         "--output-base-dir",
