@@ -8,6 +8,7 @@ phases:
       - IMAGE_TAG=$(printf '%s' "$IMAGE_TAG" | cut -c1-12)
   build:
     commands:
+      - docker build --pull -f Dockerfile -t "$API_REPOSITORY:$IMAGE_TAG" -t "$API_REPOSITORY:latest" .
       - docker build --pull -f simulation/Dockerfile -t "$WRF_REPOSITORY:$IMAGE_TAG" -t "$WRF_REPOSITORY:latest" .
       - docker build --pull -f Dockerfile.ww3-batch -t predsea-ww3-base:$IMAGE_TAG .
       - docker build -f Dockerfile.ww3-aws --build-arg BASE_IMAGE=predsea-ww3-base:$IMAGE_TAG -t "$WW3_REPOSITORY:$IMAGE_TAG" -t "$WW3_REPOSITORY:latest" .
@@ -15,7 +16,14 @@ phases:
       - docker build --pull -f Dockerfile.orchestrator -t "$ORCHESTRATOR_REPOSITORY:$IMAGE_TAG" -t "$ORCHESTRATOR_REPOSITORY:latest" .
   post_build:
     commands:
+      - docker push --all-tags "$API_REPOSITORY"
       - docker push --all-tags "$WRF_REPOSITORY"
       - docker push --all-tags "$WW3_REPOSITORY"
       - docker push --all-tags "$ECMWF_REPOSITORY"
       - docker push --all-tags "$ORCHESTRATOR_REPOSITORY"
+      - |
+        aws apprunner start-deployment \
+          --service-arn $(aws apprunner list-services --region "$AWS_DEFAULT_REGION" \
+            --query 'ServiceSummaryList[?ServiceName==`predsea-api`].ServiceArn' \
+            --output text) \
+          --region "$AWS_DEFAULT_REGION" || true
