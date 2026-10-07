@@ -10,9 +10,18 @@ from files.route_store import RouteStore as _BaseRouteStore
 logger = logging.getLogger(__name__)
 
 try:
-    from api.config import DEFAULT_ROUTE_GCS_PREFIX
+    from api.config import DEFAULT_ROUTE_GCS_PREFIX, DEFAULT_ROUTE_S3_PREFIX, PREDSEA_STORAGE_BACKEND
 except ImportError:
     DEFAULT_ROUTE_GCS_PREFIX = "gs://predsea-daily-outputs/routes"
+    DEFAULT_ROUTE_S3_PREFIX = ""
+    PREDSEA_STORAGE_BACKEND = "gcs"
+
+# Use S3 prefix when running in AWS, fall back to GCS prefix otherwise.
+DEFAULT_ROUTE_PREFIX = (
+    DEFAULT_ROUTE_S3_PREFIX
+    if PREDSEA_STORAGE_BACKEND == "s3" and DEFAULT_ROUTE_S3_PREFIX
+    else DEFAULT_ROUTE_GCS_PREFIX
+)
 
 DEFAULT_API_TIMEZONE = "Europe/Madrid"
 
@@ -24,7 +33,7 @@ class RouteStore(_BaseRouteStore):
 
     def load_latest_from_gcs(
         self,
-        gcs_prefix: str = DEFAULT_ROUTE_GCS_PREFIX,
+        gcs_prefix: str = DEFAULT_ROUTE_PREFIX,
         preferred_date: Optional[str] = None,
         fallback_days: int = 7,
     ) -> Optional[str]:
@@ -53,7 +62,7 @@ class RouteStore(_BaseRouteStore):
 
     def ensure_loaded(
         self,
-        gcs_prefix: str = DEFAULT_ROUTE_GCS_PREFIX,
+        gcs_prefix: str = DEFAULT_ROUTE_PREFIX,
         preferred_date: Optional[str] = None,
         fallback_days: int = 7,
     ) -> Optional[str]:

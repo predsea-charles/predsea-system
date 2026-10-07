@@ -41,7 +41,10 @@ class RouteStore:
         )
 
     def load_from_gcs(self, gcs_prefix: str, date_str: str) -> None:
-        """Download and load route_results.json from GCS."""
+        """Download and load route_results.json from GCS or S3 (detected by prefix)."""
+        if gcs_prefix.startswith("s3://"):
+            self.load_from_s3(gcs_prefix, date_str)
+            return
         from google.cloud import storage
         path_in_bucket = f"{date_str}/route_results.json"
         bucket_name, prefix = gcs_prefix[5:].split("/", 1)
@@ -53,6 +56,20 @@ class RouteStore:
 
         local_path = f"/tmp/route_results_{date_str}.json"
         blob.download_to_filename(local_path)
+        self.load_from_file(local_path)
+
+    def load_from_s3(self, s3_prefix: str, date_str: str) -> None:
+        """Download and load route_results.json from S3."""
+        import os
+        import boto3
+        # s3_prefix is like s3://bucket-name/routes
+        without_scheme = s3_prefix[5:]  # "bucket-name/routes"
+        bucket_name, prefix = without_scheme.split("/", 1)
+        key = f"{prefix}/{date_str}/route_results.json".lstrip("/")
+
+        client = boto3.client("s3", region_name=os.environ.get("AWS_REGION", "eu-west-1"))
+        local_path = f"/tmp/route_results_{date_str}.json"
+        client.download_file(bucket_name, key, local_path)
         self.load_from_file(local_path)
 
     def get(
