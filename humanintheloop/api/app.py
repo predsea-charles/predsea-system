@@ -625,42 +625,52 @@ def load_place_weather_response(
             if not (wind_path and wind_path.exists()):
                 wind_path = None
             
-            # If files don't exist locally and we have GCS enabled, try to download them
-            if (not waves_path or not currents_path) and getattr(store, "storage_backend", None) == "gcs":
-                logger.info("Local NetCDF files missing; attempting to resolve from GCS for coordinate sampling.")
-                bucket_name = store.bucket_name
-                # Try to find latest or specific run NetCDF files in GCS
-                # Structure: gs://bucket/copernicus/waves_latest.nc
-                try:
-                    from google.cloud import storage
-                    client = storage.Client()
-                    bucket = client.bucket(bucket_name)
-                    
-                    temp_dir = Path(tempfile.gettempdir()) / "predsea_forecasts"
-                    temp_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    # Download waves
-                    if not waves_path:
-                        waves_blob = bucket.blob("copernicus/waves_latest.nc")
-                        if waves_blob.exists():
-                            waves_path = temp_dir / "waves_latest.nc"
-                            waves_blob.download_to_filename(str(waves_path))
-                    
-                    # Download currents
-                    if not currents_path:
-                        currents_blob = bucket.blob("copernicus/currents_latest.nc")
-                        if currents_blob.exists():
-                            currents_path = temp_dir / "currents_latest.nc"
-                            currents_blob.download_to_filename(str(currents_path))
-                    
-                    # Download wind (optional)
-                    if not wind_path:
-                        wind_blob = bucket.blob("ecmwf/wind_latest.nc")
-                        if wind_blob.exists():
-                            wind_path = temp_dir / "wind_latest.nc"
-                            wind_blob.download_to_filename(str(wind_path))
-                except Exception as gcs_err:
-                    logger.warning("Failed to download NetCDF files from GCS: %s", gcs_err)
+            # If files don't exist locally, try to download them from the object store (S3 or GCS)
+            if not waves_path or not currents_path:
+                backend = getattr(store, "storage_backend", None)
+                bucket_name = getattr(store, "bucket_name", None)
+                if backend and bucket_name:
+                    logger.info("Local NetCDF files missing; attempting to resolve from %s for coordinate sampling.", backend.upper())
+                    try:
+                        temp_dir = Path(tempfile.gettempdir()) / "predsea_forecasts"
+                        temp_dir.mkdir(parents=True, exist_ok=True)
+
+                        if backend == "s3":
+                            import boto3
+                            s3 = boto3.client("s3", region_name=os.environ.get("AWS_REGION", "eu-west-1"))
+                            def _s3_download(key, dest):
+                                try:
+                                    s3.download_file(bucket_name, key, str(dest))
+                                    return dest
+                                except Exception:
+                                    return None
+                            if not waves_path:
+                                waves_path = _s3_download("copernicus/waves_latest.nc", temp_dir / "waves_latest.nc")
+                            if not currents_path:
+                                currents_path = _s3_download("copernicus/currents_latest.nc", temp_dir / "currents_latest.nc")
+                            if not wind_path:
+                                wind_path = _s3_download("ecmwf/wind_latest.nc", temp_dir / "wind_latest.nc")
+                        elif backend == "gcs":
+                            from google.cloud import storage as gcs_storage
+                            client = gcs_storage.Client()
+                            bucket = client.bucket(bucket_name)
+                            if not waves_path:
+                                blob = bucket.blob("copernicus/waves_latest.nc")
+                                if blob.exists():
+                                    waves_path = temp_dir / "waves_latest.nc"
+                                    blob.download_to_filename(str(waves_path))
+                            if not currents_path:
+                                blob = bucket.blob("copernicus/currents_latest.nc")
+                                if blob.exists():
+                                    currents_path = temp_dir / "currents_latest.nc"
+                                    blob.download_to_filename(str(currents_path))
+                            if not wind_path:
+                                blob = bucket.blob("ecmwf/wind_latest.nc")
+                                if blob.exists():
+                                    wind_path = temp_dir / "wind_latest.nc"
+                                    blob.download_to_filename(str(wind_path))
+                    except Exception as dl_err:
+                        logger.warning("Failed to download NetCDF files from %s: %s", backend.upper(), dl_err)
 
             if waves_path and currents_path:
                 payload = place_weather.build_place_weather_bundle_from_files(
@@ -1379,41 +1389,53 @@ def ensure_forecast_files_fresh(target_date_str: str) -> None:
                 logger.warning("Error checking local NC files coverage for %s: %s. Triggering fallback update.", target_date_str, e)
                 
         if needs_download:
-            # 1. Try fast download of latest forecast files from GCS
-            logger.info("Attempting fast download of latest forecast NC files from GCS...")
+            # 1. Try fast download of latest forecast files from S3 (or GCS as fallback)
+            storage_backend = os.environ.get("PREDSEA_STORAGE_BACKEND", "s3")
+            bucket_name = os.environ.get(
+                "PREDSEA_S3_BUCKET" if storage_backend == "s3" else "PREDSEA_GCS_BUCKET",
+                "predsea-daily-outputs",
+            )
+            logger.info("Attempting fast download of latest forecast NC files from %s...", storage_backend.upper())
             try:
-                from google.cloud import storage
-                bucket_name = os.environ.get("PREDSEA_GCS_BUCKET", "predsea-daily-outputs")
-                client = storage.Client()
-                bucket = client.bucket(bucket_name)
-                
-                waves_blob = bucket.blob("copernicus/waves_latest.nc")
-                currents_blob = bucket.blob("copernicus/currents_latest.nc")
-                
-                # Ensure local parent directory exists
                 waves_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                # Check if they exist on GCS first
-                if waves_blob.exists() and currents_blob.exists():
-                    logger.info("Found latest forecast NC files on GCS. Downloading...")
-                    waves_blob.download_to_filename(str(waves_path))
-                    currents_blob.download_to_filename(str(currents_path))
-                    logger.info("Successfully downloaded latest forecast NC files from GCS.")
-                    
-                    # Verify if GCS files covered target_date
+                downloaded = False
+
+                if storage_backend == "s3":
+                    import boto3
+                    s3 = boto3.client("s3", region_name=os.environ.get("AWS_REGION", "eu-west-1"))
+                    try:
+                        s3.download_file(bucket_name, "copernicus/waves_latest.nc", str(waves_path))
+                        s3.download_file(bucket_name, "copernicus/currents_latest.nc", str(currents_path))
+                        downloaded = True
+                        logger.info("Successfully downloaded latest forecast NC files from S3.")
+                    except Exception as s3_err:
+                        logger.info("Latest forecast NC files not found on S3: %s", s3_err)
+                else:
+                    from google.cloud import storage as gcs_storage
+                    client = gcs_storage.Client()
+                    bucket = client.bucket(bucket_name)
+                    waves_blob = bucket.blob("copernicus/waves_latest.nc")
+                    currents_blob = bucket.blob("copernicus/currents_latest.nc")
+                    if waves_blob.exists() and currents_blob.exists():
+                        waves_blob.download_to_filename(str(waves_path))
+                        currents_blob.download_to_filename(str(currents_path))
+                        downloaded = True
+                        logger.info("Successfully downloaded latest forecast NC files from GCS.")
+                    else:
+                        logger.info("Latest forecast NC files not found on GCS.")
+
+                if downloaded:
                     with xr.open_dataset(waves_path) as ds_waves:
                         waves_dates = pd.to_datetime(ds_waves["time"].values).date
                         if pd.to_datetime(target_date_str).date() in waves_dates:
-                            logger.info("Target date %s is covered by downloaded GCS forecast. Reloading router cache.", target_date_str)
+                            logger.info("Target date %s is covered by downloaded forecast. Reloading router cache.", target_date_str)
                             AStarWeatherRouter.clear_cache()
                             return
                         else:
-                            logger.info("Target date %s is NOT covered by downloaded GCS forecast. Falling back to Copernicus Marine live subsetting.", target_date_str)
-                else:
-                    logger.info("Latest forecast NC files not found at expected GCS location.")
+                            logger.info("Target date %s is NOT covered by downloaded forecast. Falling back to Copernicus Marine live subsetting.", target_date_str)
             except Exception as e:
-                logger.warning("Failed to download or verify forecast files from GCS: %s", e)
-                
+                logger.warning("Failed to download or verify forecast files from %s: %s", storage_backend.upper(), e)
+
             # 2. Fallback to Copernicus Marine live subsetting (may take 1-2 minutes)
             try:
                 logger.info("Triggering live Copernicus Marine subsetting download...")

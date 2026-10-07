@@ -14,17 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Cloud SDK (gcloud CLI)
-RUN curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz > /tmp/google-cloud-sdk.tar.gz \
-    && tar -xzf /tmp/google-cloud-sdk.tar.gz -C /root \
-    && /root/google-cloud-sdk/install.sh --quiet \
-    && rm /tmp/google-cloud-sdk.tar.gz \
-    && ln -sf /usr/local/bin/python3 /usr/bin/python3 \
-    && ln -sf /usr/local/bin/python /usr/bin/python
-ENV PATH="/root/google-cloud-sdk/bin:${PATH}"
-
-
-
 
 
 # Set up environment variables
