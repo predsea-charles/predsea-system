@@ -1641,12 +1641,13 @@ def create_app(evidence_store=None, route_store=None):
 
     @app.get("/health", response_model=HealthResponse)
     def health():
+        latest_date = None
+        latest_run = None
         try:
             latest_date = store.latest_date()
             latest_run = store.latest_run(latest_date)
-        except EvidenceNotFoundError:
-            latest_date = None
-            latest_run = None
+        except Exception:
+            pass
         return {
             "status": "ok",
             "latest_date": latest_date,
