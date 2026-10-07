@@ -285,7 +285,23 @@ resource "aws_batch_job_definition" "model" {
   })
 
   retry_strategy {
-    attempts = each.key == "ww3" ? 2 : 1
+    attempts = each.key == "wrf" ? 3 : (each.key == "ww3" ? 2 : 1)
+
+    # Retry on Spot interruption; exit immediately on real failures.
+    dynamic "evaluate_on_exit" {
+      for_each = each.key == "wrf" ? [1] : []
+      content {
+        on_reason = "Host EC2*"
+        action    = "RETRY"
+      }
+    }
+    dynamic "evaluate_on_exit" {
+      for_each = each.key == "wrf" ? [1] : []
+      content {
+        on_exit_code = "0"
+        action       = "EXIT"
+      }
+    }
   }
 
   timeout {
