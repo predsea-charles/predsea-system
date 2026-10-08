@@ -37,7 +37,7 @@ COPY . .
 
 # Ensure simulation/inputs directory exists and populate with the static reference bathymetry grids
 RUN mkdir -p /app/simulation/inputs && \
-    cp /app/assets/static_grids/balearic_bathymetry_*.nc /app/simulation/inputs/
+    cp /app/assets/static_grids/balearic_bathymetry_*.nc /app/simulation/inputs/ 2>/dev/null || true
 
 # Set default ports and run arguments
 EXPOSE 8080
