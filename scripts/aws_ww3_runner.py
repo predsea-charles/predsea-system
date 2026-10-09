@@ -30,24 +30,14 @@ def main() -> int:
     work.mkdir(parents=True, exist_ok=True)
     grid_prefix = f"s3://{args.s3_bucket}/static/native-marine/{args.region}/ww3-grid/"
     forcing_prefix = f"s3://{args.s3_bucket}/forcing/ww3/{args.run_date}/{args.region}/"
-    wrf_prefix = f"s3://{args.s3_bucket}/predictions/{args.run_date}/runs/{args.run_id}/wrf/"
     output_prefix = f"s3://{args.s3_bucket}/predictions/{args.run_date}/runs/{args.run_id}/{args.region}/"
     run(["aws", "s3", "sync", grid_prefix, str(work), "--only-show-errors"])
-    # NOTE: forcing is ALWAYS regenerated fresh, never reused from a prior
-    # run's cache. forcing_prefix is keyed by (run_date, region) only, not
-    # run_id or forecast_hours -- caching by wind.nc-exists here previously
-    # caused a real bug: a short canary run and a later full-length run on
-    # the same run_date silently reused the canary's short forcing, giving
-    # a false "SUCCEEDED" on a run that actually simulated a fraction of
-    # the requested forecast length. Regeneration is cheap (~seconds), so
-    # there's no real cost to always doing it fresh.
-    wrf_dir = Path("/workspace/inputs/wrf")
-    generated = Path("/workspace/inputs/ww3")
-    run(["aws", "s3", "sync", wrf_prefix, str(wrf_dir), "--exclude", "*", "--include", "wrfout_d02_*", "--only-show-errors"])
-    run(["python3", "/app/scripts/prepare_ww3_wind_from_wrf.py", "--wrf-dir", str(wrf_dir), "--output-base-dir", str(generated), "--regions", args.region])
-    region_forcing = generated / args.region
-    run(["aws", "s3", "sync", str(region_forcing), forcing_prefix, "--only-show-errors"])
-    run(["cp", "-r", f"{region_forcing}/.", str(work)])
+    # Download pre-generated WW3 wind forcing (wind.nc + namelists, only ~MB).
+    # The WRF job now generates and uploads these files after WRF completes,
+    # while the wrfout_d02 files are still local. This replaces the previous
+    # 68 GB wrfout_d02 download that made this job vulnerable to spot
+    # instance terminations.
+    run(["aws", "s3", "sync", forcing_prefix, str(work), "--only-show-errors"])
     for required in ("mod_def.ww3", "wind.nc", "ww3_prnc.nml", "ww3_shel.nml", "ww3_ounf.nml"):
         path = work / required
         if not path.is_file() or path.stat().st_size == 0:

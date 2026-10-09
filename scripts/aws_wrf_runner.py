@@ -51,6 +51,24 @@ def main() -> int:
     prefix = f"s3://{args.s3_bucket}/predictions/{args.run_date}/runs/{args.run_id}/wrf/"
     (output / "WRF_SUCCESS").write_text("status=SUCCESS\n", encoding="utf-8")
     run(["aws", "s3", "sync", str(output), prefix, "--only-show-errors"])
+
+    # Generate WW3 wind forcing while wrfout_d02 files are still local.
+    # This uploads wind.nc + namelist files (~MB) to S3 so the WW3 job
+    # can skip downloading the full ~68 GB of wrfout_d02 output.
+    ww3_forcing_base = Path("/workspace/inputs/ww3_forcing")
+    run([
+        "python3", "/app/scripts/prepare_ww3_wind_from_wrf.py",
+        "--wrf-dir", str(output),
+        "--output-base-dir", str(ww3_forcing_base),
+    ])
+    for region_dir in sorted(ww3_forcing_base.iterdir()):
+        if region_dir.is_dir():
+            ww3_forcing_prefix = (
+                f"s3://{args.s3_bucket}/forcing/ww3/{args.run_date}/{region_dir.name}/"
+            )
+            run(["aws", "s3", "sync", str(region_dir), ww3_forcing_prefix, "--only-show-errors"])
+            print(f"Uploaded WW3 wind forcing for {region_dir.name} to {ww3_forcing_prefix}", flush=True)
+
     return 0
 
 

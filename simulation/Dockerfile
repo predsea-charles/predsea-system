@@ -123,6 +123,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
+# scipy + xarray are needed by prepare_ww3_wind_from_wrf.py which now runs
+# inside this container at the end of the WRF job (while wrfout_d02 files
+# are still local), generating wind forcing for WW3 to avoid a 68 GB download.
+RUN pip3 install --no-cache-dir --break-system-packages scipy xarray
+
 RUN mpirun --version
 
 RUN mkdir -p /opt/predsea/bin
@@ -140,6 +145,10 @@ COPY simulation/Vtable.ECMWF_grib2 /data/Vtable.ECMWF_grib2
 COPY simulation/setup_domain.py /opt/predsea/setup_domain.py
 COPY simulation/run_pipeline.sh /opt/predsea/run_pipeline.sh
 COPY scripts/aws_wrf_runner.py /opt/predsea/aws_wrf_runner.py
+# Wind-forcing prep script (run after WRF, before WW3 job)
+COPY scripts/prepare_ww3_wind_from_wrf.py /app/scripts/prepare_ww3_wind_from_wrf.py
+# Region profiles required by prepare_ww3_wind_from_wrf.py (searched at /app/simulation/marine/regions)
+COPY simulation/marine/regions /app/simulation/marine/regions
 
 WORKDIR /workspace
 
