@@ -6,35 +6,26 @@ PredSea is a marine forecasting system:
 
 ECMWF
   ↓
-WRF
-  ↓
-CROCO
-  ↓
-WW3
+WRF  (AWS Batch, predsea-models-canary queue)
+  ↓ (wind forcing generated here — wind.nc uploaded to S3 forcing/ww3/)
+WW3  (AWS Batch, predsea-models-canary queue)
   ↓
 Validation
   ↓
-S3 / Athena / API
+S3 / Athena / API (App Runner)
+
+Active region: `western_mediterranean_2km`
+
+CROCO has been removed from the pipeline.
 
 ## Source of truth
 
 Before making recommendations:
 
-1. Read `aws-etl-and-simulation.md`.
+1. Read `docs/aws-etl-and-simulation.md`.
 2. Inspect the actual repository.
 3. Never assume the documentation is correct.
 4. Report discrepancies between documentation and implementation.
-
-## CROCO
-
-PredSea currently uses five regional CROCO domains.
-
-Never:
-- replace canonical grids without approval
-- change grid versions silently
-- change MPI decomposition without approval
-- modify forcing/boundary-condition logic without tests
-- declare CROCO scientifically valid merely because it exits successfully
 
 ## Safety
 
